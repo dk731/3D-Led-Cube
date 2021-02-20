@@ -15,10 +15,10 @@ real_h = real_w / 2
 real_z = 3
 real_stripw = real_h / 2.5
 
-speed = 0.002
+speed = 0.001
 offset = 0
 
-resolution = 1
+resolution = 1.5
 
 visible_size = math.tau
 
@@ -30,8 +30,9 @@ while True:
 
     cur_y = -real_h
     cur_z = 0
-
+    count = 0
     while cur_y <= real_h:
+        count += 1
         cd.set_color(white if abs(cur_y) < real_stripw else red)
         z_val = (
             math.sin((cur_y + real_h) / (real_h * 2) * visible_size + offset) * real_z
@@ -39,6 +40,7 @@ while True:
         cd.line((-real_w, cur_y, z_val), (real_w, cur_y, z_val))
         cur_y += max(z_val / real_z * resolution, min_step)
         offset += speed
+    print(count)
     cd.show()
 # while True:
 #     cd.clear()

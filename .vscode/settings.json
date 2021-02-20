@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.py": "python",
+        "helper.h": "c"
+    },
+    "python.pythonPath": "/usr/local/bin/python3.9"
+}

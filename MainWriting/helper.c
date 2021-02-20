@@ -1,4 +1,4 @@
-#include "smi_dev.h"
+#include "helper.h"
 
 int mmap_mem()
 {
@@ -193,7 +193,7 @@ void set_led(char *grb, int n)
 
 int init_shm()
 {
-    int shm_id = shm_open("VirtualCubeSHMemmory", O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
+    int shm_id = shm_open("VirtualCubeSHMemmory", O_RDWR | O_CREAT, 0);
     if (shm_id < 0)
     {
         printf("\033[38;2;255;0;0mERROR\x1b[0m Unable to create shared memmory object\n");

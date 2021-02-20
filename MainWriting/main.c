@@ -1,4 +1,4 @@
-#include "smi_dev.h"
+#include "helper.h"
 
 int main()
 {

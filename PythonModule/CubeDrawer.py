@@ -1,7 +1,8 @@
-from multiprocessing import shared_memory, Semaphore
+from multiprocessing import shared_memory
 from math import floor, pi, sin, cos
 import ast
 import warnings
+import numpy as np
 
 
 class CubeDrawer:
@@ -27,10 +28,12 @@ class CubeDrawer:
 
     def _init_drawing_(self):
         self.transform_list = list()
-        self.colors = bytearray(16 ** 3)
         self.current_color = (255, 255, 255)
+        self.colors = bytearray(16 ** 3)
 
-        self.shm_obj.buf[-1] = 0b00000100 if self._is_sync else 0b00000000
+        self.shm_obj.buf[-1] = (
+            0b00000100 if self._is_sync else 0b00000000
+        )  # set sync flag
 
     def show(self):
         while self.shm_obj.buf[-1] & 0b00000010:
@@ -61,51 +64,86 @@ class CubeDrawer:
         )
 
     def pixel_at(self, p):
-        pp = [a for a in p]
+        pp = np.append(np.array(p, np.single), np.array([1]))
         for tran in self.transform_list:
-            xx, yy, zz = pp
-            rx, ry, rz = tran[1]
-            pp[0] = (
-                (cos(rx) * cos(ry) * cos(rz) - sin(rx) * sin(rz)) * xx
-                + (sin(rx) * cos(ry) * cos(rz) + cos(rx) * sin(rz)) * yy
-                + (-sin(ry) * cos(rz)) * zz
-            )
+            if tran["recalc"]:
+                tran["model_m"] = tran["trans"] @ tran["rot"] @ tran["scale"]
+                tran["recalc"] = False
+            pp = tran["model_m"] @ pp
 
-            pp[1] = (
-                (-cos(rx) * cos(ry) * sin(rz) - sin(rx) * cos(rz)) * xx
-                + (-sin(rx) * cos(ry) * sin(rz) + cos(rx) * cos(rz)) * yy
-                + (sin(ry) * sin(rz)) * zz
-            )
-
-            pp[2] = (cos(rx) * sin(ry)) * xx + (sin(rx) * sin(ry)) * yy + (cos(ry)) * zz
-
-            pp[0] += tran[0][0]
-            pp[1] += tran[0][1]
-            pp[2] += tran[0][2]
-
-        pp = (floor(pp[0] + 0.5), floor(pp[1] + 0.5), floor(pp[2] + 0.5))
+        pp = [round(pp[x]) for x in range(3)]
 
         for a in pp:
             if a not in range(16):
                 return
 
-        cur_p = (self.size[2] * self.size[1] * pp[2] + self.size[0] * pp[1] + pp[0]) * 3
+        cur_p = ((pp[2] * 16 + pp[1]) * 16 + pp[0]) * 3
+
         self.colors[cur_p] = self.current_color[0]
         self.colors[cur_p + 1] = self.current_color[1]
         self.colors[cur_p + 2] = self.current_color[2]
 
     def push_matrix(self):
-        self.transform_list.append([[0, 0, 0], [0, 0, 0], [1, 1, 1]])
+        self.transform_list.append(
+            {
+                "trans": np.identity(4),
+                "rot": np.identity(4),
+                "scale": np.identity(4),
+                "model_m": np.identity(4),
+                "cur_angle": [0 for _ in range(3)],
+                "recalc": False,
+            }
+        )
 
     def translate(self, p):
-        self.transform_list[-1][0][0] += p[0]
-        self.transform_list[-1][0][1] += p[1]
-        self.transform_list[-1][0][2] += p[2]
+        # self.transform_list[-1][0][0] += p[0]
+        # self.transform_list[-1][0][1] += p[1]
+        # self.transform_list[-1][0][2] += p[2]
+        cur_mat = self.transform_list[-1]["trans"]
+        cur_mat[0][3] += p[0]
+        cur_mat[1][3] += p[1]
+        cur_mat[2][3] += p[2]
+        self.transform_list[-1]["recalc"] = True
 
     def rotate(self, p):  # Radians
-        self.transform_list[-1][1][0] += p[0]
-        self.transform_list[-1][1][1] += p[1]
-        self.transform_list[-1][1][2] += p[2]
+        # self.transform_list[-1][1][0] += p[0]
+        # self.transform_list[-1][1][1] += p[1]
+        # self.transform_list[-1][1][2] += p[2]
+        self.transform_list[-1]["cur_angle"] = [(x + y) for x, y in zip(p, self.transform_list[-1]["cur_angle"])]
+        cur_agnle = self.transform_list[-1]["cur_angle"]
+
+        cur_mat = self.transform_list[-1]["rot"]
+
+        cur_mat[0][0] = np.cos(cur_agnle[2]) * np.cos(cur_agnle[1])
+        cur_mat[0][1] = np.cos(cur_agnle[2]) * np.sin(cur_agnle[1]) * np.sin(
+            cur_agnle[0]
+        ) - np.sin(cur_agnle[2]) * np.cos(cur_agnle[0])
+        cur_mat[0][2] = np.cos(cur_agnle[2]) * np.sin(cur_agnle[1]) * np.cos(
+            cur_agnle[0]
+        ) + np.sin(cur_agnle[2]) * np.sin(cur_agnle[0])
+
+        cur_mat[1][0] = np.sin(cur_agnle[2]) * np.cos(cur_agnle[1])
+        cur_mat[1][1] = np.sin(cur_agnle[2]) * np.sin(cur_agnle[1]) * np.sin(
+            cur_agnle[0]
+        ) + np.cos(cur_agnle[2]) * np.cos(cur_agnle[0])
+        cur_mat[1][2] = np.sin(cur_agnle[2]) * np.sin(cur_agnle[1]) * np.cos(
+            cur_agnle[0]
+        ) + np.cos(cur_agnle[2]) * np.sin(cur_agnle[0])
+
+        cur_mat[2][0] = -np.sin(cur_agnle[1])
+        cur_mat[2][1] = np.cos(cur_agnle[1]) * np.sin(cur_agnle[0])
+        cur_mat[2][2] = np.cos(cur_agnle[1]) * np.cos(cur_agnle[0])
+
+        self.transform_list[-1]["recalc"] = True
+
+    def scale(self, p):
+        cur_mat = self.transform_list[-1]["scale"]
+
+        cur_mat[0][0] *= p[0]
+        cur_mat[1][1] *= p[1]
+        cur_mat[2][2] *= p[2]
+
+        self.transform_list[-1]["recalc"] = True
 
     def pop_matrix(self):
         if len(self.transform_list) > 0:
@@ -178,6 +216,3 @@ class CubeDrawer:
         self.pixel_at([p[0] - radius, p[1], p[2]])
         self.pixel_at([p[0], p[1] + radius, p[2]])
         self.pixel_at([p[0], p[1] - radius, p[2]])
-
-    def __del__(self):
-        self.shm_obj.close()
