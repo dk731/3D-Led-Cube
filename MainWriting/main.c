@@ -11,5 +11,7 @@ int main()
         usleep(5000000);
     }
 
+    cblas_dgemm();
+
     exit(0);
 }

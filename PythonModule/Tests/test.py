@@ -6,23 +6,24 @@ import math
 
 red = (193, 0, 0)
 white = (255, 255, 255)
-cd = CubeDrawer(brigthness=0.05, sync=True)
+cd = CubeDrawer(brigthness=0.5, sync=True)
 cd.push_matrix()
-cd.translate((7.5, 7, 3.5))
+cd.translate((7, 7, 3.5))
 
 real_w = 12
 real_h = real_w / 2
 real_z = 3
 real_stripw = real_h / 2.5
 
-speed = 0.001
+speed = 0.005
+# speed = 0
 offset = 0
 
 resolution = 1.5
 
 visible_size = math.tau
 
-min_step = 0.1
+min_step = 0.15
 
 while True:
     cd.clear()
@@ -38,9 +39,9 @@ while True:
             math.sin((cur_y + real_h) / (real_h * 2) * visible_size + offset) * real_z
         )
         cd.line((-real_w, cur_y, z_val), (real_w, cur_y, z_val))
-        cur_y += max(z_val / real_z * resolution, min_step)
+        cur_y += max(z_val / real_z, min_step) * resolution
         offset += speed
-    print(count)
+    # print(count)
     cd.show()
 # while True:
 #     cd.clear()

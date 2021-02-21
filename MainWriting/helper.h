@@ -14,6 +14,8 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 
+// #include "../../OpenBLAS/cblas.h"
+
 #define PAGE_SIZE 0x1000
 
 #define PHYS_REG_BASE 0x3F000000
@@ -38,6 +40,7 @@
 #define SMI_DMC 0x30
 #define SMI_DCS 0x34
 #define SMI_DCA 0x38
+
 #define SMI_DCD 0x3c
 #define SMI_FD 0x40
 

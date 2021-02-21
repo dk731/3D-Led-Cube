@@ -53,9 +53,6 @@ class CubeDrawer:
         else:
             self.colors = bytearray(self.size[0] * self.size[1] * self.size[2] * 3)
 
-    def set_size(self, size):
-        self.cursor_size = size
-
     def set_color(self, color):
         self.current_color = (
             round(color[1] * self.brigthness),
@@ -109,7 +106,9 @@ class CubeDrawer:
         # self.transform_list[-1][1][0] += p[0]
         # self.transform_list[-1][1][1] += p[1]
         # self.transform_list[-1][1][2] += p[2]
-        self.transform_list[-1]["cur_angle"] = [(x + y) for x, y in zip(p, self.transform_list[-1]["cur_angle"])]
+        self.transform_list[-1]["cur_angle"] = [
+            (x + y) for x, y in zip(p, self.transform_list[-1]["cur_angle"])
+        ]
         cur_agnle = self.transform_list[-1]["cur_angle"]
 
         cur_mat = self.transform_list[-1]["rot"]
@@ -171,18 +170,18 @@ class CubeDrawer:
         self.line(p1, [p1[0], p2[0], p1[2]])
         self.line(p1, [p1[0], p1[0], p2[2]])
 
-        self.line(p2, [p1[0], p2[0], p2[2]])
-        self.line(p2, [p2[0], p1[0], p2[2]])
-        self.line(p2, [p2[0], p2[0], p1[2]])
+        self.line(p2, [p1[0], p2[1], p2[2]])
+        self.line(p2, [p2[0], p1[1], p2[2]])
+        self.line(p2, [p2[0], p2[1], p1[2]])
 
-        self.line([p2[0], p1[0], p1[2]], [p1[0], p2[0], p2[2]])
-        self.line([p2[0], p1[0], p1[2]], [p2[0], p1[0], p2[2]])
+        self.line([p1[0], p1[1], p2[2]], [p2[0], p1[1], p2[2]])
+        self.line([p1[0], p1[1], p2[2]], [p1[0], p2[1], p2[2]])
 
-        self.line([p1[0], p2[0], p1[2]], [p1[0], p2[0], p2[2]])
-        self.line([p1[0], p2[0], p1[2]], [p2[0], p1[0], p2[2]])
+        self.line([p1[0], p2[1], p1[2]], [p2[0], p2[1], p1[2]])
+        self.line([p1[0], p2[1], p1[2]], [p1[0], p2[1], p2[2]])
 
-        self.line([p1[0], p1[0], p2[2]], [p1[0], p2[0], p2[2]])
-        self.line([p1[0], p1[0], p2[2]], [p2[0], p1[0], p2[2]])
+        self.line([p2[0], p1[1], p1[2]], [p2[0], p1[1], p2[2]])
+        self.line([p2[0], p1[1], p1[2]], [p2[0], p2[1], p1[2]])
 
     def circle(self, p, radius):
         x = radius
