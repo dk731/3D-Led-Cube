@@ -14,8 +14,6 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 
-// #include "../../OpenBLAS/cblas.h"
-
 #define PAGE_SIZE 0x1000
 
 #define PHYS_REG_BASE 0x3F000000
@@ -161,7 +159,7 @@ typedef struct smi_obj_struct
 
 typedef struct shm_flags
 {
-    uint8_t frame_ready : 1, lock : 1, sync : 1, other : 5;
+    uint8_t frame_shown : 1, lock : 1, other : 6;
 } shm_flags;
 
 typedef struct buf_struct

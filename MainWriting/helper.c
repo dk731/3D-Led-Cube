@@ -214,7 +214,7 @@ int init_shm()
         return 1;
     }
 
-    shm_buf->flags.frame_ready = 0;
+    shm_buf->flags.lock = 1;
 
     printf("\033[38;2;0;255;0mOK\x1b[0m Successfully initialized shared memmory object\n");
     return 0;
@@ -225,19 +225,18 @@ void *writer_thread(void *vargp)
     printf("starting thread\n");
     while (1)
     {
-
-        while (!shm_buf->flags.frame_ready)
-            ;
-
         memset(smi_obj.tmp_buf, 0, RGB_DATA_SIZE);
 
         for (int i = 0; i < (RGB_DATA_SIZE >> 3); i++)
             smi_obj.tmp_buf[i << 2] = 0xffff;
 
-        int tmpx;
-        int tmpz;
+        while (shm_buf->flags.lock || shm_buf->flags.frame_shown)
+            usleep(100);
 
         shm_buf->flags.lock = 1;
+
+        int tmpx;
+        int tmpz;
 
         for (int y = 15; y >= 0; y--)
         {
@@ -277,11 +276,11 @@ void *writer_thread(void *vargp)
             }
         }
 
+        // printf("Remove lock\n");
+
+        shm_buf->flags.frame_shown = 1;
         shm_buf->flags.lock = 0;
         draw();
-
-        if (shm_buf->flags.sync)
-            shm_buf->flags.frame_ready = 0;
     }
 }
 

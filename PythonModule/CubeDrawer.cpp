@@ -131,13 +131,14 @@ void CubeDrawer::calc_transform(double *cur_vec)
     {
         Transform *cur_trans = transform_list[i];
         double temp_mat[16];
+
         if (cur_trans->need_recalc)
         {
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 4, 4, 4, 1.0, cur_trans->translation, 4, cur_trans->rotation, 4, 0.0, temp_mat, 4);
-            cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 4, 4, 4, 1.0, temp_mat, 4, cur_trans->rotation, 4, 0.0, cur_trans->final, 4);
+            cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 4, 4, 4, 1.0, temp_mat, 4, cur_trans->scale, 4, 0.0, cur_trans->final, 4);
         }
 
-        cblas_dgemv(CblasRowMajor, CblasNoTrans, 4, 4, 1.0, cur_trans->final, 4, cur_vec, 1.0, 0.0, tmp_vec, 1.0);
+        cblas_dgemv(CblasRowMajor, CblasNoTrans, 4, 4, 1.0, cur_trans->final, 4, cur_vec, 1, 0.0, tmp_vec, 1);
         memcpy(cur_vec, tmp_vec, sizeof(double) << 2);
     }
     // std::cout << "Output vector: (" << cur_vec[0] << ", " << cur_vec[1] << ", " << cur_vec[2] << ")" << std::endl;
@@ -241,12 +242,17 @@ void CubeDrawer::rotate(double x, double y, double z)
     cur_trans[0] = cos(trans_obj->rz) * cos(trans_obj->ry);
     cur_trans[1] = cos(trans_obj->rz) * sin(trans_obj->ry) * sin(trans_obj->rx) - sin(trans_obj->rz) * cos(trans_obj->rx);
     cur_trans[2] = cos(trans_obj->rz) * sin(trans_obj->ry) * cos(trans_obj->rx) + sin(trans_obj->rz) * sin(trans_obj->rx);
-    cur_trans[3] = sin(trans_obj->rz) * cos(trans_obj->ry);
-    cur_trans[4] = sin(trans_obj->rz) * sin(trans_obj->ry) * sin(trans_obj->rx) + cos(trans_obj->rz) * cos(trans_obj->rx);
-    cur_trans[5] = sin(trans_obj->rz) * sin(trans_obj->ry) * cos(trans_obj->rx) + cos(trans_obj->rz) * sin(trans_obj->rx);
-    cur_trans[6] = -sin(trans_obj->ry);
-    cur_trans[7] = cos(trans_obj->ry) * sin(trans_obj->rx);
-    cur_trans[8] = cos(trans_obj->ry) * cos(trans_obj->rx);
+    cur_trans[4] = sin(trans_obj->rz) * cos(trans_obj->ry);
+    cur_trans[5] = sin(trans_obj->rz) * sin(trans_obj->ry) * sin(trans_obj->rx) + cos(trans_obj->rz) * cos(trans_obj->rx);
+    cur_trans[6] = sin(trans_obj->rz) * sin(trans_obj->ry) * cos(trans_obj->rx) + cos(trans_obj->rz) * sin(trans_obj->rx);
+    cur_trans[8] = -sin(trans_obj->ry);
+    cur_trans[9] = cos(trans_obj->ry) * sin(trans_obj->rx);
+    cur_trans[10] = cos(trans_obj->ry) * cos(trans_obj->rx);
+
+    // COUT_VECTOR("Angles", (&trans_obj->rx))
+    // COUT_VECTOR("1]", (&cur_trans[0]))
+    // COUT_VECTOR("2]", (&cur_trans[4]))
+    // COUT_VECTOR("3]", (&cur_trans[8]))
 
     trans_obj->need_recalc = true;
 }
@@ -308,51 +314,67 @@ void CubeDrawer::clear(PyObject *input)
 void CubeDrawer::show()
 {
     while (shm_buf->flags.lock || (is_sync && !shm_buf->flags.frame_shown))
-        ;
+        usleep(100);
+    // {
+    //     std::cout << "Lock: " << shm_buf->flags.lock << " shown: " << shm_buf->flags.frame_shown << std::endl;
+    // }
 
     shm_buf->flags.lock = 1;
     memcpy(shm_buf->buf, back_buf, 12288);
     shm_buf->flags.frame_shown = 0;
     shm_buf->flags.lock = 0;
+
+    delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - prev_show_t).count() / 1000000.0;
+    prev_show_t = std::chrono::system_clock::now();
 }
 
-bool CubeDrawer::line_box_intr(double *p1, double *p2)
+bool CubeDrawer::line_box_intr(double *p1, double *p2, bool opt_both_points)
 {
     double line[3] = {p1[0] - p2[0], p1[1] - p2[1], p1[2] - p2[2]};
+    double sq_line_len = line[0] * line[0] + line[1] * line[1] + line[2] * line[2];
     // COUT_VECTOR("Line", line)
-
+    double *cur_change = p1;
+    bool found = false;
     for (int i = 0; i < 6; i++)
     {
         double *normal = &normal_list[i * 3];
-
-        // COUT_VECTOR("Current normal", normal)
-        // COUT_VECTOR("Current coord", (&coord_list[i < 3 ? 0 : 3]))
-
-        double nor_l = cblas_ddot(3, normal, 0, line, 0);
+        double nor_l = cblas_ddot(3, normal, 1, line, 1);
 
         if (abs(nor_l) < EPSILON)
-            continue;
-        // double len = sqrt(line[0] * line[0] + line[1] * line[1] + line[2] * line[2]);
-
-        double t = (cblas_ddot(3, normal, 0, &coord_list[i < 3 ? 0 : 3], 0) - cblas_ddot(3, normal, 0, p1, 0)) / nor_l;
-
-        double tmp[3];
-
-        memcpy(tmp, p1, sizeof(double) * 3);
-
-        tmp[0] += line[0] * t;
-        tmp[1] += line[1] * t;
-        tmp[2] += line[2] * t;
-
-        if (CHECK_P_IN_BOX(tmp))
         {
-            memcpy(p1, tmp, sizeof(double) * 3);
-            // COUT_VECTOR("New point", p1)
-            return true;
+            // std::cout << "Parralel" << std::endl;
+            // COUT_VECTOR("Normal", normal)
+            // COUT_VECTOR("Line", line)
+            continue;
+        }
+
+        double tmp_res[3];
+        memcpy(tmp_res, p1, sizeof(double) * 3);
+        double *plane_point = &coord_list[i < 3 ? 0 : 3];
+
+        double diff[3] = {p1[0] - plane_point[0], p1[1] - plane_point[1], p1[2] - plane_point[2]};
+
+        double t = cblas_ddot(3, diff, 1, normal, 1) / nor_l;
+
+        tmp_res[0] -= line[0] * t;
+        tmp_res[1] -= line[1] * t;
+        tmp_res[2] -= line[2] * t;
+
+        double res_p2_line[3] = {tmp_res[0] - p2[0], tmp_res[1] - p2[1], tmp_res[2] - p2[2]};
+
+        double dot_pr = cblas_ddot(3, res_p2_line, 1, line, 1);
+
+        if (dot_pr > 0 && (dot_pr < sq_line_len))
+        {
+            memcpy(cur_change, tmp_res, sizeof(double) * 3);
+            if (found || !opt_both_points)
+                return true;
+
+            cur_change = p2;
+            found = true;
         }
     }
-
-    return false;
+    return found;
 }
 
 bool CubeDrawer::optimise_line_points(double *p1, double *p2)
@@ -361,11 +383,11 @@ bool CubeDrawer::optimise_line_points(double *p1, double *p2)
 
     if (p1_in && p2_in)
         return true;
+
     else if (!p1_in && !p2_in)
     {
-        if (!line_box_intr(p1, p2))
+        if (!line_box_intr(p2, p1, true))
             return false;
-        line_box_intr(p2, p1);
     }
     else
     {
@@ -376,15 +398,15 @@ bool CubeDrawer::optimise_line_points(double *p1, double *p2)
             p2 = p1;
             p1 = tmp;
         }
-        line_box_intr(p1, p2);
+        line_box_intr(p1, p2, false);
     }
     return true;
 }
 
 void CubeDrawer::line(double x1, double y1, double z1, double x2, double y2, double z2)
 {
-    double p1[3] = {x1, y1, z1};
-    double p2[3] = {x2, y2, z2};
+    double p1[4] = {x1, y1, z1, 1.0};
+    double p2[4] = {x2, y2, z2, 1.0};
 
     calc_transform(p1);
     calc_transform(p2);
