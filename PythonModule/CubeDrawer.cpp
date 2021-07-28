@@ -5,10 +5,41 @@ const struct ParseFuncs CubeDrawer::parse_funcs[] = {(struct ParseFuncs){PyTuple
 
 PyObject *CubeDrawer::py_exception = PyErr_NewException("ledcd.CubeDrawer", NULL, NULL);
 
-CubeDrawer::CubeDrawer(double brightness, bool sync, int mat_thread_num) : is_sync(sync)
+CubeDrawer &CubeDrawer::getInstance()
+{
+    static CubeDrawer instance;
+    return instance;
+}
+
+#ifdef VIRT_CUBE
+
+void onopen(int fd)
+{
+    CubeDrawer::getInstance().
+}
+
+void onclose(int fd)
+{
+}
+
+void CubeDrawer::send_sockets() // send back_buf to all oppened sockets
+{
+    for (auto t = CubeDrawer::socked_fds.begin(); t != CubeDrawer::socked_fds.end(); t++)
+        ws_sendframe(*t, (char *)back_buf, 12288, false, WS_FR_OP_BIN);
+}
+#endif
+
+CubeDrawer::CubeDrawer() : is_sync(false)
 {
     transform_list.push_back(new struct Transform);
 
+#ifdef VIRT_CUBE
+    evs.onopen = &onopen;
+    evs.onclose = &onclose;
+
+    ws_socket(&evs, 8080, 100);
+    // ws_sendframe(cur_fd, back_buf, 12288, false, WS_FR_OP_BIN);
+#else
     int fd = shm_open("VirtualCubeSHMemmory", O_RDWR, 0);
     if (fd < 0)
     {
@@ -26,12 +57,11 @@ CubeDrawer::CubeDrawer(double brightness, bool sync, int mat_thread_num) : is_sy
 
     shm_buf->flags.lock = 0;
     shm_buf->flags.frame_shown = 1;
+#endif
 
-    cur_brush.brigthness = brightness;
+    memset(back_buf, 0, 12288);
+    cur_brush.brigthness = 0.1;
     set_color(255.0);
-
-    openblas_set_num_threads(mat_thread_num);
-    std::cout << "Open Blass is running in: " << openblas_get_num_threads() << " threads." << std::endl;
 }
 
 int CubeDrawer::parse_num_input(PyObject *input, int req_len)
@@ -52,7 +82,7 @@ int CubeDrawer::parse_num_input(PyObject *input, int req_len)
     if (req_len == 0 ? 0 : inp_len != req_len)
     {
         char tmp_str[86];
-        sprintf(tmp_str, "Invalid input, was expecting object with size: %d, but %d elements were given", req_len, inp_len);
+        sprintf(tmp_str, "Invalid input, was expecting object with size: %d, but %ld elements were given", req_len, inp_len);
         THROW_EXP(tmp_str, -1)
     }
 
@@ -313,6 +343,7 @@ void CubeDrawer::clear(PyObject *input)
 
 void CubeDrawer::show()
 {
+#ifndef VIRT_CUBE
     while (shm_buf->flags.lock || (is_sync && !shm_buf->flags.frame_shown))
         usleep(100);
     // {
@@ -323,6 +354,7 @@ void CubeDrawer::show()
     memcpy(shm_buf->buf, back_buf, 12288);
     shm_buf->flags.frame_shown = 0;
     shm_buf->flags.lock = 0;
+#endif
 
     delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - prev_show_t).count() / 1000000.0;
     prev_show_t = std::chrono::system_clock::now();
@@ -455,4 +487,9 @@ void CubeDrawer::line(PyObject *input)
         return;
 
     line(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2], cur_parsed_args[3], cur_parsed_args[4], cur_parsed_args[5]);
+}
+
+PyObject *CubeDrawer::data()
+{
+    return Py_BuildValue("y#", back_buf, 4096 * 3);
 }
