@@ -5,6 +5,7 @@
 
 #include <cmath>
 
+#include <thread>
 #include <mutex>
 #include <list>
 #include <vector>
@@ -22,7 +23,9 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 
-#include <cblas.h>
+#include <gsl/gsl_blas.h>
+
+// #define VIRT_CUBE
 
 #ifdef VIRT_CUBE
 extern "C"
@@ -55,7 +58,8 @@ extern "C"
         std::cout << std::endl;        \
     }
 
-#define GET_MILLIS() std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count()
+#define GET_MICROS() std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count()
+#define SLEEP_MICROS(val) std::this_thread::sleep_for(std::chrono::microseconds(val))
 
 struct Brush
 {
@@ -115,10 +119,11 @@ class CubeDrawer
 private:
     Brush cur_brush;
     Pixel back_buf[4096];
+    long min_show_delay = 0;
+
 #ifndef VIRT_CUBE
     ShmBuf *shm_buf;
 #endif
-    bool first_time_show = true;
     std::vector<double> cur_parsed_args;
 
     std::vector<Transform *> transform_list;
@@ -136,10 +141,11 @@ private:
     double normal_list[18] = {-1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, -1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0};
     double coord_list[6] = {0.0, 0.0, 0.0, 15.0, 15.0, 15.0};
 
-    long prev_show_t;
+    long prev_show_time;
+    long min_frame_delay;
     static std::mutex mutex_;
 
-    CubeDrawer(double brightness = 0.1, bool sync = false);
+    CubeDrawer(double brightness = 1.0, bool sync = false, int fps_cap = 70);
     ~CubeDrawer(){};
 
 public:
@@ -151,7 +157,7 @@ public:
 #ifdef VIRT_CUBE
     std::list<int> virt_fds;
     int _get_virt_amount_();
-    long min_show_delay = 10;
+    bool wait_cube = true;
 #endif
     bool is_sync;
     double delta_time;
@@ -190,4 +196,6 @@ public:
     void line(double x1, double y1, double z1, double x2, double y2, double z2);
     void line(PyObject *input1, PyObject *input2);
     void line(PyObject *input);
+
+    void set_fps_cap(int fps);
 };

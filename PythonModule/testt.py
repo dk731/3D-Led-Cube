@@ -8,9 +8,10 @@ import threading
 
 cd = CubeDrawer.get_obj()
 cd.set_brigthness(1.0)
+cd.wait_cube = False
 
 cur_h = 0.0
-speed = 0.001
+speed = 0.1
 count = 0
 
 

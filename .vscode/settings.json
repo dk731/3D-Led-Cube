@@ -51,7 +51,9 @@
         "sstream": "cpp",
         "streambuf": "cpp",
         "cinttypes": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "chrono": "cpp",
+        "thread": "cpp"
     },
     "python.pythonPath": "/usr/local/bin/python3.9"
 }

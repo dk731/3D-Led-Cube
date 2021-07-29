@@ -11,7 +11,6 @@ CubeDrawer &CubeDrawer::get_obj()
 }
 
 #ifdef VIRT_CUBE
-
 void onopen(int fd)
 {
     CubeDrawer::get_obj().virt_fds.push_back(fd);
@@ -30,7 +29,7 @@ int CubeDrawer::_get_virt_amount_()
 }
 #endif
 
-CubeDrawer::CubeDrawer(double brightness, bool sync) : is_sync(sync), delta_time(0)
+CubeDrawer::CubeDrawer(double brightness, bool sync, int fps) : prev_show_time(0), is_sync(sync), delta_time(0)
 {
     transform_list.push_back(new struct Transform);
 #ifdef VIRT_CUBE
@@ -58,6 +57,8 @@ CubeDrawer::CubeDrawer(double brightness, bool sync) : is_sync(sync), delta_time
     shm_buf->flags.lock = 0;
     shm_buf->flags.frame_shown = 1;
 #endif
+
+    set_fps_cap(fps);
 
     memset(back_buf, 0, 12288);
     cur_brush.brigthness = brightness;
@@ -283,8 +284,6 @@ void CubeDrawer::rotate(double x, double y, double z)
     // COUT_VECTOR("1]", (&cur_trans[0]))
     // COUT_VECTOR("2]", (&cur_trans[4]))
     // COUT_VECTOR("3]", (&cur_trans[8]))
-
-    trans_obj->need_recalc = true;
 }
 void CubeDrawer::rotate(PyObject *input)
 {
@@ -343,21 +342,22 @@ void CubeDrawer::clear(PyObject *input)
 
 void CubeDrawer::show()
 {
-    if (first_time_show)
-    {
-        first_time_show = false;
-        prev_show_t = GET_MILLIS();
-    }
+    long delta = min_frame_delay - (GET_MICROS() - prev_show_time);
+    if (delta > 0)
+        SLEEP_MICROS(delta);
+
 #ifdef VIRT_CUBE
+    if (wait_cube)
+        while (!virt_fds.size())
+        {
+            SLEEP_MICROS(100000);
+            prev_show_time = GET_MICROS();
+        }
+
     // Send back_buf to all oppened sockets
-    // std::cout << "Sending to: " << virt_fds.size() << " clients" << std::endl;
-    if (GET_MILLIS() - prev_show_t > min_show_delay || first_time_show)
-    {
-        for (auto t = virt_fds.begin(); t != virt_fds.end(); t++)
-            ws_sendframe(*t, (char *)back_buf, 12288, false, WS_FR_OP_BIN);
-        delta_time = (GET_MILLIS() - prev_show_t) / 1000.0;
-        prev_show_t = GET_MILLIS();
-    }
+    for (auto t = virt_fds.begin(); t != virt_fds.end(); t++)
+        ws_sendframe(*t, (char *)back_buf, 12288, false, WS_FR_OP_BIN);
+
 #else
     while (shm_buf->flags.lock || (is_sync && !shm_buf->flags.frame_shown))
         usleep(100);
@@ -369,10 +369,10 @@ void CubeDrawer::show()
     memcpy(shm_buf->buf, back_buf, 12288);
     shm_buf->flags.frame_shown = 0;
     shm_buf->flags.lock = 0;
-
-    delta_time = GET_MILLIS() - prev_show_t;
-    prev_show_t = GET_MILLIS();
 #endif
+
+    delta_time = (GET_MICROS() - prev_show_time) / 1000000.0;
+    prev_show_time = GET_MICROS();
 }
 
 bool CubeDrawer::line_box_intr(double *p1, double *p2, bool opt_both_points)
@@ -502,4 +502,14 @@ void CubeDrawer::line(PyObject *input)
         return;
 
     line(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2], cur_parsed_args[3], cur_parsed_args[4], cur_parsed_args[5]);
+}
+
+void CubeDrawer::set_fps_cap(int fps)
+{
+    if (!fps)
+        min_frame_delay = 0;
+    else
+        min_frame_delay = (1.0 / (double)fps) * 1000000.0;
+
+    std::cout << "Changed fps cap to be: " << fps << " fps or " << min_frame_delay << " us or " << min_frame_delay / 1000.0 << " ms" << std::endl;
 }

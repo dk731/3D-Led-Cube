@@ -22,7 +22,7 @@ visible_size = math.tau
 
 min_step = 0.1
 
-rotation_speed = 0.01
+rotation_speed = 0.5
 
 while True:
     cd.clear()

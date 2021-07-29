@@ -207,6 +207,9 @@ class CubeDrawer(object):
     def line(self, *args):
         return _ledcd.CubeDrawer_line(self, *args)
 
+    def set_fps_cap(self, fps):
+        return _ledcd.CubeDrawer_set_fps_cap(self, fps)
+
 # Register CubeDrawer in _ledcd:
 _ledcd.CubeDrawer_swigregister(CubeDrawer)
 
