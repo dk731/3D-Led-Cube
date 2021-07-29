@@ -5,6 +5,8 @@
 
 #include <cmath>
 
+#include <mutex>
+#include <list>
 #include <vector>
 #include <python3.9/Python.h>
 #include <stdint.h>
@@ -20,7 +22,14 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 
-#include "cblas.h"
+#include <cblas.h>
+
+#ifdef VIRT_CUBE
+extern "C"
+{
+#include <wsserver/ws.h>
+}
+#endif
 
 #define THROW_EXP(msg, ret)                         \
     PyErr_SetString(CubeDrawer::py_exception, msg); \
@@ -45,6 +54,8 @@
             std::cout << m[i * 4 + j]; \
         std::cout << std::endl;        \
     }
+
+#define GET_MILLIS() std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count()
 
 struct Brush
 {
@@ -71,8 +82,8 @@ struct ShmFlags
 
 struct ShmBuf
 {
-    struct Pixel buf[4096];
-    struct ShmFlags flags;
+    Pixel buf[4096];
+    ShmFlags flags;
 };
 
 struct ParseFuncs
@@ -102,17 +113,19 @@ struct Transform
 class CubeDrawer
 {
 private:
-    struct Brush cur_brush;
-    struct Pixel back_buf[4096];
-    struct ShmBuf *shm_buf;
-
+    Brush cur_brush;
+    Pixel back_buf[4096];
+#ifndef VIRT_CUBE
+    ShmBuf *shm_buf;
+#endif
+    bool first_time_show = true;
     std::vector<double> cur_parsed_args;
 
-    std::vector<struct Transform *> transform_list;
+    std::vector<Transform *> transform_list;
     int parse_num_input(PyObject *input, int req_len = 0);
 
-    static const struct ParseFuncs parse_funcs[];
-    static PyObject *py_exception;
+    ParseFuncs parse_funcs[2] = {(ParseFuncs){PyTuple_Size, PyTuple_GetItem}, (ParseFuncs){PyList_Size, PyList_GetItem}};
+    PyObject *py_exception = PyErr_NewException("ledcd.CubeDrawer", NULL, NULL);
     void calc_transform(double *cur_vec);
 
     bool line_box_intr(double *p1, double *p2, bool opt_both_points);
@@ -122,13 +135,26 @@ private:
     // 0, -1, 0 / -1, 0, 0, /
     double normal_list[18] = {-1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, -1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0};
     double coord_list[6] = {0.0, 0.0, 0.0, 15.0, 15.0, 15.0};
-    bool is_sync;
 
-    std::chrono::time_point<std::chrono::system_clock> prev_show_t;
+    long prev_show_t;
+    static std::mutex mutex_;
+
+    CubeDrawer(double brightness = 0.1, bool sync = false);
+    ~CubeDrawer(){};
 
 public:
+    static CubeDrawer &get_obj();
+
+    CubeDrawer(CubeDrawer &other) = delete;
+    void operator=(const CubeDrawer &) = delete;
+
+#ifdef VIRT_CUBE
+    std::list<int> virt_fds;
+    int _get_virt_amount_();
+    long min_show_delay = 10;
+#endif
+    bool is_sync;
     double delta_time;
-    CubeDrawer(double brightness = 0.1, bool sync = true, int mat_thread_num = 4);
     void set_brigthness(double b);
 
     void set_color(double r, double g, double b);

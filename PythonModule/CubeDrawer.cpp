@@ -1,13 +1,12 @@
 #include "CubeDrawer.h"
 
-const struct ParseFuncs CubeDrawer::parse_funcs[] = {(struct ParseFuncs){PyTuple_Size, PyTuple_GetItem},
-                                                     (struct ParseFuncs){PyList_Size, PyList_GetItem}};
+std::mutex CubeDrawer::mutex_;
 
-PyObject *CubeDrawer::py_exception = PyErr_NewException("ledcd.CubeDrawer", NULL, NULL);
-
-CubeDrawer &CubeDrawer::getInstance()
+CubeDrawer &CubeDrawer::get_obj()
 {
+    CubeDrawer::mutex_.lock();
     static CubeDrawer instance;
+    CubeDrawer::mutex_.unlock();
     return instance;
 }
 
@@ -15,30 +14,31 @@ CubeDrawer &CubeDrawer::getInstance()
 
 void onopen(int fd)
 {
-    CubeDrawer::getInstance().
+    CubeDrawer::get_obj().virt_fds.push_back(fd);
+    std::cout << "Virtual cube:" << fd << " connected" << std::endl;
 }
 
 void onclose(int fd)
 {
+    CubeDrawer::get_obj().virt_fds.remove(fd);
+    std::cout << "Virtual cube: " << fd << " disconnected" << std::endl;
 }
 
-void CubeDrawer::send_sockets() // send back_buf to all oppened sockets
+int CubeDrawer::_get_virt_amount_()
 {
-    for (auto t = CubeDrawer::socked_fds.begin(); t != CubeDrawer::socked_fds.end(); t++)
-        ws_sendframe(*t, (char *)back_buf, 12288, false, WS_FR_OP_BIN);
+    return virt_fds.size();
 }
 #endif
 
-CubeDrawer::CubeDrawer() : is_sync(false)
+CubeDrawer::CubeDrawer(double brightness, bool sync) : is_sync(sync), delta_time(0)
 {
     transform_list.push_back(new struct Transform);
-
 #ifdef VIRT_CUBE
+    struct ws_events evs;
     evs.onopen = &onopen;
     evs.onclose = &onclose;
-
+    std::cout << "Oppening socket" << std::endl;
     ws_socket(&evs, 8080, 100);
-    // ws_sendframe(cur_fd, back_buf, 12288, false, WS_FR_OP_BIN);
 #else
     int fd = shm_open("VirtualCubeSHMemmory", O_RDWR, 0);
     if (fd < 0)
@@ -60,7 +60,7 @@ CubeDrawer::CubeDrawer() : is_sync(false)
 #endif
 
     memset(back_buf, 0, 12288);
-    cur_brush.brigthness = 0.1;
+    cur_brush.brigthness = brightness;
     set_color(255.0);
 }
 
@@ -343,7 +343,22 @@ void CubeDrawer::clear(PyObject *input)
 
 void CubeDrawer::show()
 {
-#ifndef VIRT_CUBE
+    if (first_time_show)
+    {
+        first_time_show = false;
+        prev_show_t = GET_MILLIS();
+    }
+#ifdef VIRT_CUBE
+    // Send back_buf to all oppened sockets
+    // std::cout << "Sending to: " << virt_fds.size() << " clients" << std::endl;
+    if (GET_MILLIS() - prev_show_t > min_show_delay || first_time_show)
+    {
+        for (auto t = virt_fds.begin(); t != virt_fds.end(); t++)
+            ws_sendframe(*t, (char *)back_buf, 12288, false, WS_FR_OP_BIN);
+        delta_time = (GET_MILLIS() - prev_show_t) / 1000.0;
+        prev_show_t = GET_MILLIS();
+    }
+#else
     while (shm_buf->flags.lock || (is_sync && !shm_buf->flags.frame_shown))
         usleep(100);
     // {
@@ -354,10 +369,10 @@ void CubeDrawer::show()
     memcpy(shm_buf->buf, back_buf, 12288);
     shm_buf->flags.frame_shown = 0;
     shm_buf->flags.lock = 0;
-#endif
 
-    delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - prev_show_t).count() / 1000000.0;
-    prev_show_t = std::chrono::system_clock::now();
+    delta_time = GET_MILLIS() - prev_show_t;
+    prev_show_t = GET_MILLIS();
+#endif
 }
 
 bool CubeDrawer::line_box_intr(double *p1, double *p2, bool opt_both_points)
@@ -487,9 +502,4 @@ void CubeDrawer::line(PyObject *input)
         return;
 
     line(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2], cur_parsed_args[3], cur_parsed_args[4], cur_parsed_args[5]);
-}
-
-PyObject *CubeDrawer::data()
-{
-    return Py_BuildValue("y#", back_buf, 4096 * 3);
 }

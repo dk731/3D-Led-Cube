@@ -1,23 +1,19 @@
 from ledcd import CubeDrawer
 from time import sleep
-import itertools
-import random
 import math
 
 red = (193, 0, 0)
 white = (255, 255, 255)
-cd = CubeDrawer(0.1, False)
-# cd.push_matrix()
+cd = CubeDrawer.get_obj()
 
 cd.translate((7.5, 7.5, 4.5))
-
+cd.set_brigthness(1.0)
 real_w = 12
 real_h = real_w / 2
 real_z = 3
 real_stripw = real_h / 2.5
 
 speed = 5
-# speed = 0
 offset = 0
 
 resolution = 1
@@ -26,7 +22,7 @@ visible_size = math.tau
 
 min_step = 0.1
 
-rotation_speed = 0.5
+rotation_speed = 0.01
 
 while True:
     cd.clear()
@@ -48,4 +44,4 @@ while True:
     offset += speed * cd.delta_time
 
     cd.show()
-    print(round(1 / cd.delta_time), "Lines: ", count, "      ", end="\r")
+    # print(round(1 / cd.delta_time), "Lines: ", count, "      ", end="\r")
