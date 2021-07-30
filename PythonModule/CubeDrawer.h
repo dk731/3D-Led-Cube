@@ -23,7 +23,9 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 
-#include <gsl/gsl_blas.h>
+#include <cblas.h>
+
+#include <GL/gl.h>
 
 // #define VIRT_CUBE
 
