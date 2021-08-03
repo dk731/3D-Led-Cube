@@ -1,9 +1,11 @@
 #version 330 core
-layout(location = 0) out ivec3 out_color;
+layout (location = 0) out vec3 out_col;
 
-in vec3 current_pos;  
+in float id;
+in vec3 color;
 
 void main()
 {
-    out_color = ivec3(255);
+  gl_FragDepth = id;
+  out_col = color;
 }
