@@ -21,13 +21,12 @@ enum draw_call_types
 {
   CALL_POINT_TYPE = 0,
   CALL_POLYGON_TYPE = 1,
-  CALL_POLYPRISM_TYPE = 2,
-  CALL_POLYPYR_TYPE = 3,
-  CALL_LINE_TYPE = 4,
-  CALL_CIRCLE_TYPE = 5,
-  CALL_FCIRCLE_TYPE = 6,
-  CALL_SPHERE_TYPE = 7,
-  CALL_FSPHERE_TYPE = 8,
+  CALL_POLYPYR_TYPE = 2,
+  CALL_LINE_TYPE = 3,
+  CALL_CIRCLE_TYPE = 4,
+  CALL_FCIRCLE_TYPE = 5,
+  CALL_SPHERE_TYPE = 6,
+  CALL_FSPHERE_TYPE = 7,
 };
 
 struct draw_call
@@ -45,22 +44,34 @@ unsigned int VBO, VAO, dc_vbo;
 
 int main()
 {
-  for (int z = 0; z < 16; z++)
-    for (int y = 0; y < 16; y++)
-      for (int x = 0; x < 16; x++)
-      {
-        draw_call *new_point_call = new draw_call({
-            .type = CALL_POINT_TYPE,
-            .color = {x * 16, y * 16, z * 16},
-            .trans_mat = {
-                1.0f, 0.0f, 0.0f, 0.0f,
-                0.0f, 1.0f, 0.0f, 0.0f,
-                0.0f, 0.0f, 1.0f, 0.0f,
-                0.0f, 0.0f, 0.0f, 1.0f},
-            .data = {x, y, z, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
-        });
-        draw_calls_arr.push_back(*new_point_call);
-      }
+  // for (int z = 0; z < 16; z++)
+  //   for (int y = 0; y < 16; y++)
+  //     for (int x = 0; x < 16; x++)
+  //     {
+  //       draw_call *new_point_call = new draw_call({
+  //           .type = CALL_POINT_TYPE,
+  //           .color = {x * 16, y * 16, z * 16},
+  //           .trans_mat = {
+  //               1.0f, 0.0f, 0.0f, 0.0f,
+  //               0.0f, 1.0f, 0.0f, 0.0f,
+  //               0.0f, 0.0f, 1.0f, 0.0f,
+  //               0.0f, 0.0f, 0.0f, 1.0f},
+  //           .data = {x, y, z, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+  //       });
+  //       draw_calls_arr.push_back(*new_point_call);
+  //     }
+
+  draw_call *new_point_call = new draw_call({
+      .type = CALL_SPHERE_TYPE,
+      .color = {255, 0, 0},
+      .trans_mat = {
+          1.0f, 0.0f, 0.0f, 0.0f,
+          0.0f, 1.0f, 0.0f, 0.0f,
+          0.0f, 0.0f, 1.0f, 0.0f,
+          0.0f, 0.0f, 0.0f, 1.0f},
+      .data = {7.5f, 7.5f, 7.5f, 1.0f, 7.0f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+  });
+  draw_calls_arr.push_back(*new_point_call);
 
   srand(time(NULL));
 
@@ -145,14 +156,14 @@ int main()
   glEnableVertexAttribArray(0);
 
   glBindBuffer(GL_ARRAY_BUFFER, dc_vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(draw_call) * draw_calls_arr.size(), &draw_calls_arr[0], GL_DYNAMIC_DRAW);
+  // glBufferData(GL_ARRAY_BUFFER, sizeof(draw_call) * draw_calls_arr.size(), &draw_calls_arr[0], GL_DYNAMIC_DRAW);
 
   for (int i = 1; i < 11; i++)
     glEnableVertexAttribArray(i);
 
   int dc_str_size = sizeof(draw_call);
 
-  glVertexAttribPointer(1, 1, GL_INT, GL_FALSE, dc_str_size, (GLvoid *)offsetof(draw_call, type));
+  glVertexAttribIPointer(1, 1, GL_INT, dc_str_size, (GLvoid *)offsetof(draw_call, type));
   glVertexAttribPointer(2, 3, GL_UNSIGNED_BYTE, GL_FALSE, dc_str_size, (GLvoid *)offsetof(draw_call, color));
   for (int i = 0; i < 4; i++)
     glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, dc_str_size, (GLvoid *)(offsetof(draw_call, trans_mat) + sizeof(float) * 4 * i));
@@ -192,6 +203,7 @@ int main()
     processInput(window);
     if (draw_calls_arr.size())
     {
+      update_draw_calls();
       glClear(GL_DEPTH_BUFFER_BIT);
 
       glUseProgram(main_prog);
@@ -204,8 +216,6 @@ int main()
       glDrawArraysInstanced(GL_POINTS, 0, 4096, draw_calls_arr.size());
 
       draw_calls_arr.clear();
-      update_draw_calls();
-
       glfwSwapBuffers(window);
     }
     // glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -251,25 +261,76 @@ void check_compile(GLuint obj)
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
-  if (key == GLFW_KEY_ENTER && action == GLFW_PRESS)
+  if (key == GLFW_KEY_M && action == GLFW_PRESS)
   {
-    std::cout << "Adding new point: " << (int)b << std::endl;
-    for (int i = 0; i < 50; i++)
+    float tmpp[3] = {rand() % 150 / 10.0f, rand() % 150 / 10.0f, rand() % 150 / 10.0f};
+    std::cout << "Adding new point at: (" << tmpp[0] << ", " << tmpp[1] << ", " << tmpp[2] << ")" << std::endl;
+
+    draw_call *new_point_call = new draw_call({
+        .type = CALL_POINT_TYPE,
+        .color = {rand() % 255, rand() % 255, rand() % 255},
+        .trans_mat = {
+            1.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f},
+        .data = {tmpp[0], tmpp[1], tmpp[2], 1.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+    });
+    draw_calls_arr.push_back(*new_point_call);
+  }
+  else if (key == GLFW_KEY_N && action == GLFW_PRESS)
+  {
+    float tmpp[9];
+    for (int i = 0; i < 9; i++)
+      tmpp[i] = rand() % 1500 / 100.0f;
+
+    std::cout << "Adding new triangle at: ";
+    for (int i = 0; i < 3; i++)
     {
-      draw_call *new_point_call = new draw_call({
-          .type = CALL_POINT_TYPE,
-          .color = {rand() % 255, rand() % 255, rand() % 255},
-          .trans_mat = {
-              1.0f, 0.0f, 0.0f, 0.0f,
-              0.0f, 1.0f, 0.0f, 0.0f,
-              0.0f, 0.0f, 1.0f, 0.0f,
-              0.0f, 0.0f, 0.0f, 1.0f},
-          .data = {rand() % 150 / 10.0f, rand() % 150 / 10.0f, rand() % 150 / 10.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
-      });
-      draw_calls_arr.push_back(*new_point_call);
-      b += 16;
+      std::cout << "(" << tmpp[i * 3] << ", " << tmpp[i * 3 + 1] << ", " << tmpp[i * 3 + 2] << ") ";
     }
-    update_draw_calls();
+    std::cout << std::endl;
+
+    draw_call *new_point_call = new draw_call({
+        .type = CALL_POLYGON_TYPE,
+        .color = {rand() % 255, rand() % 255, rand() % 255},
+        .trans_mat = {
+            1.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f},
+        .data = {tmpp[0], tmpp[1], tmpp[2], 1.0f, tmpp[3], tmpp[4], tmpp[5], 1.0f, tmpp[6], tmpp[7], tmpp[8], 1.0f, 0.5f, 0.0f, 0.0f, 0.0f},
+    });
+    draw_calls_arr.push_back(*new_point_call);
+  }
+  else if (key == GLFW_KEY_P && action == GLFW_PRESS)
+  {
+    float tmpp[12];
+    for (int i = 0; i < 12; i++)
+      tmpp[i] = rand() % 1500 / 100.0f;
+
+    std::cout << "Adding new pyramid at: ";
+    for (int i = 0; i < 4; i++)
+    {
+      std::cout << "(" << tmpp[i * 3] << ", " << tmpp[i * 3 + 1] << ", " << tmpp[i * 3 + 2] << ") ";
+    }
+    std::cout << std::endl;
+
+    draw_call *new_point_call = new draw_call({
+        .type = CALL_POLYPYR_TYPE,
+        .color = {rand() % 255, rand() % 255, rand() % 255},
+        .trans_mat = {
+            1.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f},
+        .data = {tmpp[0], tmpp[1], tmpp[2], 1.0f, tmpp[3], tmpp[4], tmpp[5], 1.0f, tmpp[6], tmpp[7], tmpp[8], 1.0f, tmpp[9], tmpp[10], tmpp[11], 1.0f},
+    });
+    draw_calls_arr.push_back(*new_point_call);
+  }
+  else if (key == GLFW_KEY_C && action == GLFW_PRESS)
+  {
+    glClear(GL_COLOR_BUFFER_BIT);
   }
 }
 
