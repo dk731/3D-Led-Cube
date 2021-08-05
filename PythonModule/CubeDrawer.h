@@ -5,6 +5,7 @@
 
 #include <cmath>
 
+#include <fstream>
 #include <thread>
 #include <mutex>
 #include <list>
@@ -19,34 +20,46 @@
 #include <fcntl.h>
 #include <stdio.h>
 
-#include <sys/shm.h>
-#include <sys/mman.h>
-#include <sys/ioctl.h>
-
 #include <cblas.h>
 
-#include <GL/gl.h>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
-// #define VIRT_CUBE
+#define VIRT_CUBE
+
+#define DEBUG_MODE
+#ifdef DEBUG_MODE
+#define DEBUG(x) x
+#else
+#define DEBUG(x)
+#endif
 
 #ifdef VIRT_CUBE
+
 extern "C"
 {
 #include <wsserver/ws.h>
 }
+
+#else
+
+#include <sys/shm.h>
+#include <sys/mman.h>
+#include <sys/ioctl.h>
+
 #endif
 
-#define THROW_EXP(msg, ret)                         \
-    PyErr_SetString(CubeDrawer::py_exception, msg); \
-    return ret;
+#define THROW_EXP(msg, ret)                 \
+    {                                       \
+        PyErr_SetString(py_exception, msg); \
+        return ret;                         \
+    }
 
 #define CHECK_IN_BOX(x, y, z) \
     (x >= 0 && x <= 15 && y >= 0 && y <= 15 && z >= 0 && z <= 15)
 
 #define CHECK_P_IN_BOX(p) \
     CHECK_IN_BOX(p[0], p[1], p[2])
-
-#define EPSILON 0.00001
 
 #define COUT_VECTOR(premsg, v) \
     std::cout << premsg << ": (" << v[0] << ", " << v[1] << ", " << v[2] << ")" << std::endl;
@@ -62,6 +75,9 @@ extern "C"
 
 #define GET_MICROS() std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count()
 #define SLEEP_MICROS(val) std::this_thread::sleep_for(std::chrono::microseconds(val))
+
+#define EPSILON 0.00001
+#define DEF_LINEW 0.5
 
 struct Brush
 {
@@ -104,6 +120,25 @@ enum ParseFuncType
     PY_LIST_PARSE
 };
 
+enum DrawCallTypes
+{
+    CALL_POINT_TYPE = 0,
+    CALL_POLYGON_TYPE = 1,
+    CALL_POLYPYR_TYPE = 2,
+    CALL_LINE_TYPE = 3,
+    CALL_CIRCLE_TYPE = 4,
+    CALL_FCIRCLE_TYPE = 5,
+    CALL_SPHERE_TYPE = 6,
+    CALL_FSPHERE_TYPE = 7,
+};
+
+struct DrawCall
+{
+    int type;
+    Pixel color;
+    float data[16];
+};
+
 struct Transform
 {
     double translation[16] = {1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0};
@@ -122,30 +157,37 @@ private:
     Brush cur_brush;
     Pixel back_buf[4096];
     long min_show_delay = 0;
-
-#ifndef VIRT_CUBE
-    ShmBuf *shm_buf;
-#endif
     std::vector<double> cur_parsed_args;
-
     std::vector<Transform *> transform_list;
-    int parse_num_input(PyObject *input, int req_len = 0);
-
-    ParseFuncs parse_funcs[2] = {(ParseFuncs){PyTuple_Size, PyTuple_GetItem}, (ParseFuncs){PyList_Size, PyList_GetItem}};
-    PyObject *py_exception = PyErr_NewException("ledcd.CubeDrawer", NULL, NULL);
-    void calc_transform(double *cur_vec);
-
-    bool line_box_intr(double *p1, double *p2, bool opt_both_points);
-    bool optimise_line_points(double *p1, double *p2);
-
-    double line_res = 0.5;
-    // 0, -1, 0 / -1, 0, 0, /
-    double normal_list[18] = {-1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, -1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0};
-    double coord_list[6] = {0.0, 0.0, 0.0, 15.0, 15.0, 15.0};
 
     long prev_show_time;
     long min_frame_delay;
     static std::mutex mutex_;
+
+#ifndef VIRT_CUBE
+    ShmBuf *shm_buf;
+#endif
+
+    int parse_num_input(PyObject *input, int req_len = 0);
+    ParseFuncs parse_funcs[2] = {(ParseFuncs){PyTuple_Size, PyTuple_GetItem}, (ParseFuncs){PyList_Size, PyList_GetItem}};
+    PyObject *py_exception = PyErr_NewException("ledcd.CubeDrawer", NULL, NULL);
+    void apply_transforms(double *cur_vec);
+
+    //opengl
+    GLuint vbo, vao, dc_vbo; // main vbo/vao and draw calls data vbo
+    GLuint main_prog;
+    GLuint pix_buf;
+
+    GLfloat gl_vertices[12288]; // static vertices
+    std::vector<DrawCall> draw_calls_arr;
+
+    GLFWwindow *context;
+
+    void init_gl();
+    bool check_compile(GLuint obj);
+    void render_texture();
+    void pool_events();
+    //
 
     CubeDrawer(double brightness = 1.0, bool sync = false, int fps_cap = 70);
     ~CubeDrawer(){};
@@ -163,19 +205,8 @@ public:
 #endif
     bool is_sync;
     double delta_time;
-    void set_brigthness(double b);
-
-    void set_color(double r, double g, double b);
-    void set_color(double rgb);
-    void set_color(PyObject *input);
 
     PyObject *get_cur_color();
-
-    void set_pixel(double x, double y, double z);
-    void set_pixel(PyObject *input);
-
-    void set_pixel_nt(double x, double y, double z); // put pixel without transformation
-    void set_pixel_nt(PyObject *input);
 
     void push_matrix();
     void pop_matrix();
@@ -195,9 +226,21 @@ public:
 
     void show();
 
-    void line(double x1, double y1, double z1, double x2, double y2, double z2);
-    void line(PyObject *input1, PyObject *input2);
-    void line(PyObject *input);
-
     void set_fps_cap(int fps);
+
+    //
+    void set_brigthness(double b);
+    void set_brigthness(int b);
+
+    void set_color(int r, int g, int b);
+    void set_color(int rgb);
+
+    void set_color(double r, double g, double b);
+    void set_color(double rgb);
+
+    void set_color(PyObject *input);
+    //
+
+    void point(double x, double y, double z, double line_width = DEF_LINEW - EPSILON);
+    void line(double x1, double y1, double z1, double x2, double y2, double z2, double line_width = DEF_LINEW - EPSILON);
 };

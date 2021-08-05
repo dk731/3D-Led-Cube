@@ -31,6 +31,8 @@ int CubeDrawer::_get_virt_amount_()
 
 CubeDrawer::CubeDrawer(double brightness, bool sync, int fps) : prev_show_time(0), is_sync(sync), delta_time(0)
 {
+    init_gl();
+
     transform_list.push_back(new struct Transform);
 #ifdef VIRT_CUBE
     struct ws_events evs;
@@ -73,9 +75,7 @@ int CubeDrawer::parse_num_input(PyObject *input, int req_len)
     else if (PyList_Check(input))
         cur_funcs = &parse_funcs[PY_LIST_PARSE];
     else
-    {
         THROW_EXP("Invalid input, was expecting tuple or list", -1)
-    }
 
     cur_parsed_args.clear();
 
@@ -102,49 +102,6 @@ int CubeDrawer::parse_num_input(PyObject *input, int req_len)
     return inp_len;
 }
 
-void CubeDrawer::set_brigthness(double b)
-{
-    if (b < 0 || b > 1)
-    {
-        THROW_EXP("Invalid input, values only in range [0, 1] are allowed", )
-    }
-    cur_brush.brigthness = b;
-    set_color(cur_brush.rr, cur_brush.gg, cur_brush.bb);
-}
-
-void CubeDrawer::set_color(double r, double g, double b)
-{
-    if (r < 0.0 || r > 255.0 || g < 0.0 || g > 255.0 || b < 0.0 || b > 255.0)
-    {
-        THROW_EXP("Invalid input, values must be in range [0, 255]", )
-    }
-
-    cur_brush.rr = r;
-    cur_brush.gg = g;
-    cur_brush.bb = b;
-
-    cur_brush.r = (unsigned char)round(cur_brush.rr * cur_brush.brigthness);
-    cur_brush.g = (unsigned char)round(cur_brush.gg * cur_brush.brigthness);
-    cur_brush.b = (unsigned char)round(cur_brush.bb * cur_brush.brigthness);
-
-    cur_brush.r = cur_brush.rr && !cur_brush.r ? 1 : cur_brush.r;
-    cur_brush.g = cur_brush.gg && !cur_brush.g ? 1 : cur_brush.g;
-    cur_brush.b = cur_brush.bb && !cur_brush.b ? 1 : cur_brush.b;
-}
-
-void CubeDrawer::set_color(double rgb)
-{
-    set_color(rgb, rgb, rgb);
-}
-
-void CubeDrawer::set_color(PyObject *input)
-{
-    if (parse_num_input(input, 3) < 0)
-        return;
-
-    set_color(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2]);
-}
-
 PyObject *CubeDrawer::get_cur_color()
 {
 
@@ -154,10 +111,9 @@ PyObject *CubeDrawer::get_cur_color()
                         PyLong_FromLongLong(cur_brush.b));
 }
 
-void CubeDrawer::calc_transform(double *cur_vec)
+void CubeDrawer::apply_transforms(double *cur_vec)
 {
     double tmp_vec[4];
-    // std::cout << "Input vector: (" << cur_vec[0] << ", " << cur_vec[1] << ", " << cur_vec[2] << ")" << std::endl;
     for (int i = transform_list.size() - 1; i >= 0; i--)
     {
         Transform *cur_trans = transform_list[i];
@@ -167,45 +123,12 @@ void CubeDrawer::calc_transform(double *cur_vec)
         {
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 4, 4, 4, 1.0, cur_trans->translation, 4, cur_trans->rotation, 4, 0.0, temp_mat, 4);
             cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 4, 4, 4, 1.0, temp_mat, 4, cur_trans->scale, 4, 0.0, cur_trans->final, 4);
+            cur_trans->need_recalc = false;
         }
 
         cblas_dgemv(CblasRowMajor, CblasNoTrans, 4, 4, 1.0, cur_trans->final, 4, cur_vec, 1, 0.0, tmp_vec, 1);
         memcpy(cur_vec, tmp_vec, sizeof(double) << 2);
     }
-    // std::cout << "Output vector: (" << cur_vec[0] << ", " << cur_vec[1] << ", " << cur_vec[2] << ")" << std::endl;
-}
-
-void CubeDrawer::set_pixel(double x, double y, double z)
-{
-    double cur_vec[4] = {x, y, z, 1.0};
-    calc_transform(cur_vec);
-
-    set_pixel_nt(cur_vec[0], cur_vec[1], cur_vec[2]);
-}
-
-void CubeDrawer::set_pixel(PyObject *input)
-{
-    if (parse_num_input(input, 3) < 0)
-        return;
-    set_pixel(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2]);
-}
-
-void CubeDrawer::set_pixel_nt(double x, double y, double z)
-{
-    // std::cout << "Set pixel at: (" << x << ", " << y << ", " << z << ")" << std::endl;
-    int rx = round(x), ry = round(y), rz = round(z);
-
-    if (!CHECK_IN_BOX(rx, ry, rz))
-        return;
-
-    memcpy(&back_buf[(((rz << 4) + ry) << 4) + rx].g, &cur_brush.g, 3);
-}
-
-void CubeDrawer::set_pixel_nt(PyObject *input)
-{
-    if (parse_num_input(input, 3) < 0)
-        return;
-    set_pixel_nt(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2]);
 }
 
 void CubeDrawer::push_matrix()
@@ -263,8 +186,9 @@ void CubeDrawer::translate(PyObject *input)
 
 void CubeDrawer::rotate(double x, double y, double z)
 {
-    double *cur_trans = transform_list.back()->rotation;
     Transform *trans_obj = transform_list.back();
+    double *cur_trans = trans_obj->rotation;
+    trans_obj->need_recalc = true;
 
     trans_obj->rx += x;
     trans_obj->ry += y;
@@ -279,11 +203,6 @@ void CubeDrawer::rotate(double x, double y, double z)
     cur_trans[8] = -sin(trans_obj->ry);
     cur_trans[9] = cos(trans_obj->ry) * sin(trans_obj->rx);
     cur_trans[10] = cos(trans_obj->ry) * cos(trans_obj->rx);
-
-    // COUT_VECTOR("Angles", (&trans_obj->rx))
-    // COUT_VECTOR("1]", (&cur_trans[0]))
-    // COUT_VECTOR("2]", (&cur_trans[4]))
-    // COUT_VECTOR("3]", (&cur_trans[8]))
 }
 void CubeDrawer::rotate(PyObject *input)
 {
@@ -342,6 +261,7 @@ void CubeDrawer::clear(PyObject *input)
 
 void CubeDrawer::show()
 {
+    render_texture();
     long delta = min_frame_delay - (GET_MICROS() - prev_show_time);
     if (delta > 0)
         SLEEP_MICROS(delta);
@@ -375,135 +295,6 @@ void CubeDrawer::show()
     prev_show_time = GET_MICROS();
 }
 
-bool CubeDrawer::line_box_intr(double *p1, double *p2, bool opt_both_points)
-{
-    double line[3] = {p1[0] - p2[0], p1[1] - p2[1], p1[2] - p2[2]};
-    double sq_line_len = line[0] * line[0] + line[1] * line[1] + line[2] * line[2];
-    // COUT_VECTOR("Line", line)
-    double *cur_change = p1;
-    bool found = false;
-    for (int i = 0; i < 6; i++)
-    {
-        double *normal = &normal_list[i * 3];
-        double nor_l = cblas_ddot(3, normal, 1, line, 1);
-
-        if (abs(nor_l) < EPSILON)
-        {
-            // std::cout << "Parralel" << std::endl;
-            // COUT_VECTOR("Normal", normal)
-            // COUT_VECTOR("Line", line)
-            continue;
-        }
-
-        double tmp_res[3];
-        memcpy(tmp_res, p1, sizeof(double) * 3);
-        double *plane_point = &coord_list[i < 3 ? 0 : 3];
-
-        double diff[3] = {p1[0] - plane_point[0], p1[1] - plane_point[1], p1[2] - plane_point[2]};
-
-        double t = cblas_ddot(3, diff, 1, normal, 1) / nor_l;
-
-        tmp_res[0] -= line[0] * t;
-        tmp_res[1] -= line[1] * t;
-        tmp_res[2] -= line[2] * t;
-
-        double res_p2_line[3] = {tmp_res[0] - p2[0], tmp_res[1] - p2[1], tmp_res[2] - p2[2]};
-
-        double dot_pr = cblas_ddot(3, res_p2_line, 1, line, 1);
-
-        if (dot_pr > 0 && (dot_pr < sq_line_len))
-        {
-            memcpy(cur_change, tmp_res, sizeof(double) * 3);
-            if (found || !opt_both_points)
-                return true;
-
-            cur_change = p2;
-            found = true;
-        }
-    }
-    return found;
-}
-
-bool CubeDrawer::optimise_line_points(double *p1, double *p2)
-{
-    bool p1_in = CHECK_P_IN_BOX(p1), p2_in = CHECK_P_IN_BOX(p2);
-
-    if (p1_in && p2_in)
-        return true;
-
-    else if (!p1_in && !p2_in)
-    {
-        if (!line_box_intr(p2, p1, true))
-            return false;
-    }
-    else
-    {
-        if (p1_in)
-        {
-            double *tmp;
-            tmp = p2;
-            p2 = p1;
-            p1 = tmp;
-        }
-        line_box_intr(p1, p2, false);
-    }
-    return true;
-}
-
-void CubeDrawer::line(double x1, double y1, double z1, double x2, double y2, double z2)
-{
-    double p1[4] = {x1, y1, z1, 1.0};
-    double p2[4] = {x2, y2, z2, 1.0};
-
-    calc_transform(p1);
-    calc_transform(p2);
-
-    if (!optimise_line_points(p1, p2))
-        return;
-
-    double line[3] = {p2[0] - p1[0],
-                      p2[1] - p1[1],
-                      p2[2] - p1[2]};
-    double len = sqrt(line[0] * line[0] + line[1] * line[1] + line[2] * line[2]);
-
-    if (len < EPSILON)
-    {
-        set_pixel(p1[0], p1[1], p1[2]);
-        return;
-    }
-
-    double cur_point = 0.0;
-
-    while (cur_point <= len)
-    {
-        double t = cur_point / len;
-        set_pixel_nt(p1[0] + t * line[0], p1[1] + t * line[1], p1[2] + t * line[2]);
-        cur_point += line_res;
-    }
-    set_pixel_nt(p2[0], p2[1], p2[2]);
-}
-
-void CubeDrawer::line(PyObject *input1, PyObject *input2)
-{
-    if (parse_num_input(input1, 3) < 0)
-        return;
-    double tmp[3];
-    memcpy(tmp, &cur_parsed_args[0], sizeof(double) * 3);
-
-    if (parse_num_input(input2, 3) < 0)
-        return;
-
-    line(tmp[0], tmp[1], tmp[2], cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2]);
-}
-
-void CubeDrawer::line(PyObject *input)
-{
-    if (parse_num_input(input, 6) < 0)
-        return;
-
-    line(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2], cur_parsed_args[3], cur_parsed_args[4], cur_parsed_args[5]);
-}
-
 void CubeDrawer::set_fps_cap(int fps)
 {
     if (!fps)
@@ -513,3 +304,286 @@ void CubeDrawer::set_fps_cap(int fps)
 
     std::cout << "Changed fps cap to be: " << fps << " fps or " << min_frame_delay << " us or " << min_frame_delay / 1000.0 << " ms" << std::endl;
 }
+
+////////// Color
+void CubeDrawer::set_brigthness(double b)
+{
+    if (b < 0 || b > 1)
+        THROW_EXP("Invalid input, values only in range [0, 1] are allowed", )
+
+    cur_brush.brigthness = b;
+    set_color(cur_brush.r, cur_brush.g, cur_brush.b);
+}
+
+void CubeDrawer::set_brigthness(int b)
+{
+    if (b < 0 || b > 255)
+        THROW_EXP("Invalid input, values only in range [0, 255] are allowed", )
+
+    cur_brush.brigthness = b / 255.0;
+    set_color(cur_brush.r, cur_brush.g, cur_brush.b);
+}
+
+void CubeDrawer::set_color(int r, int g, int b)
+{
+    if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255)
+        THROW_EXP("Invalid input, values must be in range [0, 255]", )
+
+    cur_brush.r = (unsigned char)round(r * cur_brush.brigthness);
+    cur_brush.g = (unsigned char)round(g * cur_brush.brigthness);
+    cur_brush.b = (unsigned char)round(b * cur_brush.brigthness);
+
+    cur_brush.r = r && !cur_brush.r ? 1 : cur_brush.r;
+    cur_brush.g = g && !cur_brush.g ? 1 : cur_brush.g;
+    cur_brush.b = b && !cur_brush.b ? 1 : cur_brush.b;
+}
+
+void CubeDrawer::set_color(int rgb)
+{
+    set_color(rgb, rgb, rgb);
+}
+
+void CubeDrawer::set_color(double r, double g, double b)
+{
+    if (r < 0.0 || r > 1.0 || g < 0.0 || g > 1.0 || b < 0.0 || b > 1.0)
+        THROW_EXP("Invalid input, values must be in range [0.0, 1.0]", )
+
+    set_color((int)r * 255, (int)g * 255, (int)b * 255);
+}
+
+void CubeDrawer::set_color(double rgb)
+{
+    set_color(rgb, rgb, rgb);
+}
+
+void CubeDrawer::set_color(PyObject *input)
+{
+    if (parse_num_input(input, 3) < 0)
+        return;
+    if (PyLong_Check(PyTuple_GetItem(input, 0)))
+        set_color(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2]);
+    else
+        set_color((int)cur_parsed_args[0], (int)cur_parsed_args[1], (int)cur_parsed_args[2]);
+}
+
+////////// \Color
+
+void CubeDrawer::point(double x, double y, double z, double line_width)
+{
+}
+
+void CubeDrawer::line(double x1, double y1, double z1, double x2, double y2, double z2, double line_width)
+{
+}
+
+////////// OpenGL
+void CubeDrawer::init_gl()
+{
+    if (glfwInit() != GLFW_TRUE)
+    {
+        std::cout << "Failed to initialize GLFW" << std::endl;
+        return;
+    }
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+    glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+
+    context = glfwCreateWindow(16, 256, "", NULL, NULL);
+    if (context == NULL)
+    {
+        std::cout << "Failed to create GLFW context" << std::endl;
+        glfwTerminate();
+        return;
+    }
+    glfwMakeContextCurrent(context);
+
+    GLenum err = glewInit();
+    if (err != GLEW_OK)
+    {
+        std::cout << "Failed initializing GLEW, error code: " << err << std::endl;
+        return;
+    }
+
+    std::ifstream in("./shaders/main.vert");
+    std::string tmp_vert = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+    const char *vert_str = tmp_vert.c_str();
+    in.close();
+
+    in = std::ifstream("./shaders/main.frag");
+    std::string tmp_frag = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+    const char *frag_str = tmp_frag.c_str();
+    in.close();
+
+    GLuint vert_shade = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vert_shade, 1, &vert_str, NULL);
+    glCompileShader(vert_shade);
+    check_compile(vert_shade);
+
+    GLuint frag_shade = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(frag_shade, 1, &frag_str, NULL);
+    glCompileShader(frag_shade);
+    check_compile(frag_shade);
+
+    main_prog = glCreateProgram();
+
+    glAttachShader(main_prog, vert_shade);
+    glAttachShader(main_prog, frag_shade);
+
+    int success;
+    char infoLog[512];
+    glLinkProgram(main_prog);
+    glGetProgramiv(main_prog, GL_LINK_STATUS, &success);
+    if (!success)
+    {
+        glGetProgramInfoLog(main_prog, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
+                  << infoLog << std::endl;
+    }
+    glUseProgram(main_prog);
+
+    glDeleteShader(vert_shade);
+    glDeleteShader(frag_shade);
+
+    for (int z = 0; z < 16; z++)
+        for (int y = 0; y < 16; y++)
+            for (int x = 0; x < 16; x++)
+            {
+                int ind = (x + (y + z * 16) * 16) * 3;
+                gl_vertices[ind] = x;
+                gl_vertices[ind + 1] = y;
+                gl_vertices[ind + 2] = z;
+            }
+
+    // Init in/out data
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &vbo);
+    glGenBuffers(1, &dc_vbo);
+
+    glBindVertexArray(vao);
+    //// Init vertices data
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 12288, gl_vertices, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void *)0);
+    ////
+
+    //// Init draw calls data
+    glBindBuffer(GL_ARRAY_BUFFER, dc_vbo);
+
+    for (int i = 1; i < 7; i++)
+        glEnableVertexAttribArray(i);
+
+    int dc_str_size = sizeof(DrawCall);
+
+    glVertexAttribIPointer(1, 1, GL_INT, dc_str_size, (GLvoid *)offsetof(DrawCall, type));
+    glVertexAttribPointer(2, 3, GL_UNSIGNED_BYTE, GL_FALSE, dc_str_size, (GLvoid *)offsetof(DrawCall, color));
+
+    for (int i = 0; i < 4; i++)
+        glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, dc_str_size, (GLvoid *)(offsetof(DrawCall, data) + sizeof(float) * 4 * i));
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    for (int i = 1; i < 7; i++)
+        glVertexAttribDivisor(i, 1);
+
+    glBindVertexArray(0);
+    ////
+
+    //// Init output buffer (texture)
+
+    glGenFramebuffers(1, &pix_buf);
+    glBindFramebuffer(GL_FRAMEBUFFER, pix_buf);
+    GLuint text;
+    glGenTextures(1, &text);
+    glBindTexture(GL_TEXTURE_2D, text);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 16, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, text, 0);
+
+    GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+    glDrawBuffers(1, DrawBuffers);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    {
+        std::cout << "Frame buffer was not initialized" << std::endl;
+        return;
+    }
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+
+    std::thread tmp_t(&CubeDrawer::pool_events, this);
+    tmp_t.detach();
+
+    DrawCall *new_point_call = new DrawCall({
+        .type = CALL_SPHERE_TYPE,
+        .color = {255, 0, 0},
+        .data = {7.5f, 7.5f, 7.5f, 1.0f, 7.0f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+    });
+
+    draw_calls_arr.push_back(*new_point_call);
+}
+
+bool CubeDrawer::check_compile(GLuint obj)
+{
+    GLint status;
+    glGetShaderiv(obj, GL_COMPILE_STATUS, &status);
+    if (status == GL_FALSE)
+    {
+        GLint length;
+        glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &length);
+        std::vector<char> log(length);
+        glGetShaderInfoLog(obj, length, NULL, &log[0]);
+        std::cerr << &log[0];
+        return false;
+    }
+    return true;
+}
+
+void CubeDrawer::render_texture()
+{
+    if (draw_calls_arr.size())
+    {
+        // Update draw calls data
+        glBindBuffer(GL_ARRAY_BUFFER, dc_vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(DrawCall) * draw_calls_arr.size(), &draw_calls_arr[0], GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, dc_vbo);
+
+        // Clear deph buffer
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        glUseProgram(main_prog);
+        glBindVertexArray(vao);
+        glBindFramebuffer(GL_FRAMEBUFFER, pix_buf);
+        // glViewport(0, 0, 16, 768);
+
+        // Setup uniforms
+        GLuint tmp_val = glGetUniformLocation(main_prog, "prim_calls_sum");
+        glUniform1i(tmp_val, draw_calls_arr.size());
+
+        // Render
+        glDrawArraysInstanced(GL_POINTS, 0, 4096, draw_calls_arr.size());
+
+        draw_calls_arr.clear();
+        // glfwSwapBuffers(context);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, pix_buf);
+        glReadPixels(0, 0, 16, 256, GL_RGB, GL_UNSIGNED_BYTE, back_buf);
+    }
+}
+
+void CubeDrawer::pool_events()
+{
+    while (1)
+    {
+        glfwPollEvents();
+        SLEEP_MICROS(500000);
+    }
+}
+////////// \Opengl

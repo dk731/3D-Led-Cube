@@ -3,6 +3,7 @@
     "iostream": "cpp",
     "iosfwd": "cpp",
     "ostream": "cpp",
-    "stdexcept": "cpp"
+    "stdexcept": "cpp",
+    "mutex": "cpp"
   }
 }

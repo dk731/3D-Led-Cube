@@ -1,6 +1,16 @@
 from distutils.core import setup, Extension
 
-extra_link = ["-lrt", "-lblas", "/usr/local/lib64/libws.a", "-lpthread"]
+extra_link = [
+    "/usr/local/lib64/libws.a",
+    "-lpthread",
+    "-lrt",
+    "-lblas",
+    "-lGLEW",
+    "-lGL",
+    "-lglfw",
+    "-L/usr/lib/x86_64-linux-gnu/",
+]
+
 extra_macros = [("VIRT_CUBE", None)]
 led_module = Extension(
     "_ledcd",
