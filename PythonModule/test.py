@@ -45,3 +45,9 @@ while True:
 
     cd.show()
     # print(round(1 / cd.delta_time), "Lines: ", count, "      ", end="\r")
+
+
+from ledcd import CubeDrawer
+
+a = CubeDrawer.get_obj()
+a.show()
