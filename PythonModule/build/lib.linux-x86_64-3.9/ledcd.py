@@ -63,6 +63,7 @@ class _SwigNonDynamicMeta(type):
 
 EPSILON = _ledcd.EPSILON
 DEF_LINEW = _ledcd.DEF_LINEW
+DEF_ZHEIGHT = _ledcd.DEF_ZHEIGHT
 class Brush(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
@@ -165,11 +166,19 @@ class Transform(object):
     translation = property(_ledcd.Transform_translation_get, _ledcd.Transform_translation_set)
     rotation = property(_ledcd.Transform_rotation_get, _ledcd.Transform_rotation_set)
     scale = property(_ledcd.Transform_scale_get, _ledcd.Transform_scale_set)
+    local_final = property(_ledcd.Transform_local_final_get, _ledcd.Transform_local_final_set)
     final = property(_ledcd.Transform_final_get, _ledcd.Transform_final_set)
     rx = property(_ledcd.Transform_rx_get, _ledcd.Transform_rx_set)
     ry = property(_ledcd.Transform_ry_get, _ledcd.Transform_ry_set)
     rz = property(_ledcd.Transform_rz_get, _ledcd.Transform_rz_set)
-    need_recalc = property(_ledcd.Transform_need_recalc_get, _ledcd.Transform_need_recalc_set)
+    local_recalc = property(_ledcd.Transform_local_recalc_get, _ledcd.Transform_local_recalc_set)
+    recalc = property(_ledcd.Transform_recalc_get, _ledcd.Transform_recalc_set)
+
+    def update_local(self):
+        return _ledcd.Transform_update_local(self)
+
+    def update_global(self, prev):
+        return _ledcd.Transform_update_global(self, prev)
 
     def __init__(self):
         _ledcd.Transform_swiginit(self, _ledcd.new_Transform())
@@ -232,8 +241,29 @@ class CubeDrawer(object):
     def point(self, *args):
         return _ledcd.CubeDrawer_point(self, *args)
 
+    def poly(self, *args):
+        return _ledcd.CubeDrawer_poly(self, *args)
+
+    def poly_pyr(self, *args):
+        return _ledcd.CubeDrawer_poly_pyr(self, *args)
+
     def line(self, *args):
         return _ledcd.CubeDrawer_line(self, *args)
+
+    def circle(self, *args):
+        return _ledcd.CubeDrawer_circle(self, *args)
+
+    def filled_circle(self, *args):
+        return _ledcd.CubeDrawer_filled_circle(self, *args)
+
+    def cylinder(self, *args):
+        return _ledcd.CubeDrawer_cylinder(self, *args)
+
+    def sphere(self, *args):
+        return _ledcd.CubeDrawer_sphere(self, *args)
+
+    def filled_sphere(self, *args):
+        return _ledcd.CubeDrawer_filled_sphere(self, *args)
 
 # Register CubeDrawer in _ledcd:
 _ledcd.CubeDrawer_swigregister(CubeDrawer)

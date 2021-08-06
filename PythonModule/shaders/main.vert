@@ -4,11 +4,11 @@
 #define CALL_POINT_TYPE 0 // 1D Point; 3D Solid Sphere
 #define CALL_POLYGON_TYPE 1 // 2D Triangle; 3D Triangle Prism
 #define CALL_POLYPYR_TYPE 2 // 3D Triangle Pyramid
-#define CALL_LINE_TYPE 3 // 2D Line; 3D Cylider; 2D Filled Circle
-#define CALL_CIRCLE_TYPE 4 // 2D Cicrcle Line; 3D Cylinder without foundations
-#define CALL_FCIRCLE_TYPE 5 // 2D Cicrcle; 3D Cylinder
-#define CALL_SPHERE_TYPE 6 // 3D Hollow Sphere
-#define CALL_FSPHERE_TYPE 7 // 3D Filled Sphere
+#define CALL_LINE_TYPE 3 // 2D Line; 3D Cylider; 2D Circle
+#define CALL_CIRCLE_TYPE 4 // 2D Circle line; 2D Ellipse Line; 3D Elliptic Cylinder without foundations
+#define CALL_FCIRCLE_TYPE 5 // 2D Ellipse; 3D Elliptic Cylinder
+#define CALL_SPHERE_TYPE 6 // 3D Ellipsoid Hollow
+#define CALL_FSPHERE_TYPE 7 // 3D Ellipsoid
 ////
 
 #define EPSILON 0.0001
@@ -87,21 +87,21 @@ bool point_check()
   return length(in_pos - call_data[0].xyz) <= call_data[1].x;
 }
 
-// POLY_CHECK(VEC3 POS1, VEC3 POS2, VEC3 POS3)
+// POLY_CHECK(VEC3 POS1, VEC3 POS2, VEC3 POS3, FLOAT Z_HEIGHT)
 // Data Matrix layout:
 // x y z .  <- POS1
 // x y z .  <- POS2
 // x y z .  <- POS3
-// w . . .  <- LINE_WIDTH
+// w . . .  <- Z_HEIGHT
 ///////////////////
 bool poly_check() 
 {
   vec3 p1 = call_data[0].xyz;
   vec3 p2 = call_data[1].xyz;
   vec3 p3 = call_data[2].xyz;
-  float line_width = call_data[3].x;
+  float z_height = call_data[3].x;
 
-  if (abs(dot(p1 - in_pos, normalize(cross(p2 - p1, p3 - p1)))) > line_width)
+  if (abs(dot(p1 - in_pos, normalize(cross(p2 - p1, p3 - p1)))) > z_height)
     return false;
 
   vec3 parray[9] = vec3[9](p1, p2, p3, p2, p3, p1, p3, p1, p2);
@@ -176,12 +176,13 @@ bool cicle_check()
 {
   mat4 inv_mat = inverse(
     mat4(
-      vec4(call_data[0].x, call_data[1].x, call_data[2].x, 0.0), 
-      vec4(call_data[0].y, call_data[1].y, call_data[2].y, 0.0), 
-      vec4(call_data[0].z, call_data[1].z, call_data[2].z, 0.0), 
-      vec4(call_data[0].w, call_data[1].w, call_data[2].w, 1.0)
+      vec4(call_data[0]), 
+      vec4(call_data[1]), 
+      vec4(call_data[2]), 
+      vec4(0.0, 0.0, 0.0, 1.0)
     )
   );
+
 
   vec2 r = call_data[3].xy;
   float line_width = call_data[3].z;
@@ -201,23 +202,23 @@ bool cicle_check()
 // x y z w  <- MODEL_MAT(0)
 // x y z w  <- MODEL_MAT(1)
 // x y z w  <- MODEL_MAT(2)
-// x y h .  <- R; Z_HEIGHT
+// x y . h  <- R; Z_HEIGHT
 ///////////////////
 bool fcircle_check()
 {
   mat4 inv_mat = inverse(
     mat4(
-      vec4(call_data[0].x, call_data[1].x, call_data[2].x, 0.0), 
-      vec4(call_data[0].y, call_data[1].y, call_data[2].y, 0.0), 
-      vec4(call_data[0].z, call_data[1].z, call_data[2].z, 0.0), 
-      vec4(call_data[0].w, call_data[1].w, call_data[2].w, 1.0)
+      vec4(call_data[0]), 
+      vec4(call_data[1]), 
+      vec4(call_data[2]), 
+      vec4(0.0, 0.0, 0.0, 1.0)
     )
   );
 
   vec2 r = call_data[3].xy;
-  float z_height = call_data[3].z;
+  float z_height = call_data[3].w;
 
-  vec3 new_pos = (inv_mat * vec4(in_pos, 1.0)).xyz;
+  vec3 new_pos = (vec4(in_pos, 1.0) * inv_mat).xyz;
 
   if (abs(new_pos.z) > z_height)
     return false;
@@ -237,10 +238,10 @@ bool sphere_check()
 {
   mat4 inv_mat = inverse(
     mat4(
-      vec4(call_data[0].x, call_data[1].x, call_data[2].x, 0.0), 
-      vec4(call_data[0].y, call_data[1].y, call_data[2].y, 0.0), 
-      vec4(call_data[0].z, call_data[1].z, call_data[2].z, 0.0), 
-      vec4(call_data[0].w, call_data[1].w, call_data[2].w, 1.0)
+      vec4(call_data[0]), 
+      vec4(call_data[1]), 
+      vec4(call_data[2]), 
+      vec4(0.0, 0.0, 0.0, 1.0)
     )
   );
 
@@ -264,10 +265,10 @@ bool fsphere_check()
 {
   mat4 inv_mat = inverse(
     mat4(
-      vec4(call_data[0].x, call_data[1].x, call_data[2].x, 0.0), 
-      vec4(call_data[0].y, call_data[1].y, call_data[2].y, 0.0), 
-      vec4(call_data[0].z, call_data[1].z, call_data[2].z, 0.0), 
-      vec4(call_data[0].w, call_data[1].w, call_data[2].w, 1.0)
+      vec4(call_data[0]), 
+      vec4(call_data[1]), 
+      vec4(call_data[2]), 
+      vec4(0.0, 0.0, 0.0, 1.0)
     )
   );
 
