@@ -144,11 +144,33 @@ struct Transform
     double translation[16] = {1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0};
     double rotation[16] = {1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0};
     double scale[16] = {1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0};
+    double local_final[16] = {1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0};
     double final[16] = {1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0};
+
     double rx = 0.0;
     double ry = 0.0;
     double rz = 0.0;
-    bool need_recalc = false;
+
+    bool local_recalc = false;
+    bool recalc = true;
+
+    void update_local()
+    {
+        double temp_mat[16];
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 4, 4, 4, 1.0, translation, 4, rotation, 4, 0.0, temp_mat, 4);
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 4, 4, 4, 1.0, temp_mat, 4, scale, 4, 0.0, local_final, 4);
+        local_recalc = false;
+        recalc = true;
+    }
+
+    void update_global(Transform *prev)
+    {
+        if (local_recalc)
+            update_local();
+
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 4, 4, 4, 1.0, local_final, 4, prev->local_final, 4, 0.0, final, 4);
+        recalc = false;
+    }
 };
 
 class CubeDrawer
@@ -172,6 +194,7 @@ private:
     ParseFuncs parse_funcs[2] = {(ParseFuncs){PyTuple_Size, PyTuple_GetItem}, (ParseFuncs){PyList_Size, PyList_GetItem}};
     PyObject *py_exception = PyErr_NewException("ledcd.CubeDrawer", NULL, NULL);
     void apply_transforms(double *cur_vec);
+    double *inverse_mat44(double *mat);
 
     //opengl
     GLuint vbo, vao, dc_vbo; // main vbo/vao and draw calls data vbo

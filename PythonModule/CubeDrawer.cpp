@@ -33,7 +33,8 @@ CubeDrawer::CubeDrawer(double brightness, bool sync, int fps) : prev_show_time(0
 {
     init_gl();
 
-    transform_list.push_back(new struct Transform);
+    transform_list.push_back(new Transform({.recalc = false})); // First matrix not editable
+    transform_list.push_back(new Transform());
 #ifdef VIRT_CUBE
     struct ws_events evs;
     evs.onopen = &onopen;
@@ -113,34 +114,33 @@ PyObject *CubeDrawer::get_cur_color()
 
 void CubeDrawer::apply_transforms(double *cur_vec)
 {
+    Transform *lt = transform_list.back();
+    if (lt->local_recalc)
+        lt->update_local();
+    if (lt->recalc)
+        lt->update_global(transform_list[transform_list.size() - 2]);
     double tmp_vec[4];
-    for (int i = transform_list.size() - 1; i >= 0; i--)
-    {
-        Transform *cur_trans = transform_list[i];
-        double temp_mat[16];
-
-        if (cur_trans->need_recalc)
-        {
-            cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 4, 4, 4, 1.0, cur_trans->translation, 4, cur_trans->rotation, 4, 0.0, temp_mat, 4);
-            cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 4, 4, 4, 1.0, temp_mat, 4, cur_trans->scale, 4, 0.0, cur_trans->final, 4);
-            cur_trans->need_recalc = false;
-        }
-
-        cblas_dgemv(CblasRowMajor, CblasNoTrans, 4, 4, 1.0, cur_trans->final, 4, cur_vec, 1, 0.0, tmp_vec, 1);
-        memcpy(cur_vec, tmp_vec, sizeof(double) << 2);
-    }
+    cblas_dgemv(CblasRowMajor, CblasNoTrans, 4, 4, 1.0, lt->final, 4, cur_vec, 1, 0.0, tmp_vec, 1);
+    memcpy(cur_vec, tmp_vec, sizeof(double) * 4);
 }
 
 void CubeDrawer::push_matrix()
 {
-    transform_list.push_back(new struct Transform);
+    Transform *lt = transform_list.back();
+
+    if (lt->local_recalc)
+        lt->update_local();
+    if (lt->recalc)
+        lt->update_global(transform_list[transform_list.size() - 2]);
+
+    transform_list.push_back(new Transform);
 }
 
 void CubeDrawer::pop_matrix()
 {
-    if (transform_list.size() == 1) // clear first matrix to default values
+    if (transform_list.size() == 2) // clear first matrix to default values
     {
-        Transform *cur_trans = transform_list[0];
+        Transform *cur_trans = transform_list[1];
         for (int i = 0; i < 16; i++)
             cur_trans->translation[i] = i % 5 ? 0.0 : 1.0;
 
@@ -156,7 +156,9 @@ void CubeDrawer::pop_matrix()
         cur_trans->rx = 0.0;
         cur_trans->ry = 0.0;
         cur_trans->rz = 0.0;
-        cur_trans->need_recalc = false;
+
+        cur_trans->local_recalc = false;
+        cur_trans->recalc = false;
     }
     else
     {
@@ -173,7 +175,7 @@ void CubeDrawer::translate(double x, double y, double z)
     cur_trans[7] += y;
     cur_trans[11] += z;
 
-    transform_list.back()->need_recalc = true;
+    transform_list.back()->local_recalc = true;
 }
 
 void CubeDrawer::translate(PyObject *input)
@@ -188,7 +190,7 @@ void CubeDrawer::rotate(double x, double y, double z)
 {
     Transform *trans_obj = transform_list.back();
     double *cur_trans = trans_obj->rotation;
-    trans_obj->need_recalc = true;
+    trans_obj->local_recalc = true;
 
     trans_obj->rx += x;
     trans_obj->ry += y;
@@ -220,7 +222,7 @@ void CubeDrawer::scale(double x, double y, double z)
     cur_trans[5] += y;
     cur_trans[10] += z;
 
-    transform_list.back()->need_recalc = true;
+    transform_list.back()->local_recalc = true;
 }
 
 void CubeDrawer::scale(PyObject *input)

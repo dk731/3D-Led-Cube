@@ -6,8 +6,9 @@
 #define CALL_POLYPYR_TYPE 2 // 3D Triangle Pyramid
 #define CALL_LINE_TYPE 3 // 2D Line; 3D Cylider; 2D Filled Circle
 #define CALL_CIRCLE_TYPE 4 // 2D Cicrcle Line; 3D Cylinder without foundations
-#define CALL_SPHERE_TYPE 5 // 3D Hollow Sphere
-#define CALL_FSPHERE_TYPE 6 // 3D Filled Sphere
+#define CALL_FCIRCLE_TYPE 5 // 2D Cicrcle; 3D Cylinder
+#define CALL_SPHERE_TYPE 6 // 3D Hollow Sphere
+#define CALL_FSPHERE_TYPE 7 // 3D Filled Sphere
 ////
 
 #define EPSILON 0.0001
@@ -64,6 +65,8 @@ bool check_bind()
     return line_check();
   case CALL_CIRCLE_TYPE:
     return cicle_check();
+  case CALL_FCIRCLE_TYPE:
+    return fcircle_check();
   case CALL_SPHERE_TYPE:
     return sphere_check();
   case CALL_FSPHERE_TYPE:
@@ -162,53 +165,116 @@ bool line_check()
 }
 
 
-// CIRCLE_CHECK(VEC3 POS, VEC3 DIR, VEC3 R, FLOAT LINE_WIDTH, FLOAT Z_HEIGHT)
+// CIRCLE_CHECK(MAT4X3 MODEL_MAT; VEC2 R, FLOAT LINE_WIDTH, FLOAT Z_HEIGHT)
 // Data Matrix layout:
-// x y z .  <- POS
-// x y z .  <- DIR
-// x y z .  <- R
-// w z . .  <- LINE_WITH; Z_HEIGHT
+// x y z w  <- MODEL_MAT(0)
+// x y z w  <- MODEL_MAT(1)
+// x y z w  <- MODEL_MAT(2)
+// x y w h  <- R; LINE_WIDTH; Z_HEIGHT
 ///////////////////
 bool cicle_check()
 {
-  vec3 p1 = call_data[0].xyz;
-  vec3 dir = call_data[1].xyz;
-  vec3 r = call_data[2].xyz;
-  float line_width = call_data[3].x / 2.0;
-  float z_height = call_data[3].y / 2.0;
+  mat4 inv_mat = inverse(
+    mat4(
+      vec4(call_data[0].x, call_data[1].x, call_data[2].x, 0.0), 
+      vec4(call_data[0].y, call_data[1].y, call_data[2].y, 0.0), 
+      vec4(call_data[0].z, call_data[1].z, call_data[2].z, 0.0), 
+      vec4(call_data[0].w, call_data[1].w, call_data[2].w, 1.0)
+    )
+  );
 
-  if (abs(dot(normalize(r), in_pos) + length(p1)) > z_height)
+  vec2 r = call_data[3].xy;
+  float line_width = call_data[3].z;
+  float z_height = call_data[3].w;
+
+  vec3 new_pos = (inv_mat * vec4(in_pos, 1.0)).xyz;
+
+  if (abs(new_pos.z) > z_height)
     return false;
-  
 
-
-  // float dif = length((in_pos - dir) - p1) - r;
-  // return dif >= -line_width && dif <= line_width;
-  return true;
+  vec2 res_vec = (new_pos.xy * new_pos.xy) / (r * r);
+  return abs(res_vec.x + res_vec.y - 1) <= line_width;
 }
 
-// POINT_CHECK(VEC3 POS, VEC3 R, FLOAT LINE_WIDTH)
+// FCIRCLE_CHECK(MAT4X3 MODEL_MAT; VEC2 R, FLOAT Z_HEIGHT)
 // Data Matrix layout:
-// x y z .  <- POS
-// x y z .  <- R
-// w . . .  <- LINE_WIDTH
-// . . . .
+// x y z w  <- MODEL_MAT(0)
+// x y z w  <- MODEL_MAT(1)
+// x y z w  <- MODEL_MAT(2)
+// x y h .  <- R; Z_HEIGHT
+///////////////////
+bool fcircle_check()
+{
+  mat4 inv_mat = inverse(
+    mat4(
+      vec4(call_data[0].x, call_data[1].x, call_data[2].x, 0.0), 
+      vec4(call_data[0].y, call_data[1].y, call_data[2].y, 0.0), 
+      vec4(call_data[0].z, call_data[1].z, call_data[2].z, 0.0), 
+      vec4(call_data[0].w, call_data[1].w, call_data[2].w, 1.0)
+    )
+  );
+
+  vec2 r = call_data[3].xy;
+  float z_height = call_data[3].z;
+
+  vec3 new_pos = (inv_mat * vec4(in_pos, 1.0)).xyz;
+
+  if (abs(new_pos.z) > z_height)
+    return false;
+
+  vec2 res_vec = (new_pos.xy * new_pos.xy) / (r * r);
+  return res_vec.x + res_vec.y <= 1;
+}
+
+// FCIRCLE_CHECK(MAT4X3 MODEL_MAT; VEC3 R, FLOAT LINE_WIDTH)
+// Data Matrix layout:
+// x y z w  <- MODEL_MAT(0)
+// x y z w  <- MODEL_MAT(1)
+// x y z w  <- MODEL_MAT(2)
+// x y z w  <- R; LINE_WIDTH
 ///////////////////
 bool sphere_check()
 {
-  float dif = length(in_pos - call_data[0].xyz) - call_data[1].x;
-  float line_width = call_data[1].y / 2.0f;
-  return dif >= -line_width && dif <= line_width;
+  mat4 inv_mat = inverse(
+    mat4(
+      vec4(call_data[0].x, call_data[1].x, call_data[2].x, 0.0), 
+      vec4(call_data[0].y, call_data[1].y, call_data[2].y, 0.0), 
+      vec4(call_data[0].z, call_data[1].z, call_data[2].z, 0.0), 
+      vec4(call_data[0].w, call_data[1].w, call_data[2].w, 1.0)
+    )
+  );
+
+  vec3 r = call_data[3].xyz;
+  float line_width = call_data[3].w;
+
+  vec3 new_pos = (inv_mat * vec4(in_pos, 1.0)).xyz;
+
+  vec3 res_vec = (new_pos * new_pos) / (r * r);
+  return (res_vec.x + res_vec.y + res_vec.z - 1) <= line_width;
 }
 
-// POINT_CHECK(VEC3 POS, VEC3 R)
+// FCIRCLE_CHECK(MAT4X3 MODEL_MAT; VEC3 R)
 // Data Matrix layout:
-// x y z .  <- POS
+// x y z w  <- MODEL_MAT(0)
+// x y z w  <- MODEL_MAT(1)
+// x y z w  <- MODEL_MAT(2)
 // x y z .  <- R
-// . . . .
-// . . . .
 ///////////////////
 bool fsphere_check()
 {
-  return true;
+  mat4 inv_mat = inverse(
+    mat4(
+      vec4(call_data[0].x, call_data[1].x, call_data[2].x, 0.0), 
+      vec4(call_data[0].y, call_data[1].y, call_data[2].y, 0.0), 
+      vec4(call_data[0].z, call_data[1].z, call_data[2].z, 0.0), 
+      vec4(call_data[0].w, call_data[1].w, call_data[2].w, 1.0)
+    )
+  );
+
+  vec3 r = call_data[3].xyz;
+
+  vec3 new_pos = (inv_mat * vec4(in_pos, 1.0)).xyz;
+
+  vec3 res_vec = (new_pos * new_pos) / (r * r);
+  return res_vec.x + res_vec.y + res_vec.z <= 1;
 }
