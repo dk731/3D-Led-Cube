@@ -146,6 +146,7 @@ CALL_CIRCLE_TYPE = _ledcd.CALL_CIRCLE_TYPE
 CALL_FCIRCLE_TYPE = _ledcd.CALL_FCIRCLE_TYPE
 CALL_SPHERE_TYPE = _ledcd.CALL_SPHERE_TYPE
 CALL_FSPHERE_TYPE = _ledcd.CALL_FSPHERE_TYPE
+CALL_CLEAR_TYPE = _ledcd.CALL_CLEAR_TYPE
 class DrawCall(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr

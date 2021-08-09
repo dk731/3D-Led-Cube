@@ -101,6 +101,7 @@ int CubeDrawer::parse_num_input(PyObject *input, int req_len)
             THROW_EXP("Invalid input, was expecting tuple with numbers", -1)
         }
     }
+
     return inp_len;
 }
 
@@ -121,7 +122,7 @@ void CubeDrawer::apply_transforms(float *cur_vec)
     if (lt->recalc)
         lt->update_global(transform_list[transform_list.size() - 2]);
     float tmp_vec[4];
-    cblas_sgemv(CblasRowMajor, CblasNoTrans, 4, 4, 1.0, lt->final, 4, cur_vec, 1, 0.0f, tmp_vec, 1);
+    cblas_sgemv(CblasColMajor, CblasNoTrans, 4, 4, 1.0, lt->final, 4, cur_vec, 1, 0.0f, tmp_vec, 1);
     memcpy(cur_vec, tmp_vec, sizeof(float) * 4);
 }
 
@@ -172,9 +173,9 @@ void CubeDrawer::translate(float x, float y, float z)
 {
     float *cur_trans = transform_list.back()->translation;
 
-    cur_trans[3] += x;
-    cur_trans[7] += y;
-    cur_trans[11] += z;
+    cur_trans[12] += x;
+    cur_trans[13] += y;
+    cur_trans[14] += z;
 
     transform_list.back()->local_recalc = true;
 }
@@ -197,15 +198,17 @@ void CubeDrawer::rotate(float x, float y, float z)
     trans_obj->ry += y;
     trans_obj->rz += z;
 
-    cur_trans[0] = cos(trans_obj->rz) * cos(trans_obj->ry);
-    cur_trans[1] = cos(trans_obj->rz) * sin(trans_obj->ry) * sin(trans_obj->rx) - sin(trans_obj->rz) * cos(trans_obj->rx);
-    cur_trans[2] = cos(trans_obj->rz) * sin(trans_obj->ry) * cos(trans_obj->rx) + sin(trans_obj->rz) * sin(trans_obj->rx);
-    cur_trans[4] = sin(trans_obj->rz) * cos(trans_obj->ry);
-    cur_trans[5] = sin(trans_obj->rz) * sin(trans_obj->ry) * sin(trans_obj->rx) + cos(trans_obj->rz) * cos(trans_obj->rx);
-    cur_trans[6] = sin(trans_obj->rz) * sin(trans_obj->ry) * cos(trans_obj->rx) + cos(trans_obj->rz) * sin(trans_obj->rx);
-    cur_trans[8] = -sin(trans_obj->ry);
-    cur_trans[9] = cos(trans_obj->ry) * sin(trans_obj->rx);
-    cur_trans[10] = cos(trans_obj->ry) * cos(trans_obj->rx);
+    cur_trans[0] = cos(trans_obj->rx) * cos(trans_obj->ry);
+    cur_trans[1] = sin(trans_obj->rx) * cos(trans_obj->ry);
+    cur_trans[2] = -sin(trans_obj->ry);
+
+    cur_trans[4] = cos(trans_obj->rx) * sin(trans_obj->ry) * sin(trans_obj->rz) - sin(trans_obj->rx) * cos(trans_obj->rz);
+    cur_trans[5] = sin(trans_obj->rx) * sin(trans_obj->ry) * sin(trans_obj->rz) + cos(trans_obj->rx) * cos(trans_obj->rz);
+    cur_trans[6] = cos(trans_obj->ry) * sin(trans_obj->rz);
+
+    cur_trans[8] = cos(trans_obj->rx) * sin(trans_obj->ry) * cos(trans_obj->rz) + sin(trans_obj->rx) * sin(trans_obj->rz);
+    cur_trans[9] = sin(trans_obj->rx) * sin(trans_obj->ry) * cos(trans_obj->rz) - cos(trans_obj->rx) * sin(trans_obj->rz);
+    cur_trans[10] = cos(trans_obj->ry) * cos(trans_obj->rz);
 }
 void CubeDrawer::rotate(PyObject *input)
 {
@@ -236,17 +239,14 @@ void CubeDrawer::scale(PyObject *input)
 
 void CubeDrawer::clear(float r, float g, float b)
 {
-    if (r < 0.0f || r > 255.0f || g < 0.0f || g > 255.0f || b < 0.0f || b > 255.0f)
-    {
-        THROW_EXP("Invalid input, values must be in range [0, 255]", )
-    }
+    if (r < 0.0f || r > 1.0f || g < 0.0f || g > 1.0f || b < 0.0f || b > 1.0f)
+        THROW_EXP("Invalid input, values must be in range [0, 1]", )
 
-    unsigned char tmp_col_arr[3] = {(unsigned char)round(g * cur_brush.brigthness),
-                                    (unsigned char)round(r * cur_brush.brigthness),
-                                    (unsigned char)round(b * cur_brush.brigthness)};
-
-    for (int i = 0; i < 4096; i++)
-        memcpy(&back_buf[i], tmp_col_arr, 3);
+    draw_calls_arr.push_back({.type = CALL_CLEAR_TYPE,
+                              .color = {
+                                  .g = (unsigned char)(255.0f * g),
+                                  .r = (unsigned char)(255.0f * r),
+                                  .b = (unsigned char)(255.0f * b)}});
 }
 
 void CubeDrawer::clear(float rgb)
@@ -254,13 +254,36 @@ void CubeDrawer::clear(float rgb)
     clear(rgb, rgb, rgb);
 }
 
+void CubeDrawer::clear(int rgb)
+{
+    float rgb2 = rgb / 255.0f;
+    clear(rgb2, rgb2, rgb2);
+}
+
+void CubeDrawer::clear(int r, int g, int b)
+{
+    if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255)
+        THROW_EXP("Invalid input, values must be in range [0, 255]", )
+
+    clear(r / 255.0f, g / 255.0f, b / 255.0f);
+}
+
 void CubeDrawer::clear(PyObject *input)
 {
     if (parse_num_input(input, 3) < 0)
         return;
 
-    clear(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2]);
+    if (PyLong_Check(PyTuple_GetItem(input, 0)))
+        clear(cur_parsed_args[0] / 255.0f, cur_parsed_args[1] / 255.0f, cur_parsed_args[2] / 255.0f);
+    else
+        clear(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2]);
 }
+
+// void clear(float r, float g, float b);
+// void clear(float rgb = 0.0);
+// void clear(int rgb);
+// void clear(int r, int g, int b);
+// void clear(PyObject *input);
 
 void CubeDrawer::show()
 {
@@ -599,103 +622,84 @@ void CubeDrawer::clear_draw_call_buf()
 ////////// \Opengl
 
 ////////// OpenGL Renderer API Binds
-void CubeDrawer::apoint(float x, float y, float z, float line_width)
+void CubeDrawer::apoint(float *p, float line_width)
 {
-    draw_calls_arr.push_back(
-        *(new DrawCall(
-            {
-                .type = CALL_POINT_TYPE,
-                .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
-                .data = {
-                    x, y, z, 0.0f,
-                    line_width, 0.0f, 0.0f, 0.0f,
-                    0.0f, 0.0f, 0.0f, 0.0f,
-                    0.0f, 0.0f, 0.0f, 0.0f},
-            })));
+    draw_calls_arr.push_back({
+        .type = CALL_POINT_TYPE,
+        .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
+        .data = {
+            p[0], p[1], p[2], 0.0f,
+            line_width, 0.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 0.0f},
+    });
 }
 
-void CubeDrawer::apoly(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float z_height)
+void CubeDrawer::apoly(float *p1, float *p2, float *p3, float z_height)
 {
-    draw_calls_arr.push_back(
-        *(new DrawCall(
-            {
-                .type = CALL_POLYGON_TYPE,
-                .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
-                .data = {
-                    x1, y1, z1, 0.0f,
-                    x2, y2, z2, 0.0f,
-                    x3, y3, z3, 0.0f,
-                    z_height, 0.0f, 0.0f, 0.0f},
-            })));
+    draw_calls_arr.push_back({
+        .type = CALL_POLYGON_TYPE,
+        .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
+        .data = {
+            p1[0], p1[1], p1[2], 0.0f,
+            p2[0], p2[1], p2[2], 0.0f,
+            p3[0], p3[1], p3[2], 0.0f,
+            z_height, 0.0f, 0.0f, 0.0f},
+    });
 }
 
-void CubeDrawer::apoly_pyr(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4)
+void CubeDrawer::apoly_pyr(float *p1, float *p2, float *p3, float *p4)
 {
-    draw_calls_arr.push_back(
-        *(new DrawCall(
-            {
-                .type = CALL_POLYPYR_TYPE,
-                .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
-                .data = {
-                    x1, y1, z1, 0.0f,
-                    x2, y2, z2, 0.0f,
-                    x3, y3, z3, 0.0f,
-                    x4, y4, z4, 0.0f},
-            })));
+    draw_calls_arr.push_back({
+        .type = CALL_POLYPYR_TYPE,
+        .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
+        .data = {
+            p1[0], p1[1], p1[2], 0.0f,
+            p2[0], p2[1], p2[2], 0.0f,
+            p3[0], p3[1], p3[2], 0.0f,
+            p4[0], p4[1], p4[2], 0.0f},
+    });
 }
 
-void CubeDrawer::aline(float x1, float y1, float z1, float x2, float y2, float z2, float line_width)
+void CubeDrawer::aline(float *p1, float *p2, float line_width)
 {
-    draw_calls_arr.push_back(
-        *(new DrawCall(
-            {
-                .type = CALL_POLYPYR_TYPE,
-                .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
-                .data = {
-                    x1, y1, z1, 0.0f,
-                    x2, y2, z2, 0.0f,
-                    line_width, 0.0f, 0.0f, 0.0f,
-                    0.0f, 0.0f, 0.0f, 0.0f},
-            })));
+    draw_calls_arr.push_back({
+        .type = CALL_LINE_TYPE,
+        .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
+        .data = {
+            p1[0], p1[1], p1[2], 0.0f,
+            p2[0], p2[1], p2[2], 0.0f,
+            line_width, 0.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 0.0f},
+    });
 }
 
-void CubeDrawer::acircle(float *model_mat, float rx, float ry, bool filled, float z_height, float line_width)
+void CubeDrawer::acircle(float *model_mat, float *r, bool filled, float z_height, float line_width)
 {
-    DrawCall *tmp = new DrawCall({
+    draw_calls_arr.push_back({
+        .type = filled ? CALL_FCIRCLE_TYPE : CALL_CIRCLE_TYPE,
         .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
     });
 
-    memcpy(tmp->data, model_mat, sizeof(float) * 12);
-    tmp->data[12] = rx;
-    tmp->data[13] = ry;
-    tmp->data[14] = line_width;
-    tmp->data[15] = z_height;
+    DrawCall *cur_call = &(draw_calls_arr[draw_calls_arr.size() - 1]);
 
-    if (filled)
-        tmp->type = CALL_FCIRCLE_TYPE;
-    else
-        tmp->type = CALL_CIRCLE_TYPE;
+    memcpy(cur_call->data, model_mat, sizeof(float) * 16);
 
-    draw_calls_arr.push_back(*tmp);
+    cur_call->data[3] = r[0];
+    cur_call->data[7] = r[1];
+    cur_call->data[11] = sqrt(line_width);
+    cur_call->data[15] = z_height;
 }
-void CubeDrawer::asphere(float *model_mat, float rx, float ry, float rz, bool filled, float line_width)
+void CubeDrawer::asphere(float *model_mat, float *r, bool filled, float line_width)
 {
-    DrawCall *tmp = new DrawCall({
+    draw_calls_arr.push_back({
+        .type = filled ? CALL_SPHERE_TYPE : CALL_FSPHERE_TYPE,
         .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
     });
-
-    memcpy(tmp->data, model_mat, sizeof(float) * 12);
-    tmp->data[12] = rx;
-    tmp->data[13] = ry;
-    tmp->data[14] = rz;
-    tmp->data[15] = line_width;
-
-    if (filled)
-        tmp->type = CALL_SPHERE_TYPE;
-    else
-        tmp->type = CALL_FSPHERE_TYPE;
-
-    draw_calls_arr.push_back(*tmp);
+    DrawCall cur_call = draw_calls_arr.back();
+    memcpy(cur_call.data, model_mat, sizeof(float) * 12);
+    memcpy(&cur_call.data[12], r, sizeof(float) * 3);
+    cur_call.data[15] = line_width;
 }
 ////////// \OpenGL Renderer API Binds
 
@@ -710,9 +714,9 @@ void CubeDrawer::asphere(float *model_mat, float rx, float ry, float rz, bool fi
 // CALL_POINT_TYPE
 void CubeDrawer::point(float x, float y, float z)
 {
-    float tmp[4] = {x, y, z, 1.0f};
-    apply_transforms(tmp);
-    apoint(tmp[0], tmp[1], tmp[2]);
+    float p[4] = {x, y, z, 1.0f};
+    apply_transforms(p);
+    apoint(p, DEF_LINEW);
 }
 void CubeDrawer::point(PyObject *p)
 {
@@ -721,30 +725,185 @@ void CubeDrawer::point(PyObject *p)
 
     point(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2]);
 }
-void CubeDrawer::filled_sphere(float x, float y, float z, float r) {}
-void CubeDrawer::filled_sphere(PyObject *p, float r) {}
+void CubeDrawer::filled_sphere(float x, float y, float z, float r)
+{
+    float p[4] = {x, y, z, 1.0f};
+    apply_transforms(p);
+    apoint(p, r);
+}
+
+void CubeDrawer::filled_sphere(PyObject *p, float r)
+{
+    if (parse_num_input(p, 3) < 0)
+        return;
+
+    filled_sphere(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2], r);
+}
 
 // CALL_POLYGON_TYPE
-void CubeDrawer::poly(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float height) {}
-void CubeDrawer::poly(PyObject *p1, PyObject *p2, PyObject *p3, float height) {}
+void CubeDrawer::poly(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float height)
+{
+    float pp1[4] = {x1, y1, z1, 1.0f}, pp2[4] = {x2, y2, z2, 1.0f}, pp3[4] = {x3, y3, z3, 1.0f};
+    apply_transforms(pp1);
+    apply_transforms(pp2);
+    apply_transforms(pp3);
+
+    apoly(pp1, pp2, pp3, height);
+}
+
+void CubeDrawer::poly(PyObject *p1, PyObject *p2, PyObject *p3, float height)
+{
+    float pp1[3], pp2[3], pp3[3];
+    if (parse_num_input(p1, 3) < 0)
+        return;
+    memcpy(pp1, &cur_parsed_args[0], sizeof(float) * 3);
+    if (parse_num_input(p2, 3) < 0)
+        return;
+    memcpy(pp2, &cur_parsed_args[0], sizeof(float) * 3);
+    if (parse_num_input(p3, 3) < 0)
+        return;
+    memcpy(pp3, &cur_parsed_args[0], sizeof(float) * 3);
+
+    apply_transforms(pp1);
+    apply_transforms(pp2);
+    apply_transforms(pp3);
+
+    apoly(pp1, pp2, pp3, height);
+}
 
 // CALL_POLYPYR_TYPE
-void CubeDrawer::poly_pyr(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4) {}
-void CubeDrawer::poly_pyr(PyObject *p1, PyObject *p2, PyObject *p3, PyObject *p4) {}
+void CubeDrawer::poly_pyr(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4)
+{
+    float pp1[4] = {x1, y1, z1, 1.0f}, pp2[4] = {x2, y2, z2, 1.0f}, pp3[4] = {x2, y2, z2, 1.0f}, pp4[4] = {x4, y4, z4, 1.0f};
+    apply_transforms(pp1);
+    apply_transforms(pp2);
+    apply_transforms(pp3);
+    apply_transforms(pp4);
+
+    apoly_pyr(pp1, pp2, pp3, pp4);
+}
+void CubeDrawer::poly_pyr(PyObject *p1, PyObject *p2, PyObject *p3, PyObject *p4)
+{
+    float pp1[4], pp2[4], pp3[4], pp4[4];
+    pp1[3] = 1.0f;
+    pp2[3] = 1.0f;
+    pp3[3] = 1.0f;
+    pp4[3] = 1.0f;
+
+    if (parse_num_input(p1, 3) < 0)
+        return;
+    memcpy(pp1, &cur_parsed_args[0], sizeof(float) * 3);
+    if (parse_num_input(p2, 3) < 0)
+        return;
+    memcpy(pp2, &cur_parsed_args[0], sizeof(float) * 3);
+    if (parse_num_input(p3, 3) < 0)
+        return;
+    memcpy(pp3, &cur_parsed_args[0], sizeof(float) * 3);
+    if (parse_num_input(p4, 3) < 0)
+        return;
+    memcpy(pp4, &cur_parsed_args[0], sizeof(float) * 3);
+
+    apply_transforms(pp1);
+    apply_transforms(pp2);
+    apply_transforms(pp3);
+    apply_transforms(pp4);
+
+    apoly_pyr(pp1, pp2, pp3, pp4);
+}
 
 // CALL_LINE_TYPE
-void CubeDrawer::line(float x1, float y1, float z1, float x2, float y2, float z2, float line_width) {}
-void CubeDrawer::line(PyObject *p1, PyObject *p2, float line_width) {}
-void CubeDrawer::cylinder(float x, float y, float z, float r, float height) {}
-void CubeDrawer::cylinder(PyObject *p1, PyObject *p2, float r, float height) {}
-void CubeDrawer::filled_circle(float x, float y, float z, float r) {}
-void CubeDrawer::filled_circle(PyObject *p, float r) {}
+void CubeDrawer::line(float x1, float y1, float z1, float x2, float y2, float z2, float line_width)
+{
+    float pp1[4] = {x1, y1, z1, 1.0f}, pp2[4] = {x2, y2, z2, 1.0f};
+    apply_transforms(pp1);
+    apply_transforms(pp2);
+
+    aline(pp1, pp2, line_width);
+}
+void CubeDrawer::line(PyObject *p1, PyObject *p2, float line_width)
+{
+    float pp1[4], pp2[4];
+
+    if (parse_num_input(p1, 3) < 0)
+        return;
+    memcpy(pp1, &cur_parsed_args[0], sizeof(float) * 3);
+    if (parse_num_input(p2, 3) < 0)
+        return;
+    memcpy(pp2, &cur_parsed_args[0], sizeof(float) * 3);
+    apply_transforms(pp1);
+    apply_transforms(pp2);
+
+    aline(pp1, pp2, line_width);
+}
+void CubeDrawer::cylinder(float x, float y, float z, float r, float height)
+{
+    float pdir[4] = {0.0f, height / 2.0f, 0.0f, 0.0f};
+    float tmp_pos[4] = {x, y, z, 1.0f};
+    apply_transforms(pdir);
+    apply_transforms(tmp_pos);
+
+    float pp1[4] = {tmp_pos[0] + pdir[0], tmp_pos[1] + pdir[1], tmp_pos[2] + pdir[2]}, pp2[4] = {tmp_pos[0] - pdir[0], tmp_pos[1] - pdir[1], tmp_pos[2] - pdir[2]};
+    aline(pp1, pp2, r);
+}
+void CubeDrawer::cylinder(PyObject *p1, float r, float height)
+{
+    if (parse_num_input(p1, 3) < 0)
+        return;
+
+    cylinder(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2], r, height);
+}
+void CubeDrawer::filled_circle(float x, float y, float z, float r)
+{
+    cylinder(x, y, z, r, 0.5f);
+}
+void CubeDrawer::filled_circle(PyObject *p, float r)
+{
+    if (parse_num_input(p, 3) < 0)
+        return;
+    cylinder(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2], r, 0.5f);
+}
 
 // CALL_CIRCLE_TYPE
-void CubeDrawer::circle(float x, float y, float z, float r, float line_width) {}
-void CubeDrawer::circle(PyObject *p, float r, float line_width) {}
-// void CubeDrawer::circle(float x, float y, float z, float rx, float ry, float line_width) {}
-void CubeDrawer::circle(PyObject *p, PyObject *r, float line_width) {}
+void CubeDrawer::circle(float x, float y, float z, float rx, float ry, float line_width, float thickness)
+{
+    float pp1[4] = {x, y, z, 1.0f};
+    apply_transforms(pp1);
+    float mat[16];
+    Transform *lt = transform_list.back();
+    if (lt->local_recalc)
+        lt->update_local();
+    if (lt->recalc)
+        lt->update_global(transform_list[transform_list.size() - 2]);
+
+    memcpy(mat, lt->final, sizeof(float) * 16);
+    mat[12] += pp1[0];
+    mat[13] += pp1[1];
+    mat[14] += pp1[2];
+
+    float rr[2] = {rx, ry};
+    acircle(mat, rr, false, thickness, line_width);
+}
+void CubeDrawer::circle(float x, float y, float z, float r)
+{
+    circle(x, y, z, r, r, 1.1f);
+}
+
+void CubeDrawer::circle(PyObject *p, float r, float line_width)
+{
+    if (parse_num_input(p, 3) < 0)
+        return;
+    circle(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2], r, r, line_width);
+}
+void CubeDrawer::circle(PyObject *p, PyObject *r, float line_width)
+{
+    float pp[3];
+    if (parse_num_input(p, 3) < 0)
+        return;
+    memcpy(pp, &cur_parsed_args[0], sizeof(float) * 3);
+    if (parse_num_input(r, 2) < 0)
+        return;
+    circle(pp[0], pp[1], pp[2], cur_parsed_args[0], cur_parsed_args[1], line_width);
+}
 
 // CALL_FCIRCLE_TYPE
 void CubeDrawer::filled_circle(float x, float y, float z, float rx, float ry) {}
@@ -752,7 +911,7 @@ void CubeDrawer::filled_circle(PyObject *p, PyObject *r) {}
 void CubeDrawer::cylinder(float x, float y, float z, float rx, float ry, float height) {}
 void CubeDrawer::cylinder(PyObject *p, PyObject *r, float height) {}
 
-// CALL_FCIRCLE_TYPE
+// CALL_SPHERE_TYPE
 void CubeDrawer::sphere(float x, float y, float z, float r, float line_width) {}
 void CubeDrawer::sphere(float x, float y, float z, float rx, float ry, float rz, float line_width) {}
 void CubeDrawer::sphere(PyObject *p, PyObject *r, float line_width) {}

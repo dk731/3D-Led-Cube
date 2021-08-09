@@ -9,6 +9,7 @@
 #define CALL_FCIRCLE_TYPE 5 // 2D Ellipse; 3D Elliptic Cylinder
 #define CALL_SPHERE_TYPE 6 // 3D Ellipsoid Hollow
 #define CALL_FSPHERE_TYPE 7 // 3D Ellipsoid
+#define CALL_CLEAR_TYPE 8
 ////
 
 #define EPSILON 0.0001
@@ -73,6 +74,8 @@ bool check_bind()
     return sphere_check();
   case CALL_FSPHERE_TYPE:
     return fsphere_check();
+  case CALL_CLEAR_TYPE:
+    return true;
   }
   return false;
 }
@@ -178,16 +181,18 @@ bool cicle_check()
 {
   mat4 inv_mat = inverse(
     mat4(
-      vec4(call_data[0]), 
-      vec4(call_data[1]), 
-      vec4(call_data[2]), 
-      vec4(0.0, 0.0, 0.0, 1.0)
+      vec4(call_data[0].xyz, 0.0), 
+      vec4(call_data[1].xyz, 0.0), 
+      vec4(call_data[2].xyz, 0.0), 
+      vec4(call_data[3].xyz, 1.0)
     )
   );
+  // color = call_data[3].xyz;
+  
+  // return true;
 
-
-  vec2 r = call_data[3].xy;
-  float line_width = call_data[3].z;
+  vec2 r = vec2(call_data[0].w, call_data[1].w);
+  float line_width = call_data[2].w;
   float z_height = call_data[3].w;
 
   vec3 new_pos = (inv_mat * vec4(in_pos, 1.0)).xyz;
@@ -210,14 +215,14 @@ bool fcircle_check()
 {
   mat4 inv_mat = inverse(
     mat4(
-      vec4(call_data[0]), 
-      vec4(call_data[1]), 
-      vec4(call_data[2]), 
-      vec4(0.0, 0.0, 0.0, 1.0)
+      vec4(call_data[0].xyz, 0.0), 
+      vec4(call_data[1].xyz, 0.0), 
+      vec4(call_data[2].xyz, 0.0), 
+      vec4(call_data[3].xyz, 1.0)
     )
   );
 
-  vec2 r = call_data[3].xy;
+  vec2 r = vec2(call_data[0].w, call_data[1].w);
   float z_height = call_data[3].w;
 
   vec3 new_pos = (vec4(in_pos, 1.0) * inv_mat).xyz;

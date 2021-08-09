@@ -62,7 +62,7 @@ extern "C"
     CHECK_IN_BOX(p[0], p[1], p[2])
 
 #define COUT_VECTOR(premsg, v) \
-    std::cout << premsg << ": (" << v[0] << ", " << v[1] << ", " << v[2] << ")" << std::endl;
+    std::cout << premsg << ": (" << v[0] << ", " << v[1] << ", " << v[2] << ")" << std::endl
 
 #define COUT_MAT(premsg, m)            \
     std::cout << premsg << std::endl;  \
@@ -77,8 +77,8 @@ extern "C"
 #define SLEEP_MICROS(val) std::this_thread::sleep_for(std::chrono::microseconds(val))
 
 #define EPSILON 0.00001f
-#define DEF_LINEW 0.5f
-#define DEF_ZHEIGHT 0.5f
+#define DEF_LINEW 0.5f + EPSILON
+#define DEF_ZHEIGHT 0.5f + EPSILON
 
 struct Brush
 {
@@ -131,6 +131,7 @@ enum DrawCallTypes
     CALL_FCIRCLE_TYPE = 5,
     CALL_SPHERE_TYPE = 6,
     CALL_FSPHERE_TYPE = 7,
+    CALL_CLEAR_TYPE = 8
 };
 
 struct DrawCall
@@ -158,8 +159,8 @@ struct Transform
     void update_local()
     {
         float temp_mat[16];
-        cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 4, 4, 4, 1.0f, translation, 4, rotation, 4, 0.0f, temp_mat, 4);
-        cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 4, 4, 4, 1.0f, temp_mat, 4, scale, 4, 0.0f, local_final, 4);
+        cblas_sgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 4, 4, 4, 1.0f, translation, 4, rotation, 4, 0.0f, temp_mat, 4);
+        cblas_sgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 4, 4, 4, 1.0f, temp_mat, 4, scale, 4, 0.0f, local_final, 4);
         local_recalc = false;
         recalc = true;
     }
@@ -169,7 +170,7 @@ struct Transform
         if (local_recalc)
             update_local();
 
-        cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 4, 4, 4, 1.0f, local_final, 4, prev->local_final, 4, 0.0f, final, 4);
+        cblas_sgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 4, 4, 4, 1.0f, prev->local_final, 4, local_final, 4, 0.0f, final, 4);
         recalc = false;
     }
 };
@@ -217,12 +218,12 @@ private:
     ~CubeDrawer(){};
 
     // OpenGL Renderer API Binds
-    void apoint(float x, float y, float z, float line_width = DEF_LINEW);
-    void apoly(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float z_height = DEF_ZHEIGHT);
-    void apoly_pyr(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4);
-    void aline(float x1, float y1, float z1, float x2, float y2, float z2, float line_width = DEF_LINEW);
-    void acircle(float *model_mat, float rx, float ry, bool filled = true, float z_height = DEF_ZHEIGHT, float line_width = DEF_LINEW);
-    void asphere(float *model_mat, float rx, float ry, float rz, bool filled = true, float line_width = DEF_LINEW);
+    void apoint(float *p, float line_width);
+    void apoly(float *p1, float *p2, float *p3, float z_height);
+    void apoly_pyr(float *p1, float *p2, float *p3, float *p4);
+    void aline(float *p1, float *p2, float line_width);
+    void acircle(float *model_mat, float *r, bool filled, float z_height, float line_width);
+    void asphere(float *model_mat, float *r, bool filled, float line_width);
     // \OpenGL Renderer API Binds
 
     static void err_clb(int i);
@@ -257,6 +258,8 @@ public:
 
     void clear(float r, float g, float b);
     void clear(float rgb = 0.0);
+    void clear(int rgb);
+    void clear(int r, int g, int b);
     void clear(PyObject *input);
 
     void show();
@@ -295,14 +298,14 @@ public:
     void line(float x1, float y1, float z1, float x2, float y2, float z2, float line_width = DEF_LINEW);
     void line(PyObject *p1, PyObject *p2, float line_width = DEF_LINEW);
     void cylinder(float x, float y, float z, float r, float height);
-    void cylinder(PyObject *p1, PyObject *p2, float r, float height);
+    void cylinder(PyObject *p1, float r, float height);
     void filled_circle(float x, float y, float z, float r);
     void filled_circle(PyObject *p, float r);
 
     // CALL_CIRCLE_TYPE
-    void circle(float x, float y, float z, float r, float line_width = DEF_LINEW);
+    void circle(float x, float y, float z, float rx, float ry, float line_width, float thickness = DEF_ZHEIGHT);
+    void circle(float x, float y, float z, float r);
     void circle(PyObject *p, float r, float line_width = DEF_LINEW);
-    // void circle(float x, float y, float z, float rx, float ry, float line_width = DEF_LINEW);
     void circle(PyObject *p, PyObject *r, float line_width = DEF_LINEW);
 
     // CALL_FCIRCLE_TYPE
