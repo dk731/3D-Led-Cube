@@ -866,8 +866,6 @@ void CubeDrawer::filled_circle(PyObject *p, float r)
 // CALL_CIRCLE_TYPE
 void CubeDrawer::circle(float x, float y, float z, float rx, float ry, float line_width, float thickness)
 {
-    float pp1[4] = {x, y, z, 1.0f};
-    apply_transforms(pp1);
     float mat[16];
     Transform *lt = transform_list.back();
     if (lt->local_recalc)
@@ -876,9 +874,9 @@ void CubeDrawer::circle(float x, float y, float z, float rx, float ry, float lin
         lt->update_global(transform_list[transform_list.size() - 2]);
 
     memcpy(mat, lt->final, sizeof(float) * 16);
-    mat[12] += pp1[0];
-    mat[13] += pp1[1];
-    mat[14] += pp1[2];
+    mat[12] += x;
+    mat[13] += y;
+    mat[14] += z;
 
     float rr[2] = {rx, ry};
     acircle(mat, rr, false, thickness, line_width);
@@ -888,13 +886,13 @@ void CubeDrawer::circle(float x, float y, float z, float r)
     circle(x, y, z, r, r, 1.1f);
 }
 
-void CubeDrawer::circle(PyObject *p, float r, float line_width)
+void CubeDrawer::circle(PyObject *p, float r, float line_width, float thickness)
 {
     if (parse_num_input(p, 3) < 0)
         return;
     circle(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2], r, r, line_width);
 }
-void CubeDrawer::circle(PyObject *p, PyObject *r, float line_width)
+void CubeDrawer::circle(PyObject *p, PyObject *r, float line_width, float thickness)
 {
     float pp[3];
     if (parse_num_input(p, 3) < 0)

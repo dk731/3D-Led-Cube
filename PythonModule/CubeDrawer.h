@@ -305,8 +305,8 @@ public:
     // CALL_CIRCLE_TYPE
     void circle(float x, float y, float z, float rx, float ry, float line_width, float thickness = DEF_ZHEIGHT);
     void circle(float x, float y, float z, float r);
-    void circle(PyObject *p, float r, float line_width = DEF_LINEW);
-    void circle(PyObject *p, PyObject *r, float line_width = DEF_LINEW);
+    void circle(PyObject *p, float r, float line_width = DEF_LINEW, float thickness = DEF_ZHEIGHT);
+    void circle(PyObject *p, PyObject *r, float line_width = DEF_LINEW, float thickness = DEF_ZHEIGHT);
 
     // CALL_FCIRCLE_TYPE
     void filled_circle(float x, float y, float z, float rx, float ry);

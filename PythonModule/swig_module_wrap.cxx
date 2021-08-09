@@ -8205,6 +8205,52 @@ SWIGINTERN PyObject *_wrap_CubeDrawer_circle__SWIG_3(PyObject *SWIGUNUSEDPARM(se
   PyObject *arg2 = (PyObject *) 0 ;
   float arg3 ;
   float arg4 ;
+  float arg5 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  float val3 ;
+  int ecode3 = 0 ;
+  float val4 ;
+  int ecode4 = 0 ;
+  float val5 ;
+  int ecode5 = 0 ;
+  
+  if ((nobjs < 5) || (nobjs > 5)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_CubeDrawer, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_circle" "', argument " "1"" of type '" "CubeDrawer *""'"); 
+  }
+  arg1 = reinterpret_cast< CubeDrawer * >(argp1);
+  arg2 = swig_obj[1];
+  ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "CubeDrawer_circle" "', argument " "3"" of type '" "float""'");
+  } 
+  arg3 = static_cast< float >(val3);
+  ecode4 = SWIG_AsVal_float(swig_obj[3], &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "CubeDrawer_circle" "', argument " "4"" of type '" "float""'");
+  } 
+  arg4 = static_cast< float >(val4);
+  ecode5 = SWIG_AsVal_float(swig_obj[4], &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "CubeDrawer_circle" "', argument " "5"" of type '" "float""'");
+  } 
+  arg5 = static_cast< float >(val5);
+  (arg1)->circle(arg2,arg3,arg4,arg5);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_CubeDrawer_circle__SWIG_4(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
+  PyObject *resultobj = 0;
+  CubeDrawer *arg1 = (CubeDrawer *) 0 ;
+  PyObject *arg2 = (PyObject *) 0 ;
+  float arg3 ;
+  float arg4 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val3 ;
@@ -8237,7 +8283,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_CubeDrawer_circle__SWIG_4(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
+SWIGINTERN PyObject *_wrap_CubeDrawer_circle__SWIG_5(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
   CubeDrawer *arg1 = (CubeDrawer *) 0 ;
   PyObject *arg2 = (PyObject *) 0 ;
@@ -8267,7 +8313,47 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_CubeDrawer_circle__SWIG_5(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
+SWIGINTERN PyObject *_wrap_CubeDrawer_circle__SWIG_6(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
+  PyObject *resultobj = 0;
+  CubeDrawer *arg1 = (CubeDrawer *) 0 ;
+  PyObject *arg2 = (PyObject *) 0 ;
+  PyObject *arg3 = (PyObject *) 0 ;
+  float arg4 ;
+  float arg5 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  float val4 ;
+  int ecode4 = 0 ;
+  float val5 ;
+  int ecode5 = 0 ;
+  
+  if ((nobjs < 5) || (nobjs > 5)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_CubeDrawer, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_circle" "', argument " "1"" of type '" "CubeDrawer *""'"); 
+  }
+  arg1 = reinterpret_cast< CubeDrawer * >(argp1);
+  arg2 = swig_obj[1];
+  arg3 = swig_obj[2];
+  ecode4 = SWIG_AsVal_float(swig_obj[3], &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "CubeDrawer_circle" "', argument " "4"" of type '" "float""'");
+  } 
+  arg4 = static_cast< float >(val4);
+  ecode5 = SWIG_AsVal_float(swig_obj[4], &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "CubeDrawer_circle" "', argument " "5"" of type '" "float""'");
+  } 
+  arg5 = static_cast< float >(val5);
+  (arg1)->circle(arg2,arg3,arg4,arg5);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_CubeDrawer_circle__SWIG_7(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
   CubeDrawer *arg1 = (CubeDrawer *) 0 ;
   PyObject *arg2 = (PyObject *) 0 ;
@@ -8299,7 +8385,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_CubeDrawer_circle__SWIG_6(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
+SWIGINTERN PyObject *_wrap_CubeDrawer_circle__SWIG_8(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
   CubeDrawer *arg1 = (CubeDrawer *) 0 ;
   PyObject *arg2 = (PyObject *) 0 ;
@@ -8344,7 +8430,7 @@ SWIGINTERN PyObject *_wrap_CubeDrawer_circle(PyObject *self, PyObject *args) {
           _v = SWIG_CheckState(res);
         }
         if (_v) {
-          return _wrap_CubeDrawer_circle__SWIG_4(self, argc, argv);
+          return _wrap_CubeDrawer_circle__SWIG_5(self, argc, argv);
         }
       }
     }
@@ -8359,7 +8445,7 @@ SWIGINTERN PyObject *_wrap_CubeDrawer_circle(PyObject *self, PyObject *args) {
       if (_v) {
         _v = (argv[2] != 0);
         if (_v) {
-          return _wrap_CubeDrawer_circle__SWIG_6(self, argc, argv);
+          return _wrap_CubeDrawer_circle__SWIG_8(self, argc, argv);
         }
       }
     }
@@ -8382,7 +8468,7 @@ SWIGINTERN PyObject *_wrap_CubeDrawer_circle(PyObject *self, PyObject *args) {
             _v = SWIG_CheckState(res);
           }
           if (_v) {
-            return _wrap_CubeDrawer_circle__SWIG_3(self, argc, argv);
+            return _wrap_CubeDrawer_circle__SWIG_4(self, argc, argv);
           }
         }
       }
@@ -8403,7 +8489,7 @@ SWIGINTERN PyObject *_wrap_CubeDrawer_circle(PyObject *self, PyObject *args) {
             _v = SWIG_CheckState(res);
           }
           if (_v) {
-            return _wrap_CubeDrawer_circle__SWIG_5(self, argc, argv);
+            return _wrap_CubeDrawer_circle__SWIG_7(self, argc, argv);
           }
         }
       }
@@ -8436,6 +8522,63 @@ SWIGINTERN PyObject *_wrap_CubeDrawer_circle(PyObject *self, PyObject *args) {
             }
             if (_v) {
               return _wrap_CubeDrawer_circle__SWIG_2(self, argc, argv);
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 5) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_CubeDrawer, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      _v = (argv[1] != 0);
+      if (_v) {
+        {
+          int res = SWIG_AsVal_float(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          {
+            int res = SWIG_AsVal_float(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            {
+              int res = SWIG_AsVal_float(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              return _wrap_CubeDrawer_circle__SWIG_3(self, argc, argv);
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 5) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_CubeDrawer, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      _v = (argv[1] != 0);
+      if (_v) {
+        _v = (argv[2] != 0);
+        if (_v) {
+          {
+            int res = SWIG_AsVal_float(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            {
+              int res = SWIG_AsVal_float(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              return _wrap_CubeDrawer_circle__SWIG_6(self, argc, argv);
             }
           }
         }
@@ -8545,8 +8688,10 @@ fail:
     "    CubeDrawer::circle(float,float,float,float,float,float,float)\n"
     "    CubeDrawer::circle(float,float,float,float,float,float)\n"
     "    CubeDrawer::circle(float,float,float,float)\n"
+    "    CubeDrawer::circle(PyObject *,float,float,float)\n"
     "    CubeDrawer::circle(PyObject *,float,float)\n"
     "    CubeDrawer::circle(PyObject *,float)\n"
+    "    CubeDrawer::circle(PyObject *,PyObject *,float,float)\n"
     "    CubeDrawer::circle(PyObject *,PyObject *,float)\n"
     "    CubeDrawer::circle(PyObject *,PyObject *)\n");
   return 0;
