@@ -65,8 +65,8 @@ CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(0)
     set_fps_cap(fps);
 
     memset(back_buf, 0, 12288);
-    cur_brush.brigthness = brightness;
-    set_color(255.0f);
+    cur_brush.brigthness = 1.0f;
+    set_color(255);
 }
 
 int CubeDrawer::parse_num_input(PyObject *input, int req_len)
@@ -382,8 +382,11 @@ void CubeDrawer::init_gl()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+#ifndef DEBUG_VIEW
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+#endif
 
     context = glfwCreateWindow(16, 256, "", NULL, NULL);
     if (context == NULL)
@@ -488,6 +491,7 @@ void CubeDrawer::init_gl()
 
     //// Init output buffer (texture)
 
+#ifndef DEBUG_VIEW
     glGenFramebuffers(1, &pix_buf);
     glBindFramebuffer(GL_FRAMEBUFFER, pix_buf);
     GLuint text;
@@ -509,6 +513,7 @@ void CubeDrawer::init_gl()
         std::cout << "Frame buffer was not initialized" << std::endl;
         return;
     }
+#endif
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
@@ -516,13 +521,13 @@ void CubeDrawer::init_gl()
     std::thread tmp_t(&CubeDrawer::pool_events, this);
     tmp_t.detach();
 
-    DrawCall *new_point_call = new DrawCall({
-        .type = CALL_SPHERE_TYPE,
-        .color = {255, 0, 0},
-        .data = {7.5f, 7.5f, 7.5f, 1.0f, 7.0f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
-    });
+    // DrawCall *new_point_call = new DrawCall({
+    //     .type = CALL_SPHERE_TYPE,
+    //     .color = {255, 0, 0},
+    //     .data = {7.5f, 7.5f, 7.5f, 1.0f, 7.0f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+    // });
 
-    draw_calls_arr.push_back(*new_point_call);
+    // draw_calls_arr.push_back(*new_point_call);
 }
 
 bool CubeDrawer::check_compile(GLuint obj)
@@ -565,10 +570,12 @@ void CubeDrawer::render_texture()
         // Render
         glDrawArraysInstanced(GL_POINTS, 0, 4096, draw_calls_arr.size());
 
-        // glfwSwapBuffers(context);
-
+#ifndef DEBUG_VIEW
         glBindFramebuffer(GL_FRAMEBUFFER, pix_buf);
         glReadPixels(0, 0, 16, 256, GL_RGB, GL_UNSIGNED_BYTE, back_buf);
+#else
+        glfwSwapBuffers(context);
+#endif
 
         clear_draw_call_buf();
     }
@@ -585,8 +592,8 @@ void CubeDrawer::pool_events()
 
 void CubeDrawer::clear_draw_call_buf()
 {
-    for (auto t = draw_calls_arr.begin(); t != draw_calls_arr.end(); t++)
-        delete &(*t);
+    // for (int i = 0; i < draw_calls_arr.size(); i++)
+    //     delete &draw_calls_arr[i];
     draw_calls_arr.clear();
 }
 ////////// \Opengl
@@ -692,10 +699,28 @@ void CubeDrawer::asphere(float *model_mat, float rx, float ry, float rz, bool fi
 }
 ////////// \OpenGL Renderer API Binds
 
+// void apoint(float x, float y, float z, float line_width = DEF_LINEW);
+// void apoly(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float z_height = DEF_ZHEIGHT);
+// void apoly_pyr(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4);
+// void aline(float x1, float y1, float z1, float x2, float y2, float z2, float line_width = DEF_LINEW);
+// void acircle(float *model_mat, float rx, float ry, bool filled = true, float z_height = DEF_ZHEIGHT, float line_width = DEF_LINEW);
+// void asphere(float *model_mat, float rx, float ry, float rz, bool filled = true, float line_width = DEF_LINEW);
+
 //// User friendly API Calls overloads
 // CALL_POINT_TYPE
-void CubeDrawer::point(float x, float y, float z) {}
-void CubeDrawer::point(PyObject *p) {} // tuple with 3 values
+void CubeDrawer::point(float x, float y, float z)
+{
+    float tmp[4] = {x, y, z, 1.0f};
+    apply_transforms(tmp);
+    apoint(tmp[0], tmp[1], tmp[2]);
+}
+void CubeDrawer::point(PyObject *p)
+{
+    if (parse_num_input(p, 3) < 0)
+        return;
+
+    point(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2]);
+}
 void CubeDrawer::filled_sphere(float x, float y, float z, float r) {}
 void CubeDrawer::filled_sphere(PyObject *p, float r) {}
 
@@ -718,7 +743,7 @@ void CubeDrawer::filled_circle(PyObject *p, float r) {}
 // CALL_CIRCLE_TYPE
 void CubeDrawer::circle(float x, float y, float z, float r, float line_width) {}
 void CubeDrawer::circle(PyObject *p, float r, float line_width) {}
-void CubeDrawer::circle(float x, float y, float z, float rx, float ry, float line_width) {}
+// void CubeDrawer::circle(float x, float y, float z, float rx, float ry, float line_width) {}
 void CubeDrawer::circle(PyObject *p, PyObject *r, float line_width) {}
 
 // CALL_FCIRCLE_TYPE

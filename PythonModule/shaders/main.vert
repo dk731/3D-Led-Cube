@@ -44,9 +44,11 @@ void main()
 {
   id = gl_InstanceID / float(prim_calls_sum);  
   color = cur_color / 255.0;
+  // color = vec3(1.0, 0.0, 0.0);
   
   if (check_bind())
-    gl_Position = vec4(in_pos.x / 8.0 - 1.0, (in_pos.y + in_pos.z * 16) / -128.0 + 0.9921875, 0.0, 1.0);
+  // if (true)
+    gl_Position = vec4(in_pos.x / 8.0 - 1.0, (in_pos.y + in_pos.z * 16) / 128.0 - 0.9921875, 0.0, 1.0);
   else
     gl_Position = vec4(-1.0); // spawn point outside window
 }

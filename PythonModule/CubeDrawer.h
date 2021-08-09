@@ -225,6 +225,8 @@ private:
     void asphere(float *model_mat, float rx, float ry, float rz, bool filled = true, float line_width = DEF_LINEW);
     // \OpenGL Renderer API Binds
 
+    static void err_clb(int i);
+
 public:
     static CubeDrawer &get_obj();
 
@@ -300,7 +302,7 @@ public:
     // CALL_CIRCLE_TYPE
     void circle(float x, float y, float z, float r, float line_width = DEF_LINEW);
     void circle(PyObject *p, float r, float line_width = DEF_LINEW);
-    void circle(float x, float y, float z, float rx, float ry, float line_width = DEF_LINEW);
+    // void circle(float x, float y, float z, float rx, float ry, float line_width = DEF_LINEW);
     void circle(PyObject *p, PyObject *r, float line_width = DEF_LINEW);
 
     // CALL_FCIRCLE_TYPE
