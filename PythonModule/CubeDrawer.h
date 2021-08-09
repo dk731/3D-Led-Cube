@@ -5,6 +5,7 @@
 
 #include <cmath>
 
+#include <fstream>
 #include <thread>
 #include <mutex>
 #include <list>
@@ -19,24 +20,40 @@
 #include <fcntl.h>
 #include <stdio.h>
 
-#include <sys/shm.h>
-#include <sys/mman.h>
-#include <sys/ioctl.h>
+#include <cblas.h>
 
-#include <gsl/gsl_blas.h>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
-// #define VIRT_CUBE
+#define VIRT_CUBE
+
+#define DEBUG_MODE
+#ifdef DEBUG_MODE
+#define DEBUG(x) x
+#else
+#define DEBUG(x)
+#endif
 
 #ifdef VIRT_CUBE
+
 extern "C"
 {
 #include <wsserver/ws.h>
 }
+
+#else
+
+#include <sys/shm.h>
+#include <sys/mman.h>
+#include <sys/ioctl.h>
+
 #endif
 
-#define THROW_EXP(msg, ret)                         \
-    PyErr_SetString(CubeDrawer::py_exception, msg); \
-    return ret;
+#define THROW_EXP(msg, ret)                 \
+    {                                       \
+        PyErr_SetString(py_exception, msg); \
+        return ret;                         \
+    }
 
 #define CHECK_IN_BOX(x, y, z) \
     (x >= 0 && x <= 15 && y >= 0 && y <= 15 && z >= 0 && z <= 15)
@@ -44,10 +61,8 @@ extern "C"
 #define CHECK_P_IN_BOX(p) \
     CHECK_IN_BOX(p[0], p[1], p[2])
 
-#define EPSILON 0.00001
-
 #define COUT_VECTOR(premsg, v) \
-    std::cout << premsg << ": (" << v[0] << ", " << v[1] << ", " << v[2] << ")" << std::endl;
+    std::cout << premsg << ": (" << v[0] << ", " << v[1] << ", " << v[2] << ")" << std::endl
 
 #define COUT_MAT(premsg, m)            \
     std::cout << premsg << std::endl;  \
@@ -61,15 +76,19 @@ extern "C"
 #define GET_MICROS() std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count()
 #define SLEEP_MICROS(val) std::this_thread::sleep_for(std::chrono::microseconds(val))
 
+#define EPSILON 0.00001f
+#define DEF_LINEW 0.5f + EPSILON
+#define DEF_ZHEIGHT 0.5f + EPSILON
+
 struct Brush
 {
     unsigned char g;
     unsigned char r;
     unsigned char b;
-    double rr;
-    double gg;
-    double bb;
-    double brigthness;
+    float rr;
+    float gg;
+    float bb;
+    float brigthness;
 };
 
 struct Pixel
@@ -102,16 +121,58 @@ enum ParseFuncType
     PY_LIST_PARSE
 };
 
+enum DrawCallTypes
+{
+    CALL_POINT_TYPE = 0,
+    CALL_POLYGON_TYPE = 1,
+    CALL_POLYPYR_TYPE = 2,
+    CALL_LINE_TYPE = 3,
+    CALL_CIRCLE_TYPE = 4,
+    CALL_FCIRCLE_TYPE = 5,
+    CALL_SPHERE_TYPE = 6,
+    CALL_FSPHERE_TYPE = 7,
+    CALL_CLEAR_TYPE = 8
+};
+
+struct DrawCall
+{
+    int type;
+    Pixel color;
+    float data[16];
+};
+
 struct Transform
 {
-    double translation[16] = {1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0};
-    double rotation[16] = {1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0};
-    double scale[16] = {1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0};
-    double final[16] = {1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0};
-    double rx = 0.0;
-    double ry = 0.0;
-    double rz = 0.0;
-    bool need_recalc = false;
+    float translation[16] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    float rotation[16] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    float scale[16] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    float local_final[16] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    float final[16] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    float rx = 0.0f;
+    float ry = 0.0f;
+    float rz = 0.0f;
+
+    bool local_recalc = false;
+    bool recalc = true;
+
+    void update_local()
+    {
+        float temp_mat[16];
+        cblas_sgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 4, 4, 4, 1.0f, translation, 4, rotation, 4, 0.0f, temp_mat, 4);
+        cblas_sgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 4, 4, 4, 1.0f, temp_mat, 4, scale, 4, 0.0f, local_final, 4);
+        local_recalc = false;
+        recalc = true;
+    }
+
+    void update_global(Transform *prev)
+    {
+        if (local_recalc)
+            update_local();
+
+        cblas_sgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 4, 4, 4, 1.0f, prev->local_final, 4, local_final, 4, 0.0f, final, 4);
+        recalc = false;
+    }
 };
 
 class CubeDrawer
@@ -120,33 +181,52 @@ private:
     Brush cur_brush;
     Pixel back_buf[4096];
     long min_show_delay = 0;
-
-#ifndef VIRT_CUBE
-    ShmBuf *shm_buf;
-#endif
-    std::vector<double> cur_parsed_args;
-
+    std::vector<float> cur_parsed_args;
     std::vector<Transform *> transform_list;
-    int parse_num_input(PyObject *input, int req_len = 0);
-
-    ParseFuncs parse_funcs[2] = {(ParseFuncs){PyTuple_Size, PyTuple_GetItem}, (ParseFuncs){PyList_Size, PyList_GetItem}};
-    PyObject *py_exception = PyErr_NewException("ledcd.CubeDrawer", NULL, NULL);
-    void calc_transform(double *cur_vec);
-
-    bool line_box_intr(double *p1, double *p2, bool opt_both_points);
-    bool optimise_line_points(double *p1, double *p2);
-
-    double line_res = 0.5;
-    // 0, -1, 0 / -1, 0, 0, /
-    double normal_list[18] = {-1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, -1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0};
-    double coord_list[6] = {0.0, 0.0, 0.0, 15.0, 15.0, 15.0};
 
     long prev_show_time;
     long min_frame_delay;
     static std::mutex mutex_;
 
-    CubeDrawer(double brightness = 1.0, bool sync = false, int fps_cap = 70);
+#ifndef VIRT_CUBE
+    ShmBuf *shm_buf;
+#endif
+
+    int parse_num_input(PyObject *input, int req_len = 0);
+    ParseFuncs parse_funcs[2] = {(ParseFuncs){PyTuple_Size, PyTuple_GetItem}, (ParseFuncs){PyList_Size, PyList_GetItem}};
+    PyObject *py_exception = PyErr_NewException("ledcd.CubeDrawer", NULL, NULL);
+    void apply_transforms(float *cur_vec);
+
+    //opengl
+    GLuint vbo, vao, dc_vbo; // main vbo/vao and draw calls data vbo
+    GLuint main_prog;
+    GLuint pix_buf;
+
+    GLfloat gl_vertices[12288]; // static vertices
+    std::vector<DrawCall> draw_calls_arr;
+
+    GLFWwindow *context;
+
+    void init_gl();
+    bool check_compile(GLuint obj);
+    void render_texture();
+    void pool_events();
+    void clear_draw_call_buf();
+    //
+
+    CubeDrawer(float brightness = 1.0, bool sync = false, int fps_cap = 70);
     ~CubeDrawer(){};
+
+    // OpenGL Renderer API Binds
+    void apoint(float *p, float line_width);
+    void apoly(float *p1, float *p2, float *p3, float z_height);
+    void apoly_pyr(float *p1, float *p2, float *p3, float *p4);
+    void aline(float *p1, float *p2, float line_width);
+    void acircle(float *model_mat, float *r, bool filled, float z_height, float line_width);
+    void asphere(float *model_mat, float *r, bool filled, float line_width);
+    // \OpenGL Renderer API Binds
+
+    static void err_clb(int i);
 
 public:
     static CubeDrawer &get_obj();
@@ -160,42 +240,87 @@ public:
     bool wait_cube = true;
 #endif
     bool is_sync;
-    double delta_time;
-    void set_brigthness(double b);
-
-    void set_color(double r, double g, double b);
-    void set_color(double rgb);
-    void set_color(PyObject *input);
+    float delta_time;
 
     PyObject *get_cur_color();
-
-    void set_pixel(double x, double y, double z);
-    void set_pixel(PyObject *input);
-
-    void set_pixel_nt(double x, double y, double z); // put pixel without transformation
-    void set_pixel_nt(PyObject *input);
 
     void push_matrix();
     void pop_matrix();
 
-    void translate(double x, double y, double z);
+    void translate(float x, float y, float z);
     void translate(PyObject *input);
 
-    void rotate(double x, double y, double z);
+    void rotate(float x, float y, float z);
     void rotate(PyObject *input);
 
-    void scale(double x, double y, double z);
+    void scale(float x, float y, float z);
     void scale(PyObject *input);
 
-    void clear(double r, double g, double b);
-    void clear(double rgb = 0.0);
+    void clear(float r, float g, float b);
+    void clear(float rgb = 0.0);
+    void clear(int rgb);
+    void clear(int r, int g, int b);
     void clear(PyObject *input);
 
     void show();
 
-    void line(double x1, double y1, double z1, double x2, double y2, double z2);
-    void line(PyObject *input1, PyObject *input2);
-    void line(PyObject *input);
-
     void set_fps_cap(int fps);
+
+    //
+    void set_brigthness(float b);
+    void set_brigthness(int b);
+
+    void set_color(int r, int g, int b);
+    void set_color(int rgb);
+
+    void set_color(float r, float g, float b);
+    void set_color(float rgb);
+
+    void set_color(PyObject *input);
+    //
+
+    //// User friendly API Calls overloads
+    // CALL_POINT_TYPE
+    void point(float x, float y, float z);
+    void point(PyObject *p); // tuple with 3 values
+    void filled_sphere(float x, float y, float z, float r);
+    void filled_sphere(PyObject *p, float r);
+
+    // CALL_POLYGON_TYPE
+    void poly(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float height = DEF_ZHEIGHT);
+    void poly(PyObject *p1, PyObject *p2, PyObject *p3, float height = DEF_ZHEIGHT);
+
+    // CALL_POLYPYR_TYPE
+    void poly_pyr(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4);
+    void poly_pyr(PyObject *p1, PyObject *p2, PyObject *p3, PyObject *p4);
+
+    // CALL_LINE_TYPE
+    void line(float x1, float y1, float z1, float x2, float y2, float z2, float line_width = DEF_LINEW);
+    void line(PyObject *p1, PyObject *p2, float line_width = DEF_LINEW);
+    void cylinder(float x, float y, float z, float r, float height);
+    void cylinder(PyObject *p1, float r, float height);
+    void filled_circle(float x, float y, float z, float r);
+    void filled_circle(PyObject *p, float r);
+
+    // CALL_CIRCLE_TYPE
+    void circle(float x, float y, float z, float rx, float ry, float line_width, float thickness = DEF_ZHEIGHT);
+    void circle(float x, float y, float z, float r);
+    void circle(PyObject *p, float r, float line_width = DEF_LINEW);
+    void circle(PyObject *p, PyObject *r, float line_width = DEF_LINEW);
+
+    // CALL_FCIRCLE_TYPE
+    void filled_circle(float x, float y, float z, float rx, float ry);
+    void filled_circle(PyObject *p, PyObject *r);
+    void cylinder(float x, float y, float z, float rx, float ry, float height);
+    void cylinder(PyObject *p, PyObject *r, float height);
+
+    // CALL_FCIRCLE_TYPE
+    void sphere(float x, float y, float z, float r, float line_width = DEF_LINEW);
+    void sphere(float x, float y, float z, float rx, float ry, float rz, float line_width = DEF_LINEW);
+    void sphere(PyObject *p, PyObject *r, float line_width = DEF_LINEW);
+
+    // CALL_FSPHERE_TYPE
+    void filled_sphere(float x, float y, float z, float rx, float ry, float rz);
+    void filled_sphere(PyObject *p, PyObject *r);
+    //// \User friendly API Calls overloads
 };

@@ -1,0 +1,19 @@
+Point: { pos: vec3, line_width: float } 
+
+Polygon { pos1: vec3, pos2: vec3, pos3: vec3, line_width: float = 0.5 } aka 
+// FilledPolygon { pos1: vec3, pos2: vec3, pos3: vec3 } aka triangle 2D
+
+// PolygonPrism { pos1: vec3, pos2: vec3, pos3: vec3, z_height: float, line_width: float } z_height - depth of polygon 3D
+// FilledPolygonPrism { pos1: vec3, pos2: vec3, pos3: vec3, z_height: float } 3D
+
+// PolygonPyramid { pos1: vec3, pos2: vec3, pos3: vec3, pos4: vec3, line_width: float } 3D
+FilledPolygonPyramid { pos1: vec3, pos2: vec3, pos3: vec3, pos4: vec3 } 3D
+
+Line: { pos1: vec3, pos2: vec3, line_width: float } aka cylinder 3D
+
+Circle: { pos: vec3, r: float, line_width: float } 2D
+FilledCircle: { pos: vec3, r: float } 2D
+
+Sphere: { pos: vec3, r: float, line_width: float } 3D
+// FilledSphere { pos: vec3, r: float } 3D
+

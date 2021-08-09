@@ -62,6 +62,8 @@ class _SwigNonDynamicMeta(type):
 
 
 EPSILON = _ledcd.EPSILON
+DEF_LINEW = _ledcd.DEF_LINEW
+DEF_ZHEIGHT = _ledcd.DEF_ZHEIGHT
 class Brush(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
@@ -136,17 +138,48 @@ _ledcd.ParseFuncs_swigregister(ParseFuncs)
 
 PY_TUPLE_PARSE = _ledcd.PY_TUPLE_PARSE
 PY_LIST_PARSE = _ledcd.PY_LIST_PARSE
+CALL_POINT_TYPE = _ledcd.CALL_POINT_TYPE
+CALL_POLYGON_TYPE = _ledcd.CALL_POLYGON_TYPE
+CALL_POLYPYR_TYPE = _ledcd.CALL_POLYPYR_TYPE
+CALL_LINE_TYPE = _ledcd.CALL_LINE_TYPE
+CALL_CIRCLE_TYPE = _ledcd.CALL_CIRCLE_TYPE
+CALL_FCIRCLE_TYPE = _ledcd.CALL_FCIRCLE_TYPE
+CALL_SPHERE_TYPE = _ledcd.CALL_SPHERE_TYPE
+CALL_FSPHERE_TYPE = _ledcd.CALL_FSPHERE_TYPE
+CALL_CLEAR_TYPE = _ledcd.CALL_CLEAR_TYPE
+class DrawCall(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+    type = property(_ledcd.DrawCall_type_get, _ledcd.DrawCall_type_set)
+    color = property(_ledcd.DrawCall_color_get, _ledcd.DrawCall_color_set)
+    data = property(_ledcd.DrawCall_data_get, _ledcd.DrawCall_data_set)
+
+    def __init__(self):
+        _ledcd.DrawCall_swiginit(self, _ledcd.new_DrawCall())
+    __swig_destroy__ = _ledcd.delete_DrawCall
+
+# Register DrawCall in _ledcd:
+_ledcd.DrawCall_swigregister(DrawCall)
+
 class Transform(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
     translation = property(_ledcd.Transform_translation_get, _ledcd.Transform_translation_set)
     rotation = property(_ledcd.Transform_rotation_get, _ledcd.Transform_rotation_set)
     scale = property(_ledcd.Transform_scale_get, _ledcd.Transform_scale_set)
+    local_final = property(_ledcd.Transform_local_final_get, _ledcd.Transform_local_final_set)
     final = property(_ledcd.Transform_final_get, _ledcd.Transform_final_set)
     rx = property(_ledcd.Transform_rx_get, _ledcd.Transform_rx_set)
     ry = property(_ledcd.Transform_ry_get, _ledcd.Transform_ry_set)
     rz = property(_ledcd.Transform_rz_get, _ledcd.Transform_rz_set)
-    need_recalc = property(_ledcd.Transform_need_recalc_get, _ledcd.Transform_need_recalc_set)
+    local_recalc = property(_ledcd.Transform_local_recalc_get, _ledcd.Transform_local_recalc_set)
+    recalc = property(_ledcd.Transform_recalc_get, _ledcd.Transform_recalc_set)
+
+    def update_local(self):
+        return _ledcd.Transform_update_local(self)
+
+    def update_global(self, prev):
+        return _ledcd.Transform_update_global(self, prev)
 
     def __init__(self):
         _ledcd.Transform_swiginit(self, _ledcd.new_Transform())
@@ -165,23 +198,16 @@ class CubeDrawer(object):
     @staticmethod
     def get_obj():
         return _ledcd.CubeDrawer_get_obj()
+    virt_fds = property(_ledcd.CubeDrawer_virt_fds_get, _ledcd.CubeDrawer_virt_fds_set)
+
+    def _get_virt_amount_(self):
+        return _ledcd.CubeDrawer__get_virt_amount_(self)
+    wait_cube = property(_ledcd.CubeDrawer_wait_cube_get, _ledcd.CubeDrawer_wait_cube_set)
     is_sync = property(_ledcd.CubeDrawer_is_sync_get, _ledcd.CubeDrawer_is_sync_set)
     delta_time = property(_ledcd.CubeDrawer_delta_time_get, _ledcd.CubeDrawer_delta_time_set)
 
-    def set_brigthness(self, b):
-        return _ledcd.CubeDrawer_set_brigthness(self, b)
-
-    def set_color(self, *args):
-        return _ledcd.CubeDrawer_set_color(self, *args)
-
     def get_cur_color(self):
         return _ledcd.CubeDrawer_get_cur_color(self)
-
-    def set_pixel(self, *args):
-        return _ledcd.CubeDrawer_set_pixel(self, *args)
-
-    def set_pixel_nt(self, *args):
-        return _ledcd.CubeDrawer_set_pixel_nt(self, *args)
 
     def push_matrix(self):
         return _ledcd.CubeDrawer_push_matrix(self)
@@ -204,11 +230,41 @@ class CubeDrawer(object):
     def show(self):
         return _ledcd.CubeDrawer_show(self)
 
+    def set_fps_cap(self, fps):
+        return _ledcd.CubeDrawer_set_fps_cap(self, fps)
+
+    def set_brigthness(self, *args):
+        return _ledcd.CubeDrawer_set_brigthness(self, *args)
+
+    def set_color(self, *args):
+        return _ledcd.CubeDrawer_set_color(self, *args)
+
+    def point(self, *args):
+        return _ledcd.CubeDrawer_point(self, *args)
+
+    def poly(self, *args):
+        return _ledcd.CubeDrawer_poly(self, *args)
+
+    def poly_pyr(self, *args):
+        return _ledcd.CubeDrawer_poly_pyr(self, *args)
+
     def line(self, *args):
         return _ledcd.CubeDrawer_line(self, *args)
 
-    def set_fps_cap(self, fps):
-        return _ledcd.CubeDrawer_set_fps_cap(self, fps)
+    def circle(self, *args):
+        return _ledcd.CubeDrawer_circle(self, *args)
+
+    def filled_circle(self, *args):
+        return _ledcd.CubeDrawer_filled_circle(self, *args)
+
+    def cylinder(self, *args):
+        return _ledcd.CubeDrawer_cylinder(self, *args)
+
+    def sphere(self, *args):
+        return _ledcd.CubeDrawer_sphere(self, *args)
+
+    def filled_sphere(self, *args):
+        return _ledcd.CubeDrawer_filled_sphere(self, *args)
 
 # Register CubeDrawer in _ledcd:
 _ledcd.CubeDrawer_swigregister(CubeDrawer)
