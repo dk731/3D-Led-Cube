@@ -3,7 +3,6 @@ from distutils.core import setup, Extension
 extra_link = [
     "/usr/local/lib64/libws.a",
     "-lpthread",
-    "-lrt",
     "-lblas",
     "-lGLEW",
     "-lGL",
