@@ -198,6 +198,7 @@ class CubeDrawer(object):
     @staticmethod
     def get_obj():
         return _ledcd.CubeDrawer_get_obj()
+    draw_immediate = property(_ledcd.CubeDrawer_draw_immediate_get, _ledcd.CubeDrawer_draw_immediate_set)
     virt_fds = property(_ledcd.CubeDrawer_virt_fds_get, _ledcd.CubeDrawer_virt_fds_set)
 
     def _get_virt_amount_(self):

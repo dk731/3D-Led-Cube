@@ -225,7 +225,7 @@ bool fcircle_check()
   vec2 r = vec2(call_data[0].w, call_data[1].w);
   float z_height = call_data[3].w;
 
-  vec3 new_pos = (vec4(in_pos, 1.0) * inv_mat).xyz;
+  vec3 new_pos = (inv_mat * vec4(in_pos, 1.0)).xyz;
 
   if (abs(new_pos.z) > z_height)
     return false;
@@ -245,20 +245,20 @@ bool sphere_check()
 {
   mat4 inv_mat = inverse(
     mat4(
-      vec4(call_data[0]), 
-      vec4(call_data[1]), 
-      vec4(call_data[2]), 
-      vec4(0.0, 0.0, 0.0, 1.0)
+      vec4(call_data[0].xyz, 0.0), 
+      vec4(call_data[1].xyz, 0.0), 
+      vec4(call_data[2].xyz, 0.0), 
+      vec4(call_data[3].xyz, 1.0)
     )
   );
 
-  vec3 r = call_data[3].xyz;
+  vec3 r = vec3(call_data[0].w, call_data[1].w, call_data[2].w);
   float line_width = call_data[3].w;
 
   vec3 new_pos = (inv_mat * vec4(in_pos, 1.0)).xyz;
 
   vec3 res_vec = (new_pos * new_pos) / (r * r);
-  return (res_vec.x + res_vec.y + res_vec.z - 1) <= line_width;
+  return abs(res_vec.x + res_vec.y + res_vec.z - 1) <= line_width;
 }
 
 // FCIRCLE_CHECK(MAT4X3 MODEL_MAT; VEC3 R)
@@ -272,14 +272,14 @@ bool fsphere_check()
 {
   mat4 inv_mat = inverse(
     mat4(
-      vec4(call_data[0]), 
-      vec4(call_data[1]), 
-      vec4(call_data[2]), 
-      vec4(0.0, 0.0, 0.0, 1.0)
+      vec4(call_data[0].xyz, 0.0), 
+      vec4(call_data[1].xyz, 0.0), 
+      vec4(call_data[2].xyz, 0.0), 
+      vec4(call_data[3].xyz, 1.0)
     )
   );
 
-  vec3 r = call_data[3].xyz;
+  vec3 r = vec3(call_data[0].w, call_data[1].w, call_data[2].w);
 
   vec3 new_pos = (inv_mat * vec4(in_pos, 1.0)).xyz;
 
