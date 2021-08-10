@@ -33,6 +33,6 @@ jobs:
         os: [ubuntu-20.04, windows-2019, macos-10.15]
 
     steps:
-      - run: ls -la; cd lapack-release; make cblaslib
+      - run: sudo apt-get install libblas-dev
       
 
