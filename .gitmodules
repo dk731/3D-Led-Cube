@@ -1,3 +1,0 @@
-[submodule "lapack-release"]
-	path = lapack-release
-	url = https://github.com/Reference-LAPACK/lapack-release/

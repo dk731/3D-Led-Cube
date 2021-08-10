@@ -19,7 +19,6 @@
 #include <pthread.h>
 #include <fcntl.h>
 #include <stdio.h>
-
 #include <cblas.h>
 
 #include <GL/glew.h>
