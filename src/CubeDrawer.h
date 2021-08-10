@@ -10,7 +10,7 @@
 #include <mutex>
 #include <list>
 #include <vector>
-#include <python3.9/Python.h>
+#include <Python.h>
 #include <stdint.h>
 
 #include <unistd.h>
