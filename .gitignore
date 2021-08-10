@@ -2,3 +2,4 @@ main
 *.pyc
 *.so
 *.o
+/build
