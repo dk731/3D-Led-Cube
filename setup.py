@@ -3,7 +3,6 @@ from distutils.core import setup, Extension
 extra_link = [
     "/usr/local/lib64/libws.a",
     "-lpthread",
-    "-lrt",
     "-lblas",
     "-lGLEW",
     "-lGL",
@@ -14,7 +13,7 @@ extra_link = [
 extra_macros = [("VIRT_CUBE", None)]
 led_module = Extension(
     "_ledcd",
-    sources=["swig_module_wrap.cxx", "CubeDrawer.cpp"],
+    sources=["src/swig_module_wrap.cxx", "src/CubeDrawer.cpp"],
     extra_link_args=extra_link,
     define_macros=extra_macros,
     # extra_objects=["/usr/local/lib64/libws.a"]
