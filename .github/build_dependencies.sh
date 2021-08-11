@@ -8,10 +8,11 @@ cd glfw
 mkdir build
 cd build
 cmake -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF -DGLFW_INSTALL=OFF ..
-make
 
 cat ./CMakeFiles/CMakeOutput.log
 cat ./CMakeFiles/CMakeError.log
+
+make
 
 mv ../include/* ${root_dir}/include
 mv ./src/libglfw* ${root_dir}/lib
