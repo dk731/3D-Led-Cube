@@ -21,14 +21,15 @@ if curl -L https://github.com/nigels-com/glew/releases/download/glew-2.2.0/glew-
     echo "Downloaded file"
     tar -xf glew.tgz
     ls -la
-    cd glew
-    make glew.lib
-    mv ./include/* ${root_dir}/include
-    mv ./lib/* ${root_dir}/lib
 else
     printf 'Curl failed with error code "%d" (check the manual)\n' "$?" >&2
     exit 1
 fi
 
+cd glew-2.2.0
+make glew.lib
+mv ./include/* ${root_dir}/include
+mv ./lib/* ${root_dir}/lib
+
 cd ${root_dir}
-echo "Finished building GLEW, now i am in: $(PWD)"
+echo "Finished building GLEW, now i am in: $(pwd)"
