@@ -2,6 +2,19 @@ echo "Prepering folder structure..."
 root_dir=$(pwd)
 mkdir lib
 
+echo "Building GLFW..."
+git clone https://github.com/glfw/glfw
+cd glfw
+mkdir build
+cd build
+cmake -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF -DGLFW_INSTALL=OFF ..
+make
+
+mv ../include/* ${root_dir}/include
+mv ./src/libglfw* ${root_dir}/lib
+
+exit 0
+
 echo "Building CBLAS..."
 git clone --depth 1 https://github.com/Reference-LAPACK/lapack-release
 cd lapack-release
@@ -31,4 +44,4 @@ mv ./include/GL/* ${root_dir}/include/GL
 mv ./lib/* ${root_dir}/lib
 
 cd ${root_dir}
-echo "Finished building GLEW, now i am in: $(pwd)"
+
