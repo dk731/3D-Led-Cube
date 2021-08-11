@@ -1,9 +1,10 @@
 from distutils.core import setup, Extension
 import os
-print(os.listdir('.'))
+
+print(os.listdir("."))
 print()
-print("Include: ", os.listdir('./include'))
-print("Lib: ", os.listdir('./lib'))
+print("Include: ", os.listdir("./include"))
+print("Lib: ", os.listdir("./lib"))
 
 extra_link = [
     "/usr/local/lib64/libws.a",

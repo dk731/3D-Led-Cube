@@ -6,3 +6,4 @@ main
 /lib
 /include
 /lapack-release
+glew*
