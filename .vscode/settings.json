@@ -53,7 +53,8 @@
         "cinttypes": "cpp",
         "typeinfo": "cpp",
         "chrono": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "glu.h": "c"
     },
     "python.pythonPath": "/usr/local/bin/python3.9"
 }

@@ -1,6 +1,5 @@
 echo "Prepering folder structure..."
 root_dir=$(pwd)
-mkdir include
 mkdir lib
 
 echo "Building CBLAS..."
