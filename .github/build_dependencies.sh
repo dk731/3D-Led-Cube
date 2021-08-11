@@ -9,7 +9,7 @@ mkdir build
 cd build
 cmake -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF -DGLFW_INSTALL=OFF ..
 
-cat ./CMakeFiles/CMakeOutput.log
+# cat ./CMakeFiles/CMakeOutput.log
 cat ./CMakeFiles/CMakeError.log
 
 make

@@ -5,9 +5,11 @@ main
 /build
 /lib
 /lapack-release
-glew*
+/glew*
+/glfw
 /include/*
 /include/GL/*
+
 
 !/include/GL
 !/include/GL/glu.h
