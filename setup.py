@@ -1,4 +1,6 @@
 from distutils.core import setup, Extension
+import os
+print(os.listdir('.'))
 
 extra_link = [
     "/usr/local/lib64/libws.a",
