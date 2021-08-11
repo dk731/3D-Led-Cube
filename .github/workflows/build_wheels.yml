@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - run: find / -name cblas.h
+      - run: git clone https://github.com/Reference-LAPACK/lapack-release; cd lapack-release; mv make.inc.example make.inc; make
       - run: sudo apt-get install libblas-dev
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.1.1
@@ -22,4 +22,5 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          path: ./wheelhouse/*.whl
+          path: ./wheelhouse/*.whl  
+    
