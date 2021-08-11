@@ -17,11 +17,13 @@ mv ./include/* ${root_dir}/include
 cd ${root_dir}
 
 echo "Building GLEW..."
-wget https://github.com/nigels-com/glew/releases/download/glew-2.2.0/glew-2.2.0.tgz
+# wget -O glew.tgz https://github.com/nigels-com/glew/releases/download/glew-2.2.0/glew-2.2.0.tgz
+curl https://github.com/nigels-com/glew/releases/download/glew-2.2.0/glew-2.2.0.tgz --output glew.tgz
 echo "Downloaded glew.tgz"
-tar -xf glew-2.2.0.tgz
+ls -la
+tar -xf glew.tgz
 echo "Unpacked glew.tgz"
-cd glew-2.2.0
+cd glew
 echo "I am in glew dir!"
 ls -la
 make glew.lib
