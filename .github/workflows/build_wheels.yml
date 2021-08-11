@@ -16,7 +16,7 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.1.1
         env:
-          CIBW_BEFORE_BUILD: ls -la; mkdir include; mkdir lib; git clone --depth 1 https://github.com/Reference-LAPACK/lapack-release; cd lapack-release; mv make.inc.example make.inc; mkdir build; cd build; cmake -DCBLAS=ON -DBUILD_SHARED_LIBS=ON ..; make cblas; mv ./lib/* ../../lib; mv ./include* ../../include; ls -la; ls -la ../../lib;
+          CIBW_BEFORE_BUILD: ls -la; mkdir include; mkdir lib; git clone --depth 1 https://github.com/Reference-LAPACK/lapack-release; cd lapack-release; mv make.inc.example make.inc; mkdir build; cd build; cmake -DCBLAS=ON -DBUILD_SHARED_LIBS=ON ..; make cblas; mv ./lib/* ../../lib; mv ./include/* ../../include; ls -la; ls -la ../../lib;
 
 
       - uses: actions/upload-artifact@v2
