@@ -1,5 +1,4 @@
 echo "Prepering folder structure..."
-cd ..
 mkdir include
 mkdir lib
 
