@@ -24,7 +24,12 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#define VIRT_CUBE
+// #define VIRT_CUBE
+// #define DYNAMIC_SHADER_INCLUDE
+
+#ifdef DYNAMIC_SHADER_INCLUDE
+#include "shaders.h"
+#endif
 
 #define DEBUG_MODE
 #ifdef DEBUG_MODE

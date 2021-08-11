@@ -3,3 +3,6 @@ main
 *.so
 *.o
 /build
+/lib
+/include
+/lapack-release

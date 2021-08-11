@@ -14,6 +14,7 @@ CubeDrawer &CubeDrawer::get_obj()
 void onopen(int fd)
 {
     SLEEP_MICROS(500000);
+
     CubeDrawer::get_obj().virt_fds.push_back(fd);
     std::cout << "Virtual cube:" << fd << " connected" << std::endl;
 }
@@ -429,6 +430,7 @@ void CubeDrawer::init_gl()
         return;
     }
 
+#ifndef DYNAMIC_SHADER_INCLUDE
     std::ifstream in("./shaders/main.vert");
     std::string tmp_vert = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     const char *vert_str = tmp_vert.c_str();
@@ -438,14 +440,17 @@ void CubeDrawer::init_gl()
     std::string tmp_frag = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     const char *frag_str = tmp_frag.c_str();
     in.close();
-
+#else
+    const char *vert_str = src_shaders_main_vert;
+    const char *frag_str = src_shaders_main_frag;
+#endif
     GLuint vert_shade = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vert_shade, 1, &vert_str, NULL);
+    glShaderSource(vert_shade, 1, (const char **)&vert_str, NULL);
     glCompileShader(vert_shade);
     check_compile(vert_shade);
 
     GLuint frag_shade = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(frag_shade, 1, &frag_str, NULL);
+    glShaderSource(frag_shade, 1, (const char **)&frag_str, NULL);
     glCompileShader(frag_shade);
     check_compile(frag_shade);
 
