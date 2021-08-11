@@ -17,7 +17,9 @@ mv ./include/* ${root_dir}/include
 cd ${root_dir}
 
 echo "Building GLEW..."
-if curl -o glew.tgz https://github.com/nigels-com/glew/releases/download/glew-2.2.0/glew-2.2.0.tgz; then
+if curl -L https://github.com/nigels-com/glew/releases/download/glew-2.2.0/glew-2.2.0.tgz > glew.tgz; then
+    echo "Downloaded file"
+    ls -la
     tar -xf glew.tgz
 else
     printf 'Curl failed with error code "%d" (check the manual)\n' "$?" >&2
