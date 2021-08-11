@@ -8,22 +8,18 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-20.04, windows-2019, macos-10.15]
 
     steps:
       - uses: actions/checkout@v2
-      - run: mkdir include; mkdir lib
 
-      # Generate libcblas.a
-      - run: git clone --depth 1 https://github.com/Reference-LAPACK/lapack-release
-      - run: cd lapack-release; mv make.inc.example make.inc; mkdir build; cd build; cmake -DCBLAS=ON -DBUILD_SHARED_LIBS=ON ..; make cblas; mv ./lib/* ../../lib; mv ./include* ../../include;
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.1.1
+        env:
+          CIBW_BEFORE_BUILD: mkdir include; mkdir lib; git clone --depth 1 https://github.com/Reference-LAPACK/lapack-release; cd lapack-release; mv make.inc.example make.inc; mkdir build; cd build; cmake -DCBLAS=ON -DBUILD_SHARED_LIBS=ON ..; make cblas; mv ./lib/* ../../lib; mv ./include* ../../include;
 
-      - run: python -m pip install cibuildwheel; python -m cibuildwheel --output-dir wheelhouse
-        # to supply options, put them in 'env', like:
-        # env:
-        #   CIBW_SOME_OPTION: value
 
       - uses: actions/upload-artifact@v2
         with:
-          path: ./wheelhouse/*.whl  
+          path: ./wheelhouse/*.whl
     
