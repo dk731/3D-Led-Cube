@@ -3,6 +3,7 @@ root_dir=$(pwd)
 mkdir lib
 
 echo "Building GLFW..."
+sudo apt-get install libpthread-stubs0-dev
 git clone https://github.com/glfw/glfw
 cd glfw
 mkdir build
