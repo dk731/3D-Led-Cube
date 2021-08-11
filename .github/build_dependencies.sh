@@ -17,9 +17,14 @@ mv ./include/* ${root_dir}/include
 cd ${root_dir}
 
 echo "Building GLEW..."
-wget https://github.com/nigels-com/glew/releases/download/glew-2.2.0/glew-2.2.0.tgz
-tar -xf glew-2.2.0.tgz
-cd glew-2.2.0
+if curl -o glew.tgz https://github.com/nigels-com/glew/releases/download/glew-2.2.0/glew-2.2.0.tgz; then
+    tar -xf glew.tgz
+else
+    printf 'Curl failed with error code "%d" (check the manual)\n' "$?" >&2
+    exit 1
+fi
+
+cd glew
 make glew.lib
 mv ./include/* ${root_dir}/include
 mv ./lib/* ${root_dir}/lib
