@@ -22,8 +22,16 @@ echo "Downloaded glew.tgz"
 tar -xf glew-2.2.0.tgz
 echo "Unpacked glew.tgz"
 cd glew-2.2.0
+echo "I am in glew dir!"
+ls -la
 make glew.lib
+echo "runned make file"
+ls -la ./include
+ls -la ./lib
 mv ./include/* ${root_dir}/include
 mv ./lib/* ${root_dir}/lib
+
+ls -la ${root_dir}/include
+ls -la ${root_dir}/lib
 
 cd ${root_dir}
