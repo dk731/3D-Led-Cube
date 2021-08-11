@@ -16,7 +16,7 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.1.1
         env:
-          CIBW_BEFORE_BUILD: .github/build_dependencies.sh
+          CIBW_BEFORE_BUILD: bash .github/build_dependencies.sh
 
       - uses: actions/upload-artifact@v2
         with:
