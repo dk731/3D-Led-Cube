@@ -27,7 +27,7 @@ fi
 
 cd glew-2.2.0
 make glew.lib
-mv ./include/* ${root_dir}/include
+mv ./include/GL/* ${root_dir}/include/GL
 mv ./lib/* ${root_dir}/lib
 
 cd ${root_dir}
