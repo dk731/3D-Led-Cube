@@ -4,6 +4,7 @@ import glob
 import shutil
 import urllib.request
 import tarfile
+from itertools import chain
 
 root_dir = os.getcwd()
 include_dir = os.path.join(root_dir, "include")
@@ -14,26 +15,30 @@ gl_dir = os.path.join(include_dir, "GL")
 subprocess.call(f"export LD_LIBRARY_PATH={lib_dir}", shell=True)
 
 print("Prepearing folder structure...")
-
-if os.path.exists(lib_dir):
-    for ff in glob.glob(lib_dir + "/*"):
-        os.remove(ff)
-else:
-    os.mkdir(lib_dir)
-
-def_list = [os.path.join(include_dir, f) for f in ("GL", "GL/gl.h", "GL/glu.h")]
-files_to_remove = [os.path.join(include_dir, f) for f in os.listdir(include_dir)] + [
-    os.path.join(gl_dir, f) for f in os.listdir(gl_dir)
+dirs_to_delete = [
+    "glfw",
+    "include/GLFW",
+    "glew-2.2.0",
+    "lapack-release",
+    "wsServer",
+    "lib",
 ]
 
-for file in files_to_remove:
-    if file not in def_list:
-        if not os.path.isdir(file):
-            os.remove(file)
-        else:
-            for ff in glob.glob(file + "/*"):
-                os.remove(ff)
-            os.rmdir(file)
+clear_exceptions = ["gl.h", "glu.h"]
+dirs_to_clear = ["include", "include/GL"]
+
+for d in dirs_to_clear:
+    files = os.listdir(d)
+    for file in files:
+        full_path = os.path.join(d, file)
+        if file not in clear_exceptions and os.path.isfile(full_path):
+            os.remove(full_path)
+
+for d in dirs_to_delete:
+    if os.path.exists(os.path.join(root_dir, d)):
+        shutil.rmtree(d, ignore_errors=True)
+
+os.mkdir(lib_dir)
 
 
 def build_cblas():

@@ -2,14 +2,14 @@ main
 *.pyc
 *.so
 *.o
-/build
-/lib
-/lapack-release
-/glew*
-/glfw
-/include/*
-/include/GL/*
-/wsServer
+build
+lib
+lapack-release
+glew-2.2.0
+glfw
+include
+include/GL
+wsServer
 
 !/include/GL
 !/include/GL/glu.h
