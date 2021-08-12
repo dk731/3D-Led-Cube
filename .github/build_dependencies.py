@@ -118,7 +118,7 @@ def build_wsserver():
     )
     os.chdir("./wsServer")
     os.environ["CFLAGS"] = "-fpic"
-    subprocess.call(["make"])
+    subprocess.call(["make", "libws.a"])
 
     for file in glob.glob("./include/*"):
         shutil.move(file, include_dir)
