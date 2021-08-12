@@ -42,7 +42,7 @@
 
 extern "C"
 {
-#include <wsserver/ws.h>
+#include <ws.h>
 }
 
 #else
