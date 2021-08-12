@@ -17,7 +17,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.1.1
         env:
           CIBW_BEFORE_ALL_LINUX: yum install -y libXrandr-devel libXinerama-devel libXcursor-devel libXi-devel
-          CIBW_BEFORE_BUILD: python3 .github/build_dependencies.py
+          CIBW_BEFORE_BUILD: python3 .github/build_dependencies.py; export LD_LIBRARY_PATH=/project/lib
 
       - uses: actions/upload-artifact@v2
         with:
