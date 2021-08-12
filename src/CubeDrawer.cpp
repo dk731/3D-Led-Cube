@@ -35,7 +35,8 @@ CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(0)
 {
     init_gl();
 
-    transform_list.push_back(new Transform({.recalc = false})); // First matrix not editable
+    transform_list.push_back(new Transform()); // First matrix not editable
+    transform_list[0]->recalc = false;
     transform_list.push_back(new Transform());
 #ifdef VIRT_CUBE
     struct ws_events evs;
@@ -440,6 +441,7 @@ void CubeDrawer::init_gl()
     std::string tmp_frag = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     const char *frag_str = tmp_frag.c_str();
     in.close();
+
 #else
     const char *vert_str = src_shaders_main_vert;
     const char *frag_str = src_shaders_main_frag;

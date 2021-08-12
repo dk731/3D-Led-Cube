@@ -31,13 +31,6 @@
 #include "shaders.h"
 #endif
 
-#define DEBUG_MODE
-#ifdef DEBUG_MODE
-#define DEBUG(x) x
-#else
-#define DEBUG(x)
-#endif
-
 #ifdef VIRT_CUBE
 
 extern "C"
