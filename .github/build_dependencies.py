@@ -8,6 +8,7 @@ import tarfile
 root_dir = os.getcwd()
 include_dir = os.path.join(root_dir, "include")
 lib_dir = os.path.join(root_dir, "lib")
+subprocess.call("sudo apt-get install xorg-dev libglu1-mesa-dev", shell=True)
 
 print("Prepearing folder structure...")
 os.mkdir(os.path.join(root_dir, "lib"))
