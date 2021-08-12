@@ -7,16 +7,14 @@ print("Include: ", os.listdir("./include"))
 print("Lib: ", os.listdir("./lib"))
 
 extra_link = [
-    "/usr/local/lib64/libws.a",
+    "-lws",
     "-lcblas",
     "-lpthread",
     "-lGLEW",
     "-lGL",
     "-lglfw",
-    "-L/usr/lib/x86_64-linux-gnu/",
 ]
 
-# extra_libraries = ["./lapack-release/libcblas.a"]
 
 extra_includes = ["./include"]
 extra_library_dirs = ["./lib"]
@@ -29,8 +27,7 @@ led_module = Extension(
     define_macros=extra_macros,
     include_dirs=extra_includes,
     library_dirs=extra_library_dirs,
-    runtime_library_dirs=["./lib"]
-    # extra_objects=["/usr/local/lib64/libws.a"]
+    runtime_library_dirs=["./lib"],
 )
 
 setup(

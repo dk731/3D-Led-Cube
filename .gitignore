@@ -9,7 +9,7 @@ main
 /glfw
 /include/*
 /include/GL/*
-
+/wsServer
 
 !/include/GL
 !/include/GL/glu.h

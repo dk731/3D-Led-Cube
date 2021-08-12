@@ -13,35 +13,6 @@ print("Prepearing folder structure...")
 os.mkdir(os.path.join(root_dir, "lib"))
 
 
-def build_glfw():
-    os.chdir(root_dir)
-    print("Building GLFW...")
-    subprocess.call(
-        "git clone --depth 1 https://github.com/glfw/glfw",
-        shell=True,
-    )
-    os.mkdir("./glfw/build")
-    os.chdir("./glfw/build")
-    subprocess.call(
-        [
-            "cmake",
-            "-DBUILD_SHARED_LIBS=ON",
-            "-DGLFW_BUILD_EXAMPLES=OFF",
-            "-DGLFW_BUILD_TESTS=OFF",
-            "-DGLFW_BUILD_DOCS=OFF",
-            "-DGLFW_INSTALL=OFF",
-            "..",
-        ]
-    )
-
-    subprocess.call(["make"])
-
-    for file in glob.glob("../include/*"):
-        shutil.move(file, include_dir)
-    for file in glob.glob("./src/libglfw*"):
-        shutil.move(file, lib_dir)
-
-
 def build_cblas():
     os.chdir(root_dir)
     print("Building CBLAS...")
@@ -81,6 +52,60 @@ def build_glew():
         shutil.move(file, lib_dir)
 
 
+def build_glfw():
+    os.chdir(root_dir)
+    print("Building GLFW...")
+    subprocess.call(
+        "git clone --depth 1 https://github.com/glfw/glfw",
+        shell=True,
+    )
+    os.mkdir("./glfw/build")
+    os.chdir("./glfw/build")
+    subprocess.call(
+        [
+            "cmake",
+            "-DBUILD_SHARED_LIBS=ON",
+            "-DGLFW_BUILD_EXAMPLES=OFF",
+            "-DGLFW_BUILD_TESTS=OFF",
+            "-DGLFW_BUILD_DOCS=OFF",
+            "-DGLFW_INSTALL=OFF",
+            "..",
+        ]
+    )
+
+    subprocess.call(["make"])
+
+    for file in glob.glob("../include/*"):
+        shutil.move(file, include_dir)
+    for file in glob.glob("./src/libglfw*"):
+        shutil.move(file, lib_dir)
+
+
+def build_wsserver():
+    os.chdir(root_dir)
+    print("Building wsServer...")
+    subprocess.call(
+        "git clone --depth 1 https://github.com/Theldus/wsServer",
+        shell=True,
+    )
+    os.chdir("./wsServer")
+    os.environ["CFLAGS"] = "-fpic"
+    subprocess.call(["make"])
+
+    for file in glob.glob("./include/*"):
+        shutil.move(file, include_dir)
+
+    shutil.move("./libws.a", lib_dir)
+
+
 build_cblas()
 build_glew()
 build_glfw()
+build_wsserver()
+
+os.chdir(root_dir)
+
+print("Finished building dependencies!\n")
+print("* Include dir: \n\n", "\n".join(glob.glob("./include/*")))
+print("* Include/GL dir: \n\n", "\n".join(glob.glob("./include/GL/*")))
+print("* Lib dir: \n\n", "\n".join(glob.glob("./lib/*")))
