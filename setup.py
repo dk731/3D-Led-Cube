@@ -11,7 +11,6 @@ extra_link = [
     "-lcblas",
     "-lpthread",
     "-lGLEW",
-    "-lGL",
     "-lglfw",
 ]
 
