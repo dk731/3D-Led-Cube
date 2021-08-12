@@ -2,7 +2,7 @@ import os
 import subprocess
 import glob
 import shutil
-import requests
+import urllib.request
 import tarfile
 
 root_dir = os.getcwd()
@@ -66,11 +66,10 @@ def build_glew():
     os.chdir(root_dir)
     print("Building GLEW...")
 
-    response = requests.get(
-        "https://github.com/nigels-com/glew/releases/download/glew-2.2.0/glew-2.2.0.tgz",
-        stream=True,
+    ftpstream = urllib.request.urlopen(
+        "https://github.com/nigels-com/glew/releases/download/glew-2.2.0/glew-2.2.0.tgz"
     )
-    file = tarfile.open(fileobj=response.raw, mode="r|gz")
+    file = tarfile.open(fileobj=ftpstream, mode="r|gz")
     file.extractall(path=".")
 
     os.chdir("glew-2.2.0")
