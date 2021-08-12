@@ -8,6 +8,9 @@ import tarfile
 root_dir = os.getcwd()
 include_dir = os.path.join(root_dir, "include")
 lib_dir = os.path.join(root_dir, "lib")
+print("################################################################")
+print(lib_dir)
+print("################################################################")
 subprocess.call(f"export LD_LIBRARY_PATH={lib_dir}", shell=True)
 
 print("Prepearing folder structure...")
