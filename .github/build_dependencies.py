@@ -8,15 +8,32 @@ import tarfile
 root_dir = os.getcwd()
 include_dir = os.path.join(root_dir, "include")
 lib_dir = os.path.join(root_dir, "lib")
-print("################################################################")
-print(lib_dir)
-print(os.path.abspath(__file__))
-print(os.path.join(os.path.abspath(__file__), "lib"))
-print("################################################################")
+
+gl_dir = os.path.join(include_dir, "GL")
+
 subprocess.call(f"export LD_LIBRARY_PATH={lib_dir}", shell=True)
 
 print("Prepearing folder structure...")
-os.mkdir(os.path.join(root_dir, "lib"))
+
+if os.path.exists(lib_dir):
+    for ff in glob.glob(lib_dir + "/*"):
+        os.remove(ff)
+else:
+    os.mkdir(lib_dir)
+
+def_list = [os.path.join(include_dir, f) for f in ("GL", "GL/gl.h", "GL/glu.h")]
+files_to_remove = [os.path.join(include_dir, f) for f in os.listdir(include_dir)] + [
+    os.path.join(gl_dir, f) for f in os.listdir(gl_dir)
+]
+
+for file in files_to_remove:
+    if file not in def_list:
+        if not os.path.isdir(file):
+            os.remove(file)
+        else:
+            for ff in glob.glob(file + "/*"):
+                os.remove(ff)
+            os.rmdir(file)
 
 
 def build_cblas():
