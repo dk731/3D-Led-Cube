@@ -10,6 +10,8 @@ include_dir = os.path.join(root_dir, "include")
 lib_dir = os.path.join(root_dir, "lib")
 print("################################################################")
 print(lib_dir)
+print(os.path.abspath(__file__))
+print(os.path.join(os.path.abspath(__file__), "lib"))
 print("################################################################")
 subprocess.call(f"export LD_LIBRARY_PATH={lib_dir}", shell=True)
 
