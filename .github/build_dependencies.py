@@ -55,23 +55,23 @@ def build_cblas():
     os.chdir(os.path.join(root_dir, "lapack-release/build"))
 
     subprocess.call(["cmake", "-DCBLAS=ON", "-DBUILD_SHARED_LIBS=ON", ".."])
-    subprocess.call(["make", "cblas"])
+    subprocess.call("cmake --build . --target cblas", shell=True)
 
-    with open(
-        os.path.join(
-            root_dir, "lapack-release", "build", "CMakeFiles", "CMakeError.log"
-        ),
-        "r",
-    ) as f:
-        print("Error file: \n", f.read())
+    # with open(
+    #     os.path.join(
+    #         root_dir, "lapack-release", "build", "CMakeFiles", "CMakeError.log"
+    #     ),
+    #     "r",
+    # ) as f:
+    #     print("Error file: \n", f.read())
 
-    with open(
-        os.path.join(
-            root_dir, "lapack-release", "build", "CMakeFiles", "CMakeOutput.log"
-        ),
-        "r",
-    ) as f:
-        print("Output file: \n", f.read())
+    # with open(
+    #     os.path.join(
+    #         root_dir, "lapack-release", "build", "CMakeFiles", "CMakeOutput.log"
+    #     ),
+    #     "r",
+    # ) as f:
+    #     print("Output file: \n", f.read())
 
     for file in glob.glob("./include/*.h"):
         shutil.move(file, include_dir)
@@ -145,10 +145,10 @@ def build_wsserver():
     for file in glob.glob("./include/*"):
         shutil.move(file, include_dir)
 
-    # shutil.move("./libws.a", lib_dir)
+    shutil.move("./*.a", lib_dir)
 
 
-# build_cblas()
+build_cblas()
 build_glew()
 build_glfw()
 build_wsserver()
