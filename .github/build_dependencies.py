@@ -12,8 +12,6 @@ lib_dir = os.path.join(root_dir, "lib")
 
 gl_dir = os.path.join(include_dir, "GL")
 
-os.environ["CMAKE_Fortran_COMPILER"] = "C:\\ProgramData\\Chocolatey\\bin\\gfortran.exe"
-
 
 subprocess.call(f"export LD_LIBRARY_PATH={lib_dir}", shell=True)
 
@@ -54,27 +52,8 @@ def build_cblas():
     os.rename("./lapack-release/make.inc.example", "./lapack-release/make.inc")
     os.mkdir("./lapack-release/build")
     os.chdir("./lapack-release/build")
-    print(
-        "Path exists?: ",
-        os.path.exists("C:\\ProgramData\\Chocolatey\\bin\\gfortran.exe"),
-    )
 
-    subprocess.call(["where", "gfortran"])
-
-    subprocess.call(
-        ["set", "CMAKE_Fortran_COMPILER=C:\\ProgramData\\Chocolatey\\bin\\gfortran.exe"]
-    )
-    subprocess.call(["echo", "%CMAKE_Fortran_COMPILER%"])
-
-    subprocess.call(
-        [
-            "cmake",
-            "-DCBLAS=ON",
-            "-DBUILD_SHARED_LIBS=ON",
-            "-DCMAKE_Fortran_COMPILER=C:\\ProgramData\\Chocolatey\\bin\\gfortran.exe",
-            "..",
-        ]
-    )
+    subprocess.call(["cmake", "-DCBLAS=ON", "-DBUILD_SHARED_LIBS=ON", ".."])
     subprocess.call(["make", "cblas"])
 
     for file in glob.glob("./include/*"):
