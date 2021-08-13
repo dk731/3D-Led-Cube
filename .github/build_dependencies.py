@@ -49,12 +49,14 @@ def build_cblas():
         "git clone --depth 1 https://github.com/Reference-LAPACK/lapack-release",
         shell=True,
     )
-    os.rename("./lapack-release/make.inc.example", "./lapack-release/make.inc")
-    os.mkdir("./lapack-release/build")
-    os.chdir("./lapack-release/build")
+    # os.rename("./lapack-release/make.inc.example", "./lapack-release/make.inc")
+    # os.mkdir("./lapack-release/build")
+    # os.chdir("./lapack-release/build")
+    os.chdir("./lapack-release")
+    subprocess.call(["make"])
 
-    subprocess.call(["cmake", "-DCBLAS=ON", "-DBUILD_SHARED_LIBS=ON", ".."])
-    subprocess.call(["make", "cblas"])
+    # subprocess.call(["cmake", "-DCBLAS=ON", "-DBUILD_SHARED_LIBS=ON", ".."])
+    # subprocess.call(["make", "cblas"])
 
     for file in glob.glob("./include/*"):
         shutil.move(file, include_dir)
@@ -128,9 +130,9 @@ def build_wsserver():
 
 
 build_cblas()
-build_glew()
-build_glfw()
-build_wsserver()
+# build_glew()
+# build_glfw()
+# build_wsserver()
 
 os.chdir(root_dir)
 
