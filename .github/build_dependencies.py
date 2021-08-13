@@ -54,6 +54,13 @@ def build_cblas():
     os.rename("./lapack-release/make.inc.example", "./lapack-release/make.inc")
     os.mkdir("./lapack-release/build")
     os.chdir("./lapack-release/build")
+    print(
+        "Path exists?: ",
+        os.path.exists("C:\\ProgramData\\Chocolatey\\bin\\gfortran.exe"),
+    )
+
+    subprocess.call(["where", "gfortran"])
+
     subprocess.call(
         ["set", "CMAKE_Fortran_COMPILER=C:\\ProgramData\\Chocolatey\\bin\\gfortran.exe"]
     )
