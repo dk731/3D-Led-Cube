@@ -16,7 +16,7 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.1.1
         env:
-          CIBW_BEFORE_ALL_WINDOWS: pip install delvewheel && choco install msys2 && pacman -S mingw-w64-x86_64-gcc-fortran
+          CIBW_BEFORE_ALL_WINDOWS: pip install delvewheel && choco install msys2 && C:\tools\msys64\usr\bin\bash -lc "pacman -S --noconfirm mingw-w64-x86_64-gcc-fortran"
           CIBW_BEFORE_ALL_LINUX: yum install -y libXrandr-devel libXinerama-devel libXcursor-devel libXi-devel
           CIBW_BEFORE_BUILD: python3 .github/build_dependencies.py
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: export LD_LIBRARY_PATH=/project/lib && auditwheel repair -w {dest_dir} {wheel}
