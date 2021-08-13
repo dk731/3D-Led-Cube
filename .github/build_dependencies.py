@@ -53,7 +53,7 @@ def build_cblas():
     # os.mkdir("./lapack-release/build")
     # os.chdir("./lapack-release/build")
     os.chdir("./lapack-release")
-    subprocess.call(["make"])
+    subprocess.call(["make", "cblaslib"])
 
     # subprocess.call(["cmake", "-DCBLAS=ON", "-DBUILD_SHARED_LIBS=ON", ".."])
     # subprocess.call(["make", "cblas"])
