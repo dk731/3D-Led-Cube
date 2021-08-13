@@ -110,8 +110,6 @@ def build_glfw():
     os.mkdir("./glfw/build")
     os.chdir("./glfw/build")
 
-    print("Current build dir: ", os.listdir("."))
-
     subprocess.call(
         [
             "cmake",
@@ -123,6 +121,8 @@ def build_glfw():
             "..",
         ]
     )
+
+    print("Current build dir: ", os.listdir("."))
 
     subprocess.call(["make"])
 
