@@ -146,10 +146,10 @@ def build_wsserver():
     shutil.move("./libws.a", lib_dir)
 
 
-build_cblas()
-# build_glew()
-# build_glfw()
-# build_wsserver()
+# build_cblas()
+build_glew()
+build_glfw()
+build_wsserver()
 
 os.chdir(root_dir)
 
