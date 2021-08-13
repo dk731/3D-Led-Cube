@@ -49,7 +49,7 @@ def build_cblas():
         "git clone --depth 1 https://github.com/Reference-LAPACK/lapack-release",
         shell=True,
     )
-    # os.rename("./lapack-release/make.inc.example", "./lapack-release/make.inc")
+    os.rename("./lapack-release/make.inc.example", "./lapack-release/make.inc")
     # os.mkdir("./lapack-release/build")
     # os.chdir("./lapack-release/build")
     os.chdir("./lapack-release")
