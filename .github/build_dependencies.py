@@ -124,7 +124,7 @@ def build_glfw():
 
     print("Current build dir: ", os.listdir("."))
 
-    subprocess.call(["make"])
+    subprocess.call("cmake --build .", shell=True)
 
     for file in glob.glob("../include/*"):
         shutil.move(file, include_dir)
