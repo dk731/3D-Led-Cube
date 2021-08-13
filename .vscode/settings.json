@@ -54,7 +54,12 @@
         "typeinfo": "cpp",
         "chrono": "cpp",
         "thread": "cpp",
-        "glu.h": "c"
+        "glu.h": "c",
+        "bit": "cpp",
+        "condition_variable": "cpp",
+        "ctime": "cpp",
+        "ratio": "cpp",
+        "mutex": "cpp"
     },
     "python.pythonPath": "/usr/local/bin/python3.9"
 }

@@ -16,7 +16,8 @@
 // #include <unistd.h>
 #include <time.h>
 #include <string.h>
-#include <pthread.h>
+// #include <pthread.h>
+#include <thread>
 // #include <fcntl.h>
 #include <stdio.h>
 #include <cblas.h>
