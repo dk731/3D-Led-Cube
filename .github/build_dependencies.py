@@ -109,6 +109,9 @@ def build_glfw():
     )
     os.mkdir("./glfw/build")
     os.chdir("./glfw/build")
+
+    print("Current build dir: ", os.listdir("."))
+
     subprocess.call(
         [
             "cmake",
@@ -142,7 +145,7 @@ def build_wsserver():
     for file in glob.glob("./include/*"):
         shutil.move(file, include_dir)
 
-    shutil.move("./libws.a", lib_dir)
+    # shutil.move("./libws.a", lib_dir)
 
 
 # build_cblas()
