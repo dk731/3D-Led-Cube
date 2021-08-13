@@ -92,7 +92,7 @@ def build_glew():
     file.extractall(path=".")
 
     os.chdir("glew-2.2.0")
-    subprocess.call(["make", "glew.lib"])
+    subprocess.call(["make", "WARN=-Wall -Wno-cast-function-type", "glew.lib"])
 
     for file in glob.glob("./include/GL/*"):
         shutil.move(file, os.path.join(include_dir, "GL"))
