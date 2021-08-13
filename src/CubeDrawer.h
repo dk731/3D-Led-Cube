@@ -13,11 +13,11 @@
 #include <Python.h>
 #include <stdint.h>
 
-#include <unistd.h>
+// #include <unistd.h>
 #include <time.h>
 #include <string.h>
 #include <pthread.h>
-#include <fcntl.h>
+// #include <fcntl.h>
 #include <stdio.h>
 #include <cblas.h>
 
