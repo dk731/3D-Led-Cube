@@ -50,18 +50,19 @@ def build_cblas():
         shell=True,
     )
     os.rename("./lapack-release/make.inc.example", "./lapack-release/make.inc")
-    # os.mkdir("./lapack-release/build")
-    # os.chdir("./lapack-release/build")
-    os.chdir("./lapack-release")
-    subprocess.call(["make", "cblaslib"])
 
-    # subprocess.call(["cmake", "-DCBLAS=ON", "-DBUILD_SHARED_LIBS=ON", ".."])
-    # subprocess.call(["make", "cblas"])
+    os.mkdir(os.path.join(root_dir, "lapack-release/build"))
+    os.chdir(os.path.join(root_dir, "lapack-release/build"))
 
-    for file in glob.glob("./include/*"):
+    subprocess.call(["cmake", "-DCBLAS=ON", "-DBUILD_SHARED_LIBS=ON", ".."])
+    subprocess.call(["make", "cblas"])
+
+    for file in glob.glob("./include/*.h"):
         shutil.move(file, include_dir)
     for file in glob.glob("./lib/*"):
         shutil.move(file, lib_dir)
+
+    # shutil.move("../libcblas.a", lib_dir)
 
 
 def build_glew():
@@ -130,9 +131,9 @@ def build_wsserver():
 
 
 build_cblas()
-# build_glew()
-# build_glfw()
-# build_wsserver()
+build_glew()
+build_glfw()
+build_wsserver()
 
 os.chdir(root_dir)
 
