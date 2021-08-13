@@ -137,8 +137,7 @@ def build_wsserver():
         shell=True,
     )
     os.chdir("./wsServer")
-    os.environ["CFLAGS"] = "-fpic"
-    subprocess.call(["make", "libws.a"])
+    subprocess.call(["make", "CFLAGS=-fPIC", "libws.a"])
 
     for file in glob.glob("./include/*"):
         shutil.move(file, include_dir)
@@ -157,3 +156,12 @@ print("Finished building dependencies!\n")
 print("* Include dir: \n\n", "\n".join(glob.glob("./include/*")))
 print("* Include/GL dir: \n\n", "\n".join(glob.glob("./include/GL/*")))
 print("* Lib dir: \n\n", "\n".join(glob.glob("./lib/*")))
+
+print(
+    "Environment variables: \n",
+    "\n".join([f"{name}: {val}" for name, val in os.environ.items()]),
+)
+
+print()
+
+print()
