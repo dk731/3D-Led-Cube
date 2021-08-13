@@ -15,13 +15,15 @@ gl_dir = os.path.join(include_dir, "GL")
 if "CMAKE_Fortran_COMPILER" is os.environ:
     print(os.environ["CMAKE_Fortran_COMPILER"])
 else:
-    print(os.environ["CMAKE_Fortran_COMPILER"])
+    print("No CMAKE fortran")
 
-if os.path.exists("C:\ProgramData\Chocolatey\bin\gfortran.exe"):
+if os.path.exists("C:\\ProgramData\\Chocolatey\\bin\\gfortran.exe"):
     print("gfortran exists")
 else:
     print("Not found gfortran")
-os.environ["CMAKE_Fortran_COMPILER"] = "C:\ProgramData\Chocolatey\bin\gfortran.exe"
+os.environ["CMAKE_Fortran_COMPILER"] = "C:\\ProgramData\\Chocolatey\\bin\\gfortran.exe"
+
+print("Added CMAKE_Fortran_COMPILER: ", os.environ["CMAKE_Fortran_COMPILER"])
 
 
 subprocess.call(f"export LD_LIBRARY_PATH={lib_dir}", shell=True)
