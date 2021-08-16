@@ -124,7 +124,7 @@ def build_wsserver():
 
 
 build_glm()
-# build_glew()
+build_glew()
 # build_glfw()
 # build_wsserver()
 
