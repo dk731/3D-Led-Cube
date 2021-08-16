@@ -5,6 +5,7 @@ import shutil
 import urllib.request
 import tarfile
 from itertools import chain
+import platform
 
 root_dir = os.getcwd()
 include_dir = os.path.join(root_dir, "include")
@@ -118,11 +119,17 @@ def build_wsserver():
     os.mkdir("./wsServer/build")
     os.chdir("./wsServer/build")
     # os.chdir("./wsServer")
-    os.environ["CFLAGS"] = "-fPIC"
-    subprocess.call(
-        'cmake -DCMAKE_C_FLAGS=-fPIC -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles" ..',
-        shell=True,
-    )
+    if platform.system() == "Windows":
+        subprocess.call(
+            'cmake -DCMAKE_C_FLAGS=-fPIC -G "MinGW Makefiles" ..',
+            shell=True,
+        )
+    else:
+        subprocess.call(
+            "cmake -DCMAKE_C_FLAGS=-fPIC ..",
+            shell=True,
+        )
+
     subprocess.call("make", shell=True)
     # subprocess.call("make libws.a", shell=True)
 
@@ -132,9 +139,9 @@ def build_wsserver():
     shutil.move("./libws.a", lib_dir)
 
 
-# build_glm()
-# build_glew()
-# build_glfw()
+build_glm()
+build_glew()
+build_glfw()
 build_wsserver()
 
 os.chdir(root_dir)
