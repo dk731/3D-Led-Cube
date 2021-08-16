@@ -17,8 +17,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.1.1
 
         env:
-          # CIBW_BEFORE_ALL_WINDOWS: pip install delvewheel && echo "C:\msys64\mingw64\bin" >> $GITHUB_PATH && echo "C:\msys64\usr\bin" >> $GITHUB_PATH && gfortran --version
-          CIBW_BEFORE_ALL_WINDOWS: vcpkg.exe install pthreads
+          CIBW_BEFORE_ALL_WINDOWS: pip install delvewheel
           CIBW_BEFORE_ALL_LINUX: yum install -y libXrandr-devel libXinerama-devel libXcursor-devel libXi-devel
           CIBW_BEFORE_BUILD: python3 .github/build_dependencies.py
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: export LD_LIBRARY_PATH=/project/lib && auditwheel repair -w {dest_dir} {wheel}
