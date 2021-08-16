@@ -115,13 +115,16 @@ def build_wsserver():
         "git clone --depth 1 https://github.com/Theldus/wsServer",
         shell=True,
     )
-    # os.mkdir("./wsServer/build")
-    # os.chdir("./wsServer/build")
-    os.chdir("./wsServer")
+    os.mkdir("./wsServer/build")
+    os.chdir("./wsServer/build")
+    # os.chdir("./wsServer")
     os.environ["CFLAGS"] = "-fPIC"
-    # subprocess.call("cmake -DCMAKE_C_FLAGS=-fPIC ..", shell=True)
-    # subprocess.call("cmake --build .", shell=True)
-    subprocess.call("make libws.a", shell=True)
+    subprocess.call(
+        'cmake -DCMAKE_C_FLAGS=-fPIC -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles" ..',
+        shell=True,
+    )
+    subprocess.call("mingw32-make -j4", shell=True)
+    # subprocess.call("make libws.a", shell=True)
 
     for file in glob.glob("../include/*"):
         shutil.move(file, include_dir)
