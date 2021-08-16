@@ -19,8 +19,9 @@ print("Prepearing folder structure...")
 dirs_to_delete = [
     "glfw",
     "include/GLFW",
+    "glm",
+    "include/glm",
     "glew-2.2.0",
-    "lapack-release",
     "wsServer",
     "lib",
 ]
@@ -42,43 +43,15 @@ for d in dirs_to_delete:
 os.mkdir(lib_dir)
 
 
-def build_cblas():
+def build_glm():
     os.chdir(root_dir)
-    print("Building CBLAS...")
+    print("Building GLM...")
     subprocess.call(
-        "git clone --depth 1 https://github.com/Reference-LAPACK/lapack-release",
+        "git clone --depth 1 https://github.com/g-truc/glm",
         shell=True,
     )
-    os.rename("./lapack-release/make.inc.example", "./lapack-release/make.inc")
 
-    os.mkdir(os.path.join(root_dir, "lapack-release/build"))
-    os.chdir(os.path.join(root_dir, "lapack-release/build"))
-
-    subprocess.call(["cmake", "-DCBLAS=ON", "-DBUILD_SHARED_LIBS=ON", ".."])
-    subprocess.call("cmake --build . --target cblas", shell=True)
-
-    # with open(
-    #     os.path.join(
-    #         root_dir, "lapack-release", "build", "CMakeFiles", "CMakeError.log"
-    #     ),
-    #     "r",
-    # ) as f:
-    #     print("Error file: \n", f.read())
-
-    # with open(
-    #     os.path.join(
-    #         root_dir, "lapack-release", "build", "CMakeFiles", "CMakeOutput.log"
-    #     ),
-    #     "r",
-    # ) as f:
-    #     print("Output file: \n", f.read())
-
-    for file in glob.glob("./include/*.h"):
-        shutil.move(file, include_dir)
-    for file in glob.glob("./lib/*"):
-        shutil.move(file, lib_dir)
-
-    # shutil.move("../libcblas.a", lib_dir)
+    shutil.move("./glm/glm", include_dir)
 
 
 def build_glew():
@@ -140,15 +113,16 @@ def build_wsserver():
         shell=True,
     )
     os.chdir("./wsServer")
-    subprocess.call(["make", "CFLAGS=-fPIC", "libws.a"])
+    os.environ["CFLAGS"] = "-fPIC"
+    subprocess.call(["make", "libws.a"])
 
     for file in glob.glob("./include/*"):
         shutil.move(file, include_dir)
 
-    shutil.move("./*.a", lib_dir)
+    shutil.move("./libws.a", lib_dir)
 
 
-build_cblas()
+build_glm()
 build_glew()
 build_glfw()
 build_wsserver()

@@ -2669,7 +2669,7 @@ SWIGINTERN PyObject *SWIG_PyStaticMethod_New(PyObject *SWIGUNUSEDPARM(self), PyO
 #define SWIGTYPE_p_f_p_PyObject_Py_ssize_t__p_PyObject swig_types[9]
 #define SWIGTYPE_p_f_p_PyObject__Py_ssize_t swig_types[10]
 #define SWIGTYPE_p_float swig_types[11]
-#define SWIGTYPE_p_std__listT_int_t swig_types[12]
+#define SWIGTYPE_p_glm__mat4 swig_types[12]
 #define SWIGTYPE_p_uint8_t swig_types[13]
 static swig_type_info *swig_types[15];
 static swig_module_info swig_module = {swig_types, 14, 0, 0, 0, 0};
@@ -4468,10 +4468,10 @@ SWIGINTERN PyObject *DrawCall_swiginit(PyObject *SWIGUNUSEDPARM(self), PyObject 
 SWIGINTERN PyObject *_wrap_Transform_translation_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   Transform *arg1 = (Transform *) 0 ;
-  float *arg2 ;
+  glm::mat4 arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 = 0 ;
+  void *argp2 ;
   int res2 = 0 ;
   PyObject *swig_obj[2] ;
   
@@ -4481,19 +4481,20 @@ SWIGINTERN PyObject *_wrap_Transform_translation_set(PyObject *SWIGUNUSEDPARM(se
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Transform_translation_set" "', argument " "1"" of type '" "Transform *""'"); 
   }
   arg1 = reinterpret_cast< Transform * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_float, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Transform_translation_set" "', argument " "2"" of type '" "float [16]""'"); 
-  } 
-  arg2 = reinterpret_cast< float * >(argp2);
   {
-    if (arg2) {
-      size_t ii = 0;
-      for (; ii < (size_t)16; ++ii) *(float *)&arg1->translation[ii] = *((float *)arg2 + ii);
+    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_glm__mat4,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Transform_translation_set" "', argument " "2"" of type '" "glm::mat4""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Transform_translation_set" "', argument " "2"" of type '" "glm::mat4""'");
     } else {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in variable '""translation""' of type '""float [16]""'");
+      glm::mat4 * temp = reinterpret_cast< glm::mat4 * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
     }
   }
+  if (arg1) (arg1)->translation = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -4507,7 +4508,7 @@ SWIGINTERN PyObject *_wrap_Transform_translation_get(PyObject *SWIGUNUSEDPARM(se
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  float *result = 0 ;
+  glm::mat4 result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -4516,8 +4517,8 @@ SWIGINTERN PyObject *_wrap_Transform_translation_get(PyObject *SWIGUNUSEDPARM(se
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Transform_translation_get" "', argument " "1"" of type '" "Transform *""'"); 
   }
   arg1 = reinterpret_cast< Transform * >(argp1);
-  result = (float *)(float *) ((arg1)->translation);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_float, 0 |  0 );
+  result =  ((arg1)->translation);
+  resultobj = SWIG_NewPointerObj((new glm::mat4(static_cast< const glm::mat4& >(result))), SWIGTYPE_p_glm__mat4, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -4527,10 +4528,10 @@ fail:
 SWIGINTERN PyObject *_wrap_Transform_rotation_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   Transform *arg1 = (Transform *) 0 ;
-  float *arg2 ;
+  glm::mat4 arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 = 0 ;
+  void *argp2 ;
   int res2 = 0 ;
   PyObject *swig_obj[2] ;
   
@@ -4540,19 +4541,20 @@ SWIGINTERN PyObject *_wrap_Transform_rotation_set(PyObject *SWIGUNUSEDPARM(self)
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Transform_rotation_set" "', argument " "1"" of type '" "Transform *""'"); 
   }
   arg1 = reinterpret_cast< Transform * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_float, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Transform_rotation_set" "', argument " "2"" of type '" "float [16]""'"); 
-  } 
-  arg2 = reinterpret_cast< float * >(argp2);
   {
-    if (arg2) {
-      size_t ii = 0;
-      for (; ii < (size_t)16; ++ii) *(float *)&arg1->rotation[ii] = *((float *)arg2 + ii);
+    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_glm__mat4,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Transform_rotation_set" "', argument " "2"" of type '" "glm::mat4""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Transform_rotation_set" "', argument " "2"" of type '" "glm::mat4""'");
     } else {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in variable '""rotation""' of type '""float [16]""'");
+      glm::mat4 * temp = reinterpret_cast< glm::mat4 * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
     }
   }
+  if (arg1) (arg1)->rotation = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -4566,7 +4568,7 @@ SWIGINTERN PyObject *_wrap_Transform_rotation_get(PyObject *SWIGUNUSEDPARM(self)
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  float *result = 0 ;
+  glm::mat4 result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -4575,8 +4577,8 @@ SWIGINTERN PyObject *_wrap_Transform_rotation_get(PyObject *SWIGUNUSEDPARM(self)
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Transform_rotation_get" "', argument " "1"" of type '" "Transform *""'"); 
   }
   arg1 = reinterpret_cast< Transform * >(argp1);
-  result = (float *)(float *) ((arg1)->rotation);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_float, 0 |  0 );
+  result =  ((arg1)->rotation);
+  resultobj = SWIG_NewPointerObj((new glm::mat4(static_cast< const glm::mat4& >(result))), SWIGTYPE_p_glm__mat4, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -4586,10 +4588,10 @@ fail:
 SWIGINTERN PyObject *_wrap_Transform_scale_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   Transform *arg1 = (Transform *) 0 ;
-  float *arg2 ;
+  glm::mat4 arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 = 0 ;
+  void *argp2 ;
   int res2 = 0 ;
   PyObject *swig_obj[2] ;
   
@@ -4599,19 +4601,20 @@ SWIGINTERN PyObject *_wrap_Transform_scale_set(PyObject *SWIGUNUSEDPARM(self), P
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Transform_scale_set" "', argument " "1"" of type '" "Transform *""'"); 
   }
   arg1 = reinterpret_cast< Transform * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_float, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Transform_scale_set" "', argument " "2"" of type '" "float [16]""'"); 
-  } 
-  arg2 = reinterpret_cast< float * >(argp2);
   {
-    if (arg2) {
-      size_t ii = 0;
-      for (; ii < (size_t)16; ++ii) *(float *)&arg1->scale[ii] = *((float *)arg2 + ii);
+    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_glm__mat4,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Transform_scale_set" "', argument " "2"" of type '" "glm::mat4""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Transform_scale_set" "', argument " "2"" of type '" "glm::mat4""'");
     } else {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in variable '""scale""' of type '""float [16]""'");
+      glm::mat4 * temp = reinterpret_cast< glm::mat4 * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
     }
   }
+  if (arg1) (arg1)->scale = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -4625,7 +4628,7 @@ SWIGINTERN PyObject *_wrap_Transform_scale_get(PyObject *SWIGUNUSEDPARM(self), P
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  float *result = 0 ;
+  glm::mat4 result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -4634,8 +4637,8 @@ SWIGINTERN PyObject *_wrap_Transform_scale_get(PyObject *SWIGUNUSEDPARM(self), P
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Transform_scale_get" "', argument " "1"" of type '" "Transform *""'"); 
   }
   arg1 = reinterpret_cast< Transform * >(argp1);
-  result = (float *)(float *) ((arg1)->scale);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_float, 0 |  0 );
+  result =  ((arg1)->scale);
+  resultobj = SWIG_NewPointerObj((new glm::mat4(static_cast< const glm::mat4& >(result))), SWIGTYPE_p_glm__mat4, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -4645,10 +4648,10 @@ fail:
 SWIGINTERN PyObject *_wrap_Transform_local_final_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   Transform *arg1 = (Transform *) 0 ;
-  float *arg2 ;
+  glm::mat4 arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 = 0 ;
+  void *argp2 ;
   int res2 = 0 ;
   PyObject *swig_obj[2] ;
   
@@ -4658,19 +4661,20 @@ SWIGINTERN PyObject *_wrap_Transform_local_final_set(PyObject *SWIGUNUSEDPARM(se
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Transform_local_final_set" "', argument " "1"" of type '" "Transform *""'"); 
   }
   arg1 = reinterpret_cast< Transform * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_float, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Transform_local_final_set" "', argument " "2"" of type '" "float [16]""'"); 
-  } 
-  arg2 = reinterpret_cast< float * >(argp2);
   {
-    if (arg2) {
-      size_t ii = 0;
-      for (; ii < (size_t)16; ++ii) *(float *)&arg1->local_final[ii] = *((float *)arg2 + ii);
+    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_glm__mat4,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Transform_local_final_set" "', argument " "2"" of type '" "glm::mat4""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Transform_local_final_set" "', argument " "2"" of type '" "glm::mat4""'");
     } else {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in variable '""local_final""' of type '""float [16]""'");
+      glm::mat4 * temp = reinterpret_cast< glm::mat4 * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
     }
   }
+  if (arg1) (arg1)->local_final = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -4684,7 +4688,7 @@ SWIGINTERN PyObject *_wrap_Transform_local_final_get(PyObject *SWIGUNUSEDPARM(se
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  float *result = 0 ;
+  glm::mat4 result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -4693,8 +4697,8 @@ SWIGINTERN PyObject *_wrap_Transform_local_final_get(PyObject *SWIGUNUSEDPARM(se
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Transform_local_final_get" "', argument " "1"" of type '" "Transform *""'"); 
   }
   arg1 = reinterpret_cast< Transform * >(argp1);
-  result = (float *)(float *) ((arg1)->local_final);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_float, 0 |  0 );
+  result =  ((arg1)->local_final);
+  resultobj = SWIG_NewPointerObj((new glm::mat4(static_cast< const glm::mat4& >(result))), SWIGTYPE_p_glm__mat4, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -4704,10 +4708,10 @@ fail:
 SWIGINTERN PyObject *_wrap_Transform_final_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   Transform *arg1 = (Transform *) 0 ;
-  float *arg2 ;
+  glm::mat4 arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 = 0 ;
+  void *argp2 ;
   int res2 = 0 ;
   PyObject *swig_obj[2] ;
   
@@ -4717,19 +4721,20 @@ SWIGINTERN PyObject *_wrap_Transform_final_set(PyObject *SWIGUNUSEDPARM(self), P
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Transform_final_set" "', argument " "1"" of type '" "Transform *""'"); 
   }
   arg1 = reinterpret_cast< Transform * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_float, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Transform_final_set" "', argument " "2"" of type '" "float [16]""'"); 
-  } 
-  arg2 = reinterpret_cast< float * >(argp2);
   {
-    if (arg2) {
-      size_t ii = 0;
-      for (; ii < (size_t)16; ++ii) *(float *)&arg1->final[ii] = *((float *)arg2 + ii);
+    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_glm__mat4,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Transform_final_set" "', argument " "2"" of type '" "glm::mat4""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Transform_final_set" "', argument " "2"" of type '" "glm::mat4""'");
     } else {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in variable '""final""' of type '""float [16]""'");
+      glm::mat4 * temp = reinterpret_cast< glm::mat4 * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
     }
   }
+  if (arg1) (arg1)->final = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -4743,7 +4748,7 @@ SWIGINTERN PyObject *_wrap_Transform_final_get(PyObject *SWIGUNUSEDPARM(self), P
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  float *result = 0 ;
+  glm::mat4 result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -4752,8 +4757,8 @@ SWIGINTERN PyObject *_wrap_Transform_final_get(PyObject *SWIGUNUSEDPARM(self), P
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Transform_final_get" "', argument " "1"" of type '" "Transform *""'"); 
   }
   arg1 = reinterpret_cast< Transform * >(argp1);
-  result = (float *)(float *) ((arg1)->final);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_float, 0 |  0 );
+  result =  ((arg1)->final);
+  resultobj = SWIG_NewPointerObj((new glm::mat4(static_cast< const glm::mat4& >(result))), SWIGTYPE_p_glm__mat4, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -5175,141 +5180,6 @@ SWIGINTERN PyObject *_wrap_CubeDrawer_draw_immediate_get(PyObject *SWIGUNUSEDPAR
   }
   arg1 = reinterpret_cast< CubeDrawer * >(argp1);
   result = (bool) ((arg1)->draw_immediate);
-  resultobj = SWIG_From_bool(static_cast< bool >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_CubeDrawer_virt_fds_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CubeDrawer *arg1 = (CubeDrawer *) 0 ;
-  std::list< int > arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
-  PyObject *swig_obj[2] ;
-  
-  if (!SWIG_Python_UnpackTuple(args, "CubeDrawer_virt_fds_set", 2, 2, swig_obj)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_CubeDrawer, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_virt_fds_set" "', argument " "1"" of type '" "CubeDrawer *""'"); 
-  }
-  arg1 = reinterpret_cast< CubeDrawer * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_std__listT_int_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "CubeDrawer_virt_fds_set" "', argument " "2"" of type '" "std::list< int >""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "CubeDrawer_virt_fds_set" "', argument " "2"" of type '" "std::list< int >""'");
-    } else {
-      std::list< int > * temp = reinterpret_cast< std::list< int > * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
-  if (arg1) (arg1)->virt_fds = arg2;
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_CubeDrawer_virt_fds_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CubeDrawer *arg1 = (CubeDrawer *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject *swig_obj[1] ;
-  std::list< int > result;
-  
-  if (!args) SWIG_fail;
-  swig_obj[0] = args;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_CubeDrawer, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_virt_fds_get" "', argument " "1"" of type '" "CubeDrawer *""'"); 
-  }
-  arg1 = reinterpret_cast< CubeDrawer * >(argp1);
-  result =  ((arg1)->virt_fds);
-  resultobj = SWIG_NewPointerObj((new std::list< int >(static_cast< const std::list< int >& >(result))), SWIGTYPE_p_std__listT_int_t, SWIG_POINTER_OWN |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_CubeDrawer__get_virt_amount_(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CubeDrawer *arg1 = (CubeDrawer *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject *swig_obj[1] ;
-  int result;
-  
-  if (!args) SWIG_fail;
-  swig_obj[0] = args;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_CubeDrawer, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer__get_virt_amount_" "', argument " "1"" of type '" "CubeDrawer *""'"); 
-  }
-  arg1 = reinterpret_cast< CubeDrawer * >(argp1);
-  result = (int)(arg1)->_get_virt_amount_();
-  resultobj = SWIG_From_int(static_cast< int >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_CubeDrawer_wait_cube_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CubeDrawer *arg1 = (CubeDrawer *) 0 ;
-  bool arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  bool val2 ;
-  int ecode2 = 0 ;
-  PyObject *swig_obj[2] ;
-  
-  if (!SWIG_Python_UnpackTuple(args, "CubeDrawer_wait_cube_set", 2, 2, swig_obj)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_CubeDrawer, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_wait_cube_set" "', argument " "1"" of type '" "CubeDrawer *""'"); 
-  }
-  arg1 = reinterpret_cast< CubeDrawer * >(argp1);
-  ecode2 = SWIG_AsVal_bool(swig_obj[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "CubeDrawer_wait_cube_set" "', argument " "2"" of type '" "bool""'");
-  } 
-  arg2 = static_cast< bool >(val2);
-  if (arg1) (arg1)->wait_cube = arg2;
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_CubeDrawer_wait_cube_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CubeDrawer *arg1 = (CubeDrawer *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject *swig_obj[1] ;
-  bool result;
-  
-  if (!args) SWIG_fail;
-  swig_obj[0] = args;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_CubeDrawer, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_wait_cube_get" "', argument " "1"" of type '" "CubeDrawer *""'"); 
-  }
-  arg1 = reinterpret_cast< CubeDrawer * >(argp1);
-  result = (bool) ((arg1)->wait_cube);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -10239,11 +10109,6 @@ static PyMethodDef SwigMethods[] = {
 	 { "CubeDrawer_get_obj", _wrap_CubeDrawer_get_obj, METH_NOARGS, NULL},
 	 { "CubeDrawer_draw_immediate_set", _wrap_CubeDrawer_draw_immediate_set, METH_VARARGS, NULL},
 	 { "CubeDrawer_draw_immediate_get", _wrap_CubeDrawer_draw_immediate_get, METH_O, NULL},
-	 { "CubeDrawer_virt_fds_set", _wrap_CubeDrawer_virt_fds_set, METH_VARARGS, NULL},
-	 { "CubeDrawer_virt_fds_get", _wrap_CubeDrawer_virt_fds_get, METH_O, NULL},
-	 { "CubeDrawer__get_virt_amount_", _wrap_CubeDrawer__get_virt_amount_, METH_O, NULL},
-	 { "CubeDrawer_wait_cube_set", _wrap_CubeDrawer_wait_cube_set, METH_VARARGS, NULL},
-	 { "CubeDrawer_wait_cube_get", _wrap_CubeDrawer_wait_cube_get, METH_O, NULL},
 	 { "CubeDrawer_is_sync_set", _wrap_CubeDrawer_is_sync_set, METH_VARARGS, NULL},
 	 { "CubeDrawer_is_sync_get", _wrap_CubeDrawer_is_sync_get, METH_O, NULL},
 	 { "CubeDrawer_delta_time_set", _wrap_CubeDrawer_delta_time_set, METH_VARARGS, NULL},
@@ -10291,7 +10156,7 @@ static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_f_p_PyObject_Py_ssize_t__p_PyObject = {"_p_f_p_PyObject_Py_ssize_t__p_PyObject", "PyObject *(*)(PyObject *,Py_ssize_t)", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_f_p_PyObject__Py_ssize_t = {"_p_f_p_PyObject__Py_ssize_t", "Py_ssize_t (*)(PyObject *)", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_float = {"_p_float", "float *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_std__listT_int_t = {"_p_std__listT_int_t", "std::list< int > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_glm__mat4 = {"_p_glm__mat4", "glm::mat4 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint8_t = {"_p_uint8_t", "uint8_t *", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {
@@ -10307,7 +10172,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_f_p_PyObject_Py_ssize_t__p_PyObject,
   &_swigt__p_f_p_PyObject__Py_ssize_t,
   &_swigt__p_float,
-  &_swigt__p_std__listT_int_t,
+  &_swigt__p_glm__mat4,
   &_swigt__p_uint8_t,
 };
 
@@ -10323,7 +10188,7 @@ static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0,
 static swig_cast_info _swigc__p_f_p_PyObject_Py_ssize_t__p_PyObject[] = {  {&_swigt__p_f_p_PyObject_Py_ssize_t__p_PyObject, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_PyObject__Py_ssize_t[] = {  {&_swigt__p_f_p_PyObject__Py_ssize_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_float[] = {  {&_swigt__p_float, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_std__listT_int_t[] = {  {&_swigt__p_std__listT_int_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_glm__mat4[] = {  {&_swigt__p_glm__mat4, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint8_t[] = {  {&_swigt__p_uint8_t, 0, 0, 0},{0, 0, 0, 0}};
 
 static swig_cast_info *swig_cast_initial[] = {
@@ -10339,7 +10204,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_f_p_PyObject_Py_ssize_t__p_PyObject,
   _swigc__p_f_p_PyObject__Py_ssize_t,
   _swigc__p_float,
-  _swigc__p_std__listT_int_t,
+  _swigc__p_glm__mat4,
   _swigc__p_uint8_t,
 };
 

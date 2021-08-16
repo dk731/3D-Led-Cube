@@ -21,6 +21,7 @@ void onopen(int fd)
 
 void onclose(int fd)
 {
+
     CubeDrawer::get_obj().virt_fds.remove(fd);
     std::cout << "Virtual cube: " << fd << " disconnected" << std::endl;
 }
@@ -123,9 +124,8 @@ void CubeDrawer::apply_transforms(float *cur_vec)
         lt->update_local();
     if (lt->recalc)
         lt->update_global(transform_list[transform_list.size() - 2]);
-    float tmp_vec[4];
-    cblas_sgemv(CblasColMajor, CblasNoTrans, 4, 4, 1.0, lt->final, 4, cur_vec, 1, 0.0f, tmp_vec, 1);
-    memcpy(cur_vec, tmp_vec, sizeof(float) * 4);
+
+    memcpy(cur_vec, &(lt->final * glm::make_vec4(cur_vec))[0], sizeof(float) * 4);
 }
 
 void CubeDrawer::push_matrix()
@@ -145,17 +145,11 @@ void CubeDrawer::pop_matrix()
     if (transform_list.size() == 2) // clear first matrix to default values
     {
         Transform *cur_trans = transform_list[1];
-        for (int i = 0; i < 16; i++)
-            cur_trans->translation[i] = i % 5 ? 0.0f : 1.0f;
 
-        for (int i = 0; i < 16; i++)
-            cur_trans->rotation[i] = i % 5 ? 0.0f : 1.0f;
-
-        for (int i = 0; i < 16; i++)
-            cur_trans->scale[i] = i % 5 ? 0.0f : 1.0f;
-
-        for (int i = 0; i < 16; i++)
-            cur_trans->final[i] = i % 5 ? 0.0f : 1.0f;
+        memcpy(&(cur_trans->translation[0])[0], &(transform_list[0]->final[0])[0], sizeof(float) * 16);
+        memcpy(&(cur_trans->rotation[0])[0], &(transform_list[0]->final[0])[0], sizeof(float) * 16);
+        memcpy(&(cur_trans->scale[0])[0], &(transform_list[0]->final[0])[0], sizeof(float) * 16);
+        memcpy(&(cur_trans->final[0])[0], &(transform_list[0]->final[0])[0], sizeof(float) * 16);
 
         cur_trans->rx = 0.0f;
         cur_trans->ry = 0.0f;
@@ -173,11 +167,7 @@ void CubeDrawer::pop_matrix()
 
 void CubeDrawer::translate(float x, float y, float z)
 {
-    float *cur_trans = transform_list.back()->translation;
-
-    cur_trans[12] += x;
-    cur_trans[13] += y;
-    cur_trans[14] += z;
+    transform_list.back()->translation[3] += glm::vec4(x, y, z, 0.0f);
 
     transform_list.back()->local_recalc = true;
 }
@@ -193,24 +183,23 @@ void CubeDrawer::translate(PyObject *input)
 void CubeDrawer::rotate(float x, float y, float z)
 {
     Transform *trans_obj = transform_list.back();
-    float *cur_trans = trans_obj->rotation;
     trans_obj->local_recalc = true;
 
     trans_obj->rx += x;
     trans_obj->ry += y;
     trans_obj->rz += z;
 
-    cur_trans[0] = cos(trans_obj->rx) * cos(trans_obj->ry);
-    cur_trans[1] = sin(trans_obj->rx) * cos(trans_obj->ry);
-    cur_trans[2] = -sin(trans_obj->ry);
+    trans_obj->rotation[0].x = cos(trans_obj->rx) * cos(trans_obj->ry);
+    trans_obj->rotation[0].y = sin(trans_obj->rx) * cos(trans_obj->ry);
+    trans_obj->rotation[0].z = -sin(trans_obj->ry);
 
-    cur_trans[4] = cos(trans_obj->rx) * sin(trans_obj->ry) * sin(trans_obj->rz) - sin(trans_obj->rx) * cos(trans_obj->rz);
-    cur_trans[5] = sin(trans_obj->rx) * sin(trans_obj->ry) * sin(trans_obj->rz) + cos(trans_obj->rx) * cos(trans_obj->rz);
-    cur_trans[6] = cos(trans_obj->ry) * sin(trans_obj->rz);
+    trans_obj->rotation[1].x = cos(trans_obj->rx) * sin(trans_obj->ry) * sin(trans_obj->rz) - sin(trans_obj->rx) * cos(trans_obj->rz);
+    trans_obj->rotation[1].y = sin(trans_obj->rx) * sin(trans_obj->ry) * sin(trans_obj->rz) + cos(trans_obj->rx) * cos(trans_obj->rz);
+    trans_obj->rotation[1].z = cos(trans_obj->ry) * sin(trans_obj->rz);
 
-    cur_trans[8] = cos(trans_obj->rx) * sin(trans_obj->ry) * cos(trans_obj->rz) + sin(trans_obj->rx) * sin(trans_obj->rz);
-    cur_trans[9] = sin(trans_obj->rx) * sin(trans_obj->ry) * cos(trans_obj->rz) - cos(trans_obj->rx) * sin(trans_obj->rz);
-    cur_trans[10] = cos(trans_obj->ry) * cos(trans_obj->rz);
+    trans_obj->rotation[2].x = cos(trans_obj->rx) * sin(trans_obj->ry) * cos(trans_obj->rz) + sin(trans_obj->rx) * sin(trans_obj->rz);
+    trans_obj->rotation[2].y = sin(trans_obj->rx) * sin(trans_obj->ry) * cos(trans_obj->rz) - cos(trans_obj->rx) * sin(trans_obj->rz);
+    trans_obj->rotation[2].z = cos(trans_obj->ry) * cos(trans_obj->rz);
 }
 void CubeDrawer::rotate(PyObject *input)
 {
@@ -222,11 +211,9 @@ void CubeDrawer::rotate(PyObject *input)
 
 void CubeDrawer::scale(float x, float y, float z)
 {
-    float *cur_trans = transform_list.back()->scale;
-
-    cur_trans[0] += x;
-    cur_trans[5] += y;
-    cur_trans[10] += z;
+    transform_list.back()->scale[0].x += x;
+    transform_list.back()->scale[1].y += y;
+    transform_list.back()->scale[2].z += z;
 
     transform_list.back()->local_recalc = true;
 }
@@ -738,7 +725,7 @@ void CubeDrawer::get_mat_offset(float *mat, float x, float y, float z)
     if (lt->recalc)
         lt->update_global(transform_list[transform_list.size() - 2]);
 
-    memcpy(mat, lt->final, sizeof(float) * 16);
+    memcpy(mat, &(lt->final[0])[0], sizeof(float) * 16);
     mat[12] += x;
     mat[13] += y;
     mat[14] += z;

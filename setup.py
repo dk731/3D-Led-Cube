@@ -1,7 +1,7 @@
 from distutils.core import setup, Extension
 import os
 
-extra_link = ["-lws", "-lcblas", "-lpthread", "-lGLEW", "-lglfw"]
+extra_link = ["-lws", "-lpthread", "-lGLEW", "-lglfw"]
 
 
 extra_includes = ["./include"]

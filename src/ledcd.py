@@ -199,11 +199,6 @@ class CubeDrawer(object):
     def get_obj():
         return _ledcd.CubeDrawer_get_obj()
     draw_immediate = property(_ledcd.CubeDrawer_draw_immediate_get, _ledcd.CubeDrawer_draw_immediate_set)
-    virt_fds = property(_ledcd.CubeDrawer_virt_fds_get, _ledcd.CubeDrawer_virt_fds_set)
-
-    def _get_virt_amount_(self):
-        return _ledcd.CubeDrawer__get_virt_amount_(self)
-    wait_cube = property(_ledcd.CubeDrawer_wait_cube_get, _ledcd.CubeDrawer_wait_cube_set)
     is_sync = property(_ledcd.CubeDrawer_is_sync_get, _ledcd.CubeDrawer_is_sync_set)
     delta_time = property(_ledcd.CubeDrawer_delta_time_get, _ledcd.CubeDrawer_delta_time_set)
 
