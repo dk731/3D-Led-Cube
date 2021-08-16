@@ -77,11 +77,13 @@ def build_glfw():
     os.chdir(root_dir)
     print("Building GLFW...")
     subprocess.call(
-        "git clone --depth 1 https://github.com/glfw/glfw",
+        "git clone https://github.com/glfw/glfw",
         shell=True,
     )
-    os.mkdir("./glfw/build")
-    os.chdir("./glfw/build")
+    os.chdir("./glfw")
+    subprocess.call("git checkout 201400b974b63eb7f23eb7d8563589df9c699d7c", shell=True)
+    os.mkdir("./build")
+    os.chdir("./build")
 
     subprocess.call(
         [

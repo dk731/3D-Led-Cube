@@ -4,7 +4,7 @@ main
 *.o
 build
 lib
-lapack-release
+glm
 glew-2.2.0
 glfw
 include
