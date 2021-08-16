@@ -64,7 +64,7 @@ def build_glew():
     file.extractall(path=".")
 
     os.chdir("glew-2.2.0")
-    subprocess.call(["make", "WARN=-Wall -Wno-cast-function-type", "glew.lib"])
+    subprocess.call(["make", "WARN=-Wall -Wno-cast-function-type", "glew.lib.shared"])
 
     for file in glob.glob("./include/GL/*"):
         shutil.move(file, os.path.join(include_dir, "GL"))
@@ -92,6 +92,8 @@ def build_glfw():
             "-DGLFW_BUILD_TESTS=OFF",
             "-DGLFW_BUILD_DOCS=OFF",
             "-DGLFW_INSTALL=OFF",
+            f"-DCMAKE_RUNTIME_OUTPUT_DIRECTORY={lib_dir}",
+            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={lib_dir}",
             "..",
         ]
     )
@@ -102,8 +104,8 @@ def build_glfw():
 
     for file in glob.glob("../include/*"):
         shutil.move(file, include_dir)
-    for file in glob.glob("./src/libglfw*"):
-        shutil.move(file, lib_dir)
+    # for file in glob.glob("./src/libglfw*"):
+    #     shutil.move(file, lib_dir)
 
 
 def build_wsserver():
