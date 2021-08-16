@@ -130,8 +130,10 @@ def build_wsserver():
 build_glfw()
 # build_wsserver()
 
-for d, _, f in list(os.walk(lib_dir))[1:]:
-    shutil.move(os.path.join(root_dir, d, f), lib_dir)
+os.chdir(root_dir)
+for d, _, files in list(os.walk(lib_dir))[1:]:
+    for file in files:
+        shutil.move(os.path.join(root_dir, d, file), lib_dir)
 
 print("Finished building dependencies!\n")
 print("* Include dir: \n\n", "\n".join(glob.glob("./include/*")))
