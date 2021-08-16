@@ -11,6 +11,7 @@ extra_macros = [("VIRT_CUBE", None), ("DYNAMIC_SHADER_INCLUDE", None)]
 led_module = Extension(
     "_ledcd",
     sources=["src/swig_module_wrap.cxx", "src/CubeDrawer.cpp"],
+    extra_compile_args=["-std=gnu++17"],
     extra_link_args=extra_link,
     define_macros=extra_macros,
     include_dirs=extra_includes,
