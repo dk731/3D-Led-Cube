@@ -123,7 +123,7 @@ def build_wsserver():
         'cmake -DCMAKE_C_FLAGS=-fPIC -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles" ..',
         shell=True,
     )
-    subprocess.call("mingw32-make -j4", shell=True)
+    subprocess.call("make", shell=True)
     # subprocess.call("make libws.a", shell=True)
 
     for file in glob.glob("../include/*"):
