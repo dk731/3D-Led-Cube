@@ -127,8 +127,8 @@ def build_wsserver():
 
 # build_glm()
 # build_glew()
-build_glfw()
-# build_wsserver()
+# build_glfw()
+build_wsserver()
 
 os.chdir(root_dir)
 for d, _, files in list(os.walk(lib_dir))[1:]:
