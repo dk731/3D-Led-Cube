@@ -12,8 +12,7 @@ lib_dir = os.path.join(root_dir, "lib")
 
 gl_dir = os.path.join(include_dir, "GL")
 
-
-subprocess.call(f"export LD_LIBRARY_PATH={lib_dir}", shell=True)
+os.environ["LD_LIBRARY_PATH"] = lib_dir
 
 print("Prepearing folder structure...")
 dirs_to_delete = [
@@ -125,9 +124,9 @@ def build_wsserver():
 
 
 build_glm()
-build_glew()
-build_glfw()
-build_wsserver()
+# build_glew()
+# build_glfw()
+# build_wsserver()
 
 os.chdir(root_dir)
 
