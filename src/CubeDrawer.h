@@ -194,7 +194,7 @@ private:
 #endif
 
     int parse_num_input(PyObject *input, int req_len = 0);
-    ParseFuncs parse_funcs[2] = {(ParseFuncs){PyTuple_Size, PyTuple_GetItem}, (ParseFuncs){PyList_Size, PyList_GetItem}};
+    ParseFuncs parse_funcs[2];
     PyObject *py_exception = PyErr_NewException("ledcd.CubeDrawer", NULL, NULL);
     void apply_transforms(float *cur_vec);
 

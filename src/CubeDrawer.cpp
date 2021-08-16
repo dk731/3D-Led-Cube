@@ -35,6 +35,11 @@ int CubeDrawer::_get_virt_amount_()
 CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(0), is_sync(sync), delta_time(0)
 {
     init_gl();
+    parse_funcs[0].get_size = PyTuple_Size;
+    parse_funcs[0].get_item = PyTuple_GetItem;
+
+    parse_funcs[1].get_size = PyList_Size;
+    parse_funcs[1].get_item = PyList_GetItem;
 
     transform_list.push_back(new Transform()); // First matrix not editable
     transform_list[0]->recalc = false;
