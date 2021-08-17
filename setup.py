@@ -17,7 +17,7 @@ if platform.system() == "Windows":
     extra_link = [
         "/DEFAULTLIB:glfw3dll.lib",
         "/DEFAULTLIB:libws.a",
-        "/DEFAULTLIB:libglew32.dll",
+        "/DEFAULTLIB:libglew32.dll.a",
     ]
 else:
     extra_link = ["-lws", "-lpthread", "-lGLEW", "-lglfw"]
