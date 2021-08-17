@@ -13,15 +13,16 @@ runtime_libs = []
 
 if platform.system() == "Windows":
     sys.path.append(lib_dir)
-    extra_link = glob.glob(lib_dir + "/*.a") + glob.glob(lib_dir + "/*.lib")
+    # extra_link = glob.glob(lib_dir + "/*.a") + glob.glob(lib_dir + "/*.lib")
+    extra_link = []
 else:
     extra_link = ["-lws", "-lpthread", "-lGLEW", "-lglfw"]
     runtime_libs.append(lib_dir)
 
-extra_link[0] = "/DEFAULTLIB:" + extra_link[0]
+# extra_link[0] = "/DEFAULTLIB:" + extra_link[0]
 extra_link.append("/VERBOSE")
-extra_link.append("-ws")
-extra_link.append("-libws")
+# extra_link.append("-ws")
+# extra_link.append("-libws")
 
 extra_macros = [("VIRT_CUBE", None), ("DYNAMIC_SHADER_INCLUDE", None)]
 led_module = Extension(
