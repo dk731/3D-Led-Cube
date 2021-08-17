@@ -1,11 +1,19 @@
 from distutils.core import setup, Extension
 import os
+import platform
+import sys
 
 extra_link = ["-lws", "-lpthread", "-lGLEW", "-lglfw"]
 
 
 extra_includes = ["./include"]
 extra_library_dirs = ["./lib"]
+runtime_libs = []
+
+if platform.system() == "Windows":
+    sys.path.append(os.path.join(os.getcwd(), "lib"))
+else:
+    runtime_libs.append("./lib")
 
 extra_macros = [("VIRT_CUBE", None), ("DYNAMIC_SHADER_INCLUDE", None)]
 led_module = Extension(
@@ -15,7 +23,7 @@ led_module = Extension(
     define_macros=extra_macros,
     include_dirs=extra_includes,
     library_dirs=extra_library_dirs,
-    runtime_library_dirs=["./lib"],
+    runtime_library_dirs=runtime_libs,
 )
 
 setup(
