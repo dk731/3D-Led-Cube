@@ -4,17 +4,19 @@ import platform
 import sys
 import glob
 
+root_dir = os.getcwd()
+lib_dir = os.path.join(root_dir, "lib")
 
 extra_includes = ["./include"]
-extra_library_dirs = ["./lib"]
+extra_library_dirs = [lib_dir]
 runtime_libs = []
 
 if platform.system() == "Windows":
-    sys.path.append(os.path.join(os.getcwd(), "lib"))
-    extra_link = glob.glob("./lib/*.a") + glob.glob("./lib/*.lib")
+    sys.path.append(lib_dir)
+    extra_link = glob.glob(lib_dir + "/*.a") + glob.glob(lib_dir + "/*.lib")
 else:
     extra_link = ["-lws", "-lpthread", "-lGLEW", "-lglfw"]
-    runtime_libs.append("./lib")
+    runtime_libs.append(lib_dir)
 
 extra_macros = [("VIRT_CUBE", None), ("DYNAMIC_SHADER_INCLUDE", None)]
 led_module = Extension(
