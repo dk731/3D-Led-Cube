@@ -105,8 +105,9 @@ def build_glfw():
 
     for file in glob.glob("../include/*"):
         shutil.move(file, include_dir)
-    # for file in glob.glob("./src/libglfw*"):
-    #     shutil.move(file, lib_dir)
+    if platform.system() == "Windows":
+        for file in glob.glob("./src/Debug/*"):
+            shutil.move(file, lib_dir)
 
 
 def build_wsserver():

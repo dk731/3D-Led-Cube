@@ -2,8 +2,7 @@ from distutils.core import setup, Extension
 import os
 import platform
 import sys
-
-extra_link = ["-lws", "-lpthread", "-lGLEW", "-lglfw"]
+import glob
 
 
 extra_includes = ["./include"]
@@ -12,7 +11,9 @@ runtime_libs = []
 
 if platform.system() == "Windows":
     sys.path.append(os.path.join(os.getcwd(), "lib"))
+    extra_link = glob.glob("./lib/*.a") + glob.glob("./lib/*.lib")
 else:
+    extra_link = ["-lws", "-lpthread", "-lGLEW", "-lglfw"]
     runtime_libs.append("./lib")
 
 extra_macros = [("VIRT_CUBE", None), ("DYNAMIC_SHADER_INCLUDE", None)]
