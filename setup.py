@@ -18,6 +18,8 @@ else:
     extra_link = ["-lws", "-lpthread", "-lGLEW", "-lglfw"]
     runtime_libs.append(lib_dir)
 
+extra_link[0] = "/DEFAULTLIB:" + extra_link[0]
+
 extra_macros = [("VIRT_CUBE", None), ("DYNAMIC_SHADER_INCLUDE", None)]
 led_module = Extension(
     "_ledcd",
