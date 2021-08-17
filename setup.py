@@ -14,7 +14,7 @@ runtime_libs = []
 if platform.system() == "Windows":
     sys.path.append(lib_dir)
     # extra_link = glob.glob(lib_dir + "/*.a") + glob.glob(lib_dir + "/*.lib")
-    extra_link = [f"/IMPLIB:{lib_dir}+\libws.a"]
+    extra_link = [f"/IMPLIB:{lib_dir}+\glfw3dll.lib"]
 else:
     extra_link = ["-lws", "-lpthread", "-lGLEW", "-lglfw"]
     runtime_libs.append(lib_dir)
