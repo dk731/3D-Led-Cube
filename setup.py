@@ -15,9 +15,9 @@ if platform.system() == "Windows":
     sys.path.append(lib_dir)
     # extra_link = glob.glob(lib_dir + "/*.a") + glob.glob(lib_dir + "/*.lib")
     extra_link = [
-        "/IMPLIB:glfw3dll.lib",
-        "/IMPLIB:libws.a",
-        "/IMPLIB:libglew32.dll.a",
+        f"/IMPLIB:{lib_dir}/glfw3dll.lib",
+        f"/IMPLIB:{lib_dir}/libws.a",
+        f"/IMPLIB:{lib_dir}/libglew32.dll.a",
     ]
 else:
     extra_link = ["-lws", "-lpthread", "-lGLEW", "-lglfw"]
