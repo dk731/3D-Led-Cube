@@ -16,9 +16,9 @@ if platform.system() == "Windows":
     sys.path.append(lib_dir)
     # extra_link = glob.glob(lib_dir + "/*.a") + glob.glob(lib_dir + "/*.lib")
     extra_link = [
-        f"/IMPLIB:{lib_dir}/glfw3dll.lib",
-        f"/IMPLIB:{lib_dir}/libws.a",
-        f"/IMPLIB:{lib_dir}/libglew32.dll.a",
+        f"/DEFAULTLIB:{lib_dir}\\glfw3dll.lib",
+        f"/DEFAULTLIB:{lib_dir}\\glew32d.lib",
+        f"/DEFAULTLIB:opengl32.lib",
     ]
     
     extra_includes.append(os.path.join(vcpkg_dir, "include"))
