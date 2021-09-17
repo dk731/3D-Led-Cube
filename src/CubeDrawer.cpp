@@ -11,24 +11,30 @@ CubeDrawer &CubeDrawer::get_obj()
 }
 
 #ifdef VIRT_CUBE
-void onopen(int fd)
+void onopen(websocketpp::connection_hdl hdl)
 {
     SLEEP_MICROS(500000);
-
-    CubeDrawer::get_obj().virt_fds.push_back(fd);
-    std::cout << "Virtual cube:" << fd << " connected" << std::endl;
+    CubeDrawer::get_obj().virt_hdls.push_back(hdl);
+    std::cout << "Virtual cube connected" << std::endl;
 }
 
-void onclose(int fd)
+void onclose(websocketpp::connection_hdl hdl)
 {
+    CubeDrawer::get_obj().virt_hdls.remove_if([hdl](std::weak_ptr<void> p){
+        std::shared_ptr<void> swp = hdl.lock();
+        std::shared_ptr<void> sp = p.lock();
+        if(swp && sp)
+            return swp == sp;
+        return false;
+    });
 
-    CubeDrawer::get_obj().virt_fds.remove(fd);
-    std::cout << "Virtual cube: " << fd << " disconnected" << std::endl;
+
+    std::cout << "Virtual cube disconnected" << std::endl;
 }
 
 int CubeDrawer::_get_virt_amount_()
 {
-    return virt_fds.size();
+    return virt_hdls.size();
 }
 #endif
 
@@ -45,11 +51,15 @@ CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(0)
     transform_list[0]->recalc = false;
     transform_list.push_back(new Transform());
 #ifdef VIRT_CUBE
-    struct ws_events evs;
-    evs.onopen = &onopen;
-    evs.onclose = &onclose;
-    std::cout << "Oppening socket" << std::endl;
-    ws_socket(&evs, 8080, 100);
+    ws_server.init_asio();
+    
+    ws_server.set_open_handler(&onopen);
+    ws_server.set_close_handler(&onclose);
+
+    ws_server.listen(8080);
+    ws_server.start_accept();
+
+    // std::thread virt_server([](){CubeDrawer::get_obj().ws_server.run();});
 #else
     int fd = shm_open("VirtualCubeSHMemmory", O_RDWR, 0);
     if (fd < 0)
@@ -290,15 +300,16 @@ void CubeDrawer::show()
 
 #ifdef VIRT_CUBE
     if (wait_cube)
-        while (!virt_fds.size())
+        while (!virt_hdls.size())
         {
             SLEEP_MICROS(100000);
             prev_show_time = GET_MICROS();
         }
 
     // Send back_buf to all oppened sockets
-    for (auto t = virt_fds.begin(); t != virt_fds.end(); t++)
-        ws_sendframe(*t, (char *)back_buf, 12288, false, WS_FR_OP_BIN);
+    for (auto t = virt_hdls.begin(); t != virt_hdls.end(); t++)
+        ws_server.send(*t, (void *)back_buf, 12288, websocketpp::frame::opcode::BINARY);
+        // ws_sendframe(*t, (char *)back_buf, 12288, false, WS_FR_OP_BIN);
 
 #else
     while (shm_buf->flags.lock || (is_sync && !shm_buf->flags.frame_shown))

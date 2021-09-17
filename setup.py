@@ -20,11 +20,11 @@ if platform.system() == "Windows":
         f"/IMPLIB:{lib_dir}/libglew32.dll.a",
     ]
 else:
-    extra_link = ["-lws", "-lpthread", "-lGLEW", "-lglfw"]
+    extra_link = ["-lpthread", "-lGLEW", "-lglfw"]
     runtime_libs.append(lib_dir)
 
 # extra_link[0] = "/DEFAULTLIB:" + extra_link[0]
-extra_link.append("/VERBOSE")
+# extra_link.append("/VERBOSE")
 # extra_link.append("-ws")
 # extra_link.append("-libws")
 

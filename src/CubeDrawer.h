@@ -10,6 +10,7 @@
 #include <mutex>
 #include <list>
 #include <vector>
+#include <map>
 #include <Python.h>
 #include <stdint.h>
 
@@ -39,10 +40,8 @@
 
 #ifdef VIRT_CUBE
 
-extern "C"
-{
-#include <ws.h>
-}
+#include <websocketpp/config/asio_no_tls.hpp>
+#include <websocketpp/server.hpp>
 
 #else
 
@@ -239,9 +238,10 @@ public:
 
     bool draw_immediate = false;
 #ifdef VIRT_CUBE
-    std::list<int> virt_fds;
+    std::list<websocketpp::connection_hdl> virt_hdls;
     int _get_virt_amount_();
     bool wait_cube = true;
+    websocketpp::server<websocketpp::config::asio> ws_server;
 #endif
     bool is_sync;
     float delta_time;
