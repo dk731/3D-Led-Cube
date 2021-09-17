@@ -15,11 +15,13 @@ if platform.system() == "Windows":
     vcpkg_dir = f"C:\\vcpkg\\installed\\{ 'x64' if '64' in platform.architecture()[0] else 'x86' }-windows"
     sys.path.append(lib_dir)
     # extra_link = glob.glob(lib_dir + "/*.a") + glob.glob(lib_dir + "/*.lib")
-    extra_link = [
-        f"/DEFAULTLIB:{lib_dir}\\glfw3dll.lib",
-        f"/DEFAULTLIB:{lib_dir}\\glew32d.lib",
-        f"/DEFAULTLIB:opengl32.lib",
-    ]
+#     extra_link = [
+#         f"/DEFAULTLIB:{lib_dir}\\glfw3dll.lib",
+#         f"/DEFAULTLIB:{lib_dir}\\glew32d.lib",
+#         f"/DEFAULTLIB:opengl32.lib",
+#     ]
+    extra_link = glob.glob(lib_dir + "/*.lib")
+    extra_link.append("/DEFAULTLIB:opengl32.lib")
     
     extra_includes.append(os.path.join(vcpkg_dir, "include"))
     extra_library_dirs.append(os.path.join(vcpkg_dir, "lib"))
