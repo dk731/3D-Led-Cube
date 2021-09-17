@@ -65,22 +65,31 @@ def build_glew():
     file = tarfile.open(fileobj=ftpstream, mode="r|gz")
     file.extractall(path=".")
 
-    os.chdir("glew-2.2.0")
-    subprocess.call(["make", "WARN=-Wall -Wno-cast-function-type", "glew.lib.shared"])
+    os.mkdir("./glew-2.2.0/build/cmake/build")
+    os.chdir("./glew-2.2.0/build/cmake/build")
 
-    for file in glob.glob("./include/GL/*"):
+    # subprocess.call(["make", "WARN=-Wall -Wno-cast-function-type", "glew.lib.shared"])
+
+    subprocess.call(["cmake", "-DBUILD_SHARED_LIBS=ON", ".."])
+    subprocess.call(["cmake", "--build", "."])
+
+    for file in glob.glob("../../../include/GL/*"):
         shutil.move(file, os.path.join(include_dir, "GL"))
-    for file in glob.glob("./lib/*"):
+    for file in glob.glob("./lib/Debug/*"):
+        shutil.move(file, lib_dir)
+    for file in glob.glob("./bin/Debug/*"):
         shutil.move(file, lib_dir)
 
 
 def build_glfw():
     os.chdir(root_dir)
     print("Building GLFW...")
+    
     subprocess.call(
         "git clone https://github.com/glfw/glfw",
         shell=True,
     )
+
     os.chdir("./glfw")
     subprocess.call("git checkout 201400b974b63eb7f23eb7d8563589df9c699d7c", shell=True)
     os.mkdir("./build")
@@ -164,11 +173,12 @@ print("Finished building dependencies!\n")
 print("* Include dir: \n\n", "\n".join(glob.glob("./include/*")))
 print("* Include/GL dir: \n\n", "\n".join(glob.glob("./include/GL/*")))
 print("* Lib dir: \n\n", "\n".join(glob.glob("./lib/*")))
+print("* Lib dir Debug: \n\n", "\n".join(glob.glob("./lib/Debug/*")))
 
-print(
-    "Environment variables: \n",
-    "\n".join([f"{name}: {val}" for name, val in os.environ.items()]),
-)
+# print(
+#     "Environment variables: \n",
+#     "\n".join([f"{name}: {val}" for name, val in os.environ.items()]),
+# )
 
 print()
 
