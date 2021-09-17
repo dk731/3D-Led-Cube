@@ -12,6 +12,7 @@ extra_library_dirs = [lib_dir]
 runtime_libs = []
 
 if platform.system() == "Windows":
+    vcpkg_dir = f"C:\\vcpkg\\installed\\{ 'x64' if '64' in platform.architecture()[0] else 'x86' }-windows"
     sys.path.append(lib_dir)
     # extra_link = glob.glob(lib_dir + "/*.a") + glob.glob(lib_dir + "/*.lib")
     extra_link = [
@@ -19,6 +20,13 @@ if platform.system() == "Windows":
         f"/IMPLIB:{lib_dir}/libws.a",
         f"/IMPLIB:{lib_dir}/libglew32.dll.a",
     ]
+    
+    extra_includes.append(os.path.join(vcpkg_dir, "include"))
+    extra_library_dirs.append(os.path.join(vcpkg_dir, "lib"))
+
+    print("PATH TO THE VCPKG: ", vcpkg_dir)
+    print(glob.glob(os.path.join(os.path.join(vcpkg_dir, "include") + "/*")))
+
 else:
     extra_link = ["-lpthread", "-lGLEW", "-lglfw"]
     runtime_libs.append(lib_dir)
