@@ -40,6 +40,8 @@
 
 #ifdef VIRT_CUBE
 
+#define ASIO_STANDALONE
+#define _WEBSOCKETPP_CPP11_TYPES_TRAITS_
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
 
