@@ -10,6 +10,7 @@ glfw
 include
 include/GL
 wsServer
+websocketpp
 
 !/include/GL
 !/include/GL/glu.h
