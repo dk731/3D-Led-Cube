@@ -20,14 +20,14 @@ void onopen(websocketpp::connection_hdl hdl)
 
 void onclose(websocketpp::connection_hdl hdl)
 {
-    CubeDrawer::get_obj().virt_hdls.remove_if([hdl](std::weak_ptr<void> p){
-        std::shared_ptr<void> swp = hdl.lock();
-        std::shared_ptr<void> sp = p.lock();
-        if(swp && sp)
-            return swp == sp;
-        return false;
-    });
-
+    CubeDrawer::get_obj().virt_hdls.remove_if([hdl](std::weak_ptr<void> p)
+                                              {
+                                                  std::shared_ptr<void> swp = hdl.lock();
+                                                  std::shared_ptr<void> sp = p.lock();
+                                                  if (swp && sp)
+                                                      return swp == sp;
+                                                  return false;
+                                              });
 
     std::cout << "Virtual cube disconnected" << std::endl;
 }
@@ -52,14 +52,17 @@ CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(0)
     transform_list.push_back(new Transform());
 #ifdef VIRT_CUBE
     ws_server.init_asio();
-    
+
     ws_server.set_open_handler(&onopen);
     ws_server.set_close_handler(&onclose);
 
     ws_server.listen(8080);
     ws_server.start_accept();
 
-    // std::thread virt_server([](){CubeDrawer::get_obj().ws_server.run();});
+    std::thread virt_server([]()
+                            { CubeDrawer::get_obj().ws_server.run(); });
+    virt_server.detach();
+
 #else
     int fd = shm_open("VirtualCubeSHMemmory", O_RDWR, 0);
     if (fd < 0)

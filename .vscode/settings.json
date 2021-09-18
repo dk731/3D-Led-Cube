@@ -59,7 +59,9 @@
         "condition_variable": "cpp",
         "ctime": "cpp",
         "ratio": "cpp",
-        "mutex": "cpp"
+        "mutex": "cpp",
+        "forward_list": "cpp",
+        "xmemory": "cpp"
     },
     "python.pythonPath": "/usr/local/bin/python3.9"
 }

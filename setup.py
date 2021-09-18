@@ -20,7 +20,7 @@ if platform.system() == "Windows":
 #         f"/DEFAULTLIB:{lib_dir}\\glew32d.lib",
 #         f"/DEFAULTLIB:opengl32.lib",
 #     ]
-    extra_link = [ f'/DEFAULTLIB:"{file}"' for file in glob.glob(lib_dir + "/*.lib")]
+    extra_link = [ f"/DEFAULTLIB:{file}" for file in glob.glob(lib_dir + "/*.lib")]
     extra_link.append("/DEFAULTLIB:opengl32.lib")
     
     extra_includes.append(os.path.join(vcpkg_dir, "include"))
