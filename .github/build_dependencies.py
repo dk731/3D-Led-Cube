@@ -175,6 +175,10 @@ print("* Include/GL dir: \n\n", "\n".join(glob.glob("./include/GL/*")))
 print("* Lib dir: \n\n", "\n".join(glob.glob("./lib/*")))
 print("* Lib dir Debug: \n\n", "\n".join(glob.glob("./lib/Debug/*")))
 
+if platform.system() == "Windows":
+    print("Moving all dll's to C:\\Windows\\System32")
+    for file in glob.glob(lib_dir + "\\*.dll"):
+        shutil.move(file, "C:\\Windows\\System32")
 # print(
 #     "Environment variables: \n",
 #     "\n".join([f"{name}: {val}" for name, val in os.environ.items()]),
