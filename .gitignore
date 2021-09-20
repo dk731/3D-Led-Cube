@@ -4,13 +4,15 @@ main
 *.o
 build
 lib
+tmp
+bin
 glm
-glew-2.2.0
-glfw
+glew*
+glfw*
 include
-include/GL
 wsServer
 websocketpp
+clean.bat
 
 !/include/GL
 !/include/GL/glu.h

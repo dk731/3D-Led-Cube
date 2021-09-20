@@ -24,7 +24,7 @@ dirs_to_delete = [
     "glew-2.2.0",
     "wsServer",
     "lib",
-    "websocketpp"
+    "websocketpp",
 ]
 
 clear_exceptions = ["gl.h", "glu.h"]
@@ -84,7 +84,7 @@ def build_glew():
 def build_glfw():
     os.chdir(root_dir)
     print("Building GLFW...")
-    
+
     subprocess.call(
         "git clone https://github.com/glfw/glfw",
         shell=True,
@@ -154,9 +154,12 @@ def build_ws():
     os.chdir(root_dir)
     print("Building WebSocket++...")
 
-    subprocess.call("git clone --depth 1 https://github.com/zaphoyd/websocketpp", shell=True)
+    subprocess.call(
+        "git clone --depth 1 https://github.com/zaphoyd/websocketpp", shell=True
+    )
 
     shutil.move("./websocketpp/websocketpp", include_dir)
+
 
 build_glm()
 build_glew()
