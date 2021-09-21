@@ -333,8 +333,8 @@ class CustomBuild(build.build):
             0
             if subprocess.call(
                 call_str,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
+#                 stdout=subprocess.DEVNULL,
+#                 stderr=subprocess.DEVNULL,
                 shell=True,
             )
             == 0
