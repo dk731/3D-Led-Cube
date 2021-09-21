@@ -316,7 +316,7 @@ class CustomBuild(build.build):
             print("    Prepearing Makefile for build ... ", end="")
             self.call(f"cmake -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF -DGLFW_INSTALL=OFF -DCMAKE_RUNTIME_OUTPUT_DIRECTORY={self.bin_dir} -DCMAKE_LIBRARY_OUTPUT_DIRECTORY={self.lib_dir} ..")
             print("    Building GLFW ... ", end="")
-            self.call("cmake --build .")
+            self.call("make _POSIX_C_SOURCE=200809L")
             # for file in glob.glob("../../../include/GL/*"):
             #     shutil.move(file, os.path.join(include_dir, "GL"))
             # for file in glob.glob("./lib/Debug/*"):
