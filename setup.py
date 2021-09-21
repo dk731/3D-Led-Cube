@@ -59,8 +59,11 @@ class CustomBuild(build.build):
             led_module.extra_link_args = ["-lpthread", "-lGLEW", "-lglfw"]
         build.build.run(self)
 
-        for file in glob.glob(os.path.join(self.bin_dir, "*.*")):
-            shutil.copy(file, self.python_dll_dir)
+        if os.path.exists(self.python_dll_dir)
+            for file in glob.glob(os.path.join(self.bin_dir, "*.*")):
+                shutil.copy(file, self.python_dll_dir)
+        else:
+            print(f"Dont know where to put needed dll's, raise issue or do it manualy (dll location should be in: {self.bin_dir})")
 
     def install_dependencies(self):
         print("Prepearing dependencies for build ...\n\n")
