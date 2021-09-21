@@ -62,6 +62,10 @@ class CustomBuild(build.build):
             
             for file in glob.glob(os.path.join(self.lib_dir, "*so*")):
                 shutil.copy(file, self.bin_dir)
+            
+            if "LD_LIBRARY_PATH" in os.environ:
+                for file in glob.glob(self.bin_dir):
+                    shutil.copy(file, os.environ["LD_LIBRARY_PATH"])
 
             
         build.build.run(self)
