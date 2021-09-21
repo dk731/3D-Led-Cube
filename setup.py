@@ -41,7 +41,7 @@ class CustomBuild(build.build):
         if self.system == "Windows":
             self.python_dll_dir = os.path.join(os.path.dirname(sys.executable), "Lib", "site-packages")
         else:
-            self.python_dll_dir = os.environ["LD_LIBRARY_PATH"] if "LD_LIBRARY_PATH" in os.environ else "NO LIB DIR WAS FOUND"
+            self.python_dll_dir = "/lib"
 
     def run(self):
         global led_module
