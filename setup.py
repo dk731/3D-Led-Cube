@@ -373,7 +373,7 @@ setup(
     author="dk731",
     description="""Led Cube driver module""",
     ext_modules=[led_module],
-    py_modules=["_ledcd"],
+    py_modules=["ledcd"],
     package_dir={"": "src"},
     cmdclass={"build": CustomBuild},
 )
