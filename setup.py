@@ -154,7 +154,7 @@ class CustomBuild(build.build):
             results = []
             for c in [
                 "sudo apt-get install -y libasio-dev",
-                "sudo yum install -y asio-devel",
+                "yum install -y asio-devel",
                 "sudo dnf --enablerepo=powertools install asio-devel",
                 "sudo packman -Syu asio",
             ]:
