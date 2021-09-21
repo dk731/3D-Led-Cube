@@ -22,10 +22,6 @@ class CustomBuild(build.build):
         self.bin_dir = os.path.join(self.root_dir, "bin")
         self.tmp_dir = os.path.join(self.root_dir, "tmp")
 
-        self.python_dll_dir = os.path.join(
-            os.path.dirname(sys.executable), "Lib", "site-packages"
-        )
-
         self.arch = 64 if sys.maxsize > 2 ** 32 else 32
         self.system = platform.system()
 
@@ -41,6 +37,11 @@ class CustomBuild(build.build):
             os.mkdir(self.bin_dir)
         if not os.path.exists(self.tmp_dir):
             os.mkdir(self.tmp_dir)
+
+        if self.system == "Windows":
+            self.python_dll_dir = os.path.join(os.path.dirname(sys.executable), "Lib", "site-packages")
+        else:
+            self.python_dll_dir = os.environ["LD_LIBRARY_PATH"] if "LD_LIBRARY_PATH" in os.environ else "NO LIB DIR WAS FOUND"
 
     def run(self):
         global led_module
@@ -62,16 +63,12 @@ class CustomBuild(build.build):
             
             for file in glob.glob(os.path.join(self.lib_dir, "*so*")):
                 shutil.copy(file, self.bin_dir)
-            
-            if "LD_LIBRARY_PATH" in os.environ:
-                for file in glob.glob(self.bin_dir):
-                    shutil.copy(file, os.environ["LD_LIBRARY_PATH"])
 
             
         build.build.run(self)
 
         if os.path.exists(self.python_dll_dir):
-            for file in glob.glob(os.path.join(self.bin_dir, "*.*")):
+            for file in glob.glob(os.path.join(self.bin_dir, "*")):
                 shutil.copy(file, self.python_dll_dir)
         else:
             print(
