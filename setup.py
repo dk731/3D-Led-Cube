@@ -307,7 +307,7 @@ class CustomBuild(build.build):
                 shutil.move(file, self.bin_dir)
         else:
             print("    Downloading Source files ... ", end="")
-            self.call("git clone --depth 1 https://github.com/glfw/glfw")
+            self.call("git clone https://github.com/glfw/glfw")
 
             glfw_dir = os.path.join(self.root_dir, glob.glob("*glfw*")[0])
 
@@ -319,7 +319,8 @@ class CustomBuild(build.build):
             print("    Prepearing Makefile for build ... ", end="")
             self.call(f"cmake -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF -DGLFW_INSTALL=OFF -DCMAKE_RUNTIME_OUTPUT_DIRECTORY={self.bin_dir} -DCMAKE_LIBRARY_OUTPUT_DIRECTORY={self.lib_dir} ..")
             print("    Building GLFW ... ", end="")
-            self.call("make _POSIX_C_SOURCE=200809L")
+            # self.call("make _POSIX_C_SOURCE=200809L")
+            self.call("cmake --build .")
             # for file in glob.glob("../../../include/GL/*"):
             #     shutil.move(file, os.path.join(include_dir, "GL"))
             # for file in glob.glob("./lib/Debug/*"):
