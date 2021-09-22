@@ -61,7 +61,8 @@
         "ratio": "cpp",
         "mutex": "cpp",
         "forward_list": "cpp",
-        "xmemory": "cpp"
+        "xmemory": "cpp",
+        "xlocale": "cpp"
     },
     "python.pythonPath": "/usr/local/bin/python3.9"
 }

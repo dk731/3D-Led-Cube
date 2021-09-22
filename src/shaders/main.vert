@@ -49,7 +49,7 @@ void main()
   
   if (check_bind())
   // if (true)
-    gl_Position = vec4(in_pos.x / 8.0 - 1.0, (in_pos.y + in_pos.z * 16) / 128.0 - 0.9921875, 0.0, 1.0);
+    gl_Position = vec4(-0.875 + in_pos.x * 0.125, -0.9921875 + (in_pos.y + in_pos.z * 16) * 0.0078125, 0.0, 1.0);
   else
     gl_Position = vec4(-1.0); // spawn point outside window
 }

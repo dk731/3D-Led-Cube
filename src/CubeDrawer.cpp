@@ -38,7 +38,7 @@ int CubeDrawer::_get_virt_amount_()
 }
 #endif
 
-CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(0), is_sync(sync), delta_time(0)
+CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(GET_MICROS()), is_sync(sync), delta_time(0)
 {
     init_gl();
     parse_funcs[0].get_size = PyTuple_Size;
@@ -51,6 +51,7 @@ CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(0)
     transform_list[0]->recalc = false;
     transform_list.push_back(new Transform());
 #ifdef VIRT_CUBE
+    ws_server.clear_access_channels(websocketpp::log::alevel::all);
     ws_server.init_asio();
 
     ws_server.set_open_handler(&onopen);
@@ -249,11 +250,11 @@ void CubeDrawer::clear(float r, float g, float b)
     if (r < 0.0f || r > 1.0f || g < 0.0f || g > 1.0f || b < 0.0f || b > 1.0f)
         THROW_EXP("Invalid input, values must be in range [0, 1]", )
 
-    // draw_calls_arr.push_back({.type = CALL_CLEAR_TYPE,
-    //                           .color = {
-    //                               .g = (unsigned char)(255.0f * g),
-    //                               .r = (unsigned char)(255.0f * r),
-    //                               .b = (unsigned char)(255.0f * b)}});
+    draw_calls_arr.push_back({.type = CALL_CLEAR_TYPE,
+                              .color = {
+                                  .g = (unsigned char)(255.0f * g),
+                                  .r = (unsigned char)(255.0f * r),
+                                  .b = (unsigned char)(255.0f * b)}});
     if (draw_immediate)
         show();
 }
@@ -297,9 +298,12 @@ void CubeDrawer::clear(PyObject *input)
 void CubeDrawer::show()
 {
     render_texture();
-    long delta = min_frame_delay - (GET_MICROS() - prev_show_time);
+    long long delta = min_frame_delay - (GET_MICROS() - prev_show_time);
     if (delta > 0)
+    {
+        // std::cout << "Sleeping: " << delta << "   min_del: " << min_frame_delay << "   prev_show_time: " << prev_show_time << "    cur_time: " << GET_MICROS() << std::endl;
         SLEEP_MICROS(delta);
+    }
 
 #ifdef VIRT_CUBE
     if (wait_cube)
@@ -308,12 +312,9 @@ void CubeDrawer::show()
             SLEEP_MICROS(100000);
             prev_show_time = GET_MICROS();
         }
-
     // Send back_buf to all oppened sockets
     for (auto t = virt_hdls.begin(); t != virt_hdls.end(); t++)
         ws_server.send(*t, (void *)back_buf, 12288, websocketpp::frame::opcode::BINARY);
-        // ws_sendframe(*t, (char *)back_buf, 12288, false, WS_FR_OP_BIN);
-
 #else
     while (shm_buf->flags.lock || (is_sync && !shm_buf->flags.frame_shown))
         usleep(100);
@@ -559,6 +560,8 @@ void CubeDrawer::init_gl()
     std::thread tmp_t(&CubeDrawer::pool_events, this);
     tmp_t.detach();
 
+    glViewport(0, 0, 16, 256);
+
     // DrawCall *new_point_call = new DrawCall({
     //     .type = CALL_SPHERE_TYPE,
     //     .color = {255, 0, 0},
@@ -639,16 +642,15 @@ void CubeDrawer::clear_draw_call_buf()
 ////////// OpenGL Renderer API Binds
 void CubeDrawer::apoint(float *p, float line_width)
 {
-
-    // draw_calls_arr.push_back({
-    //     .type = CALL_POINT_TYPE,
-    //     .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
-    //     .data = {
-    //         p[0], p[1], p[2], 0.0f,
-    //         line_width, 0.0f, 0.0f, 0.0f,
-    //         0.0f, 0.0f, 0.0f, 0.0f,
-    //         0.0f, 0.0f, 0.0f, 0.0f},
-    // });
+    draw_calls_arr.push_back({
+        .type = CALL_POINT_TYPE,
+        .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
+        .data = {
+            p[0], p[1], p[2], 0.0f,
+            line_width, 0.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 0.0f},
+    });
 
     if (draw_immediate)
         show();
@@ -656,15 +658,15 @@ void CubeDrawer::apoint(float *p, float line_width)
 
 void CubeDrawer::apoly(float *p1, float *p2, float *p3, float z_height)
 {
-    // draw_calls_arr.push_back({
-    //     .type = CALL_POLYGON_TYPE,
-    //     .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
-    //     .data = {
-    //         p1[0], p1[1], p1[2], 0.0f,
-    //         p2[0], p2[1], p2[2], 0.0f,
-    //         p3[0], p3[1], p3[2], 0.0f,
-    //         z_height, 0.0f, 0.0f, 0.0f},
-    // });
+    draw_calls_arr.push_back({
+        .type = CALL_POLYGON_TYPE,
+        .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
+        .data = {
+            p1[0], p1[1], p1[2], 0.0f,
+            p2[0], p2[1], p2[2], 0.0f,
+            p3[0], p3[1], p3[2], 0.0f,
+            z_height, 0.0f, 0.0f, 0.0f},
+    });
 
     if (draw_immediate)
         show();
@@ -672,15 +674,15 @@ void CubeDrawer::apoly(float *p1, float *p2, float *p3, float z_height)
 
 void CubeDrawer::apoly_pyr(float *p1, float *p2, float *p3, float *p4)
 {
-    // draw_calls_arr.push_back({
-    //     .type = CALL_POLYPYR_TYPE,
-    //     .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
-    //     .data = {
-    //         p1[0], p1[1], p1[2], 0.0f,
-    //         p2[0], p2[1], p2[2], 0.0f,
-    //         p3[0], p3[1], p3[2], 0.0f,
-    //         p4[0], p4[1], p4[2], 0.0f},
-    // });
+    draw_calls_arr.push_back({
+        .type = CALL_POLYPYR_TYPE,
+        .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
+        .data = {
+            p1[0], p1[1], p1[2], 0.0f,
+            p2[0], p2[1], p2[2], 0.0f,
+            p3[0], p3[1], p3[2], 0.0f,
+            p4[0], p4[1], p4[2], 0.0f},
+    });
 
     if (draw_immediate)
         show();
@@ -688,15 +690,15 @@ void CubeDrawer::apoly_pyr(float *p1, float *p2, float *p3, float *p4)
 
 void CubeDrawer::aline(float *p1, float *p2, float line_width)
 {
-    // draw_calls_arr.push_back({
-    //     .type = CALL_LINE_TYPE,
-    //     .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
-    //     .data = {
-    //         p1[0], p1[1], p1[2], 0.0f,
-    //         p2[0], p2[1], p2[2], 0.0f,
-    //         line_width, 0.0f, 0.0f, 0.0f,
-    //         0.0f, 0.0f, 0.0f, 0.0f},
-    // });
+    draw_calls_arr.push_back({
+        .type = CALL_LINE_TYPE,
+        .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
+        .data = {
+            p1[0], p1[1], p1[2], 0.0f,
+            p2[0], p2[1], p2[2], 0.0f,
+            line_width, 0.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 0.0f},
+    });
 
     if (draw_immediate)
         show();
@@ -704,10 +706,10 @@ void CubeDrawer::aline(float *p1, float *p2, float line_width)
 
 void CubeDrawer::acircle(float *model_mat, float *r, bool filled, float z_height, float line_width)
 {
-    // draw_calls_arr.push_back({
-    //     .type = filled ? CALL_FCIRCLE_TYPE : CALL_CIRCLE_TYPE,
-    //     .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
-    // });
+    draw_calls_arr.push_back({
+        .type = filled ? CALL_FCIRCLE_TYPE : CALL_CIRCLE_TYPE,
+        .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
+    });
 
     DrawCall *cur_call = &(draw_calls_arr[draw_calls_arr.size() - 1]);
 
@@ -724,10 +726,11 @@ void CubeDrawer::acircle(float *model_mat, float *r, bool filled, float z_height
 
 void CubeDrawer::asphere(float *model_mat, float *r, bool filled, float line_width)
 {
-    // draw_calls_arr.push_back({
-    //     .type = filled ? CALL_SPHERE_TYPE : CALL_FSPHERE_TYPE,
-    //     .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
-    // });
+    draw_calls_arr.push_back({
+        .type = filled ? CALL_SPHERE_TYPE : CALL_FSPHERE_TYPE,
+        .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
+    });
+
     DrawCall cur_call = draw_calls_arr.back();
     memcpy(cur_call.data, model_mat, sizeof(float) * 12);
     memcpy(&cur_call.data[12], r, sizeof(float) * 3);
@@ -831,6 +834,7 @@ void CubeDrawer::poly_pyr(float x1, float y1, float z1, float x2, float y2, floa
 
     apoly_pyr(pp1, pp2, pp3, pp4);
 }
+
 void CubeDrawer::poly_pyr(PyObject *p1, PyObject *p2, PyObject *p3, PyObject *p4)
 {
     float pp1[4], pp2[4], pp3[4], pp4[4];

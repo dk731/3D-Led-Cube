@@ -186,8 +186,8 @@ private:
     std::vector<float> cur_parsed_args;
     std::vector<Transform *> transform_list;
 
-    long prev_show_time;
-    long min_frame_delay;
+    long long prev_show_time;
+    long long min_frame_delay;
     static std::mutex mutex_;
 
 #ifndef VIRT_CUBE
