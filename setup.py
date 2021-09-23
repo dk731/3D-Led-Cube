@@ -365,14 +365,17 @@ class CustomBuild(build.build):
 
 
 os.chdir(root_dir)
-
+src_dir = os.path.join(root_dir)
 extra_macros = [
     ("VIRT_CUBE", None),
     ("DYNAMIC_SHADER_INCLUDE", None),
 ]
 led_module = Extension(
     "_ledcd",
-    sources=["src/swig_module_wrap.cxx", "src/CubeDrawer.cpp"],
+    sources=[
+        os.path.join(src_dir, "swig_module_wrap.cxx"),
+        os.path.join(src_dir, "CubeDrawer.cpp"),
+    ],
     define_macros=extra_macros,
     library_dirs=include_dirs,
     extra_compile_args=["-std:c++20"]
