@@ -22,14 +22,10 @@ class CustomBuild(build.build):
         self.bin_dir = os.path.join(self.root_dir, "bin")
         self.tmp_dir = os.path.join(self.root_dir, "tmp")
 
-        self.python_dll_dir = os.path.join(
-            os.path.dirname(sys.executable), "Lib", "site-packages"
-        )
-
         self.arch = 64 if sys.maxsize > 2 ** 32 else 32
         self.system = platform.system()
 
-        self.include_dirs = []
+        self.include_dirs = [os.path.join(self.root_dir, "include")]
         self.compiled_libs = []
 
         self.errors_count = 0
@@ -41,6 +37,13 @@ class CustomBuild(build.build):
             os.mkdir(self.bin_dir)
         if not os.path.exists(self.tmp_dir):
             os.mkdir(self.tmp_dir)
+
+        if self.system == "Windows":
+            self.python_dll_dir = os.path.join(
+                os.path.dirname(sys.executable), "Lib", "site-packages"
+            )
+        else:
+            self.python_dll_dir = "/lib"
 
     def run(self):
         global led_module
@@ -56,11 +59,17 @@ class CustomBuild(build.build):
 
             led_module.extra_link_args = [f"/DEFAULTLIB:{lib}" for lib in lib_files]
         else:
-            led_module.extra_link_args = ["-lpthread", "-lGLEW", "-lglfw"]
+            led_module.extra_link_args = ["-lGLEW", "-lglfw"]
+            led_module.library_dirs = [self.lib_dir]
+            led_module.runtime_library_dirs = [self.bin_dir]
+
+            for file in glob.glob(os.path.join(self.lib_dir, "*so*")):
+                shutil.copy(file, self.bin_dir)
+
         build.build.run(self)
 
         if os.path.exists(self.python_dll_dir):
-            for file in glob.glob(os.path.join(self.bin_dir, "*.*")):
+            for file in glob.glob(os.path.join(self.bin_dir, "*")):
                 shutil.copy(file, self.python_dll_dir)
         else:
             print(
@@ -146,8 +155,8 @@ class CustomBuild(build.build):
             )
             results = []
             for c in [
-                "sudo apt-get -y install asio-dev",
-                "sudo yum install -y asio-devel",
+                "sudo apt-get install -y libasio-dev",
+                "yum install -y asio-devel",
                 "sudo dnf --enablerepo=powertools install asio-devel",
                 "sudo packman -Syu asio",
             ]:
@@ -193,7 +202,7 @@ class CustomBuild(build.build):
 
             shutil.unpack_archive(tmp_glew, root_dir, format="zip")
 
-            glew_dir = glob.glob("*glew*")[0]
+            glew_dir = os.path.join(self.root_dir, glob.glob("*glew*")[0])
 
             for file in glob.glob(  # Move all .lib's
                 os.path.join(
@@ -229,23 +238,27 @@ class CustomBuild(build.build):
                 return
             shutil.unpack_archive(tmp_glew, root_dir, format="tar")
 
-            glew_dir = glob.glob("*glew*")[0]
+            glew_dir = os.path.join(self.root_dir, glob.glob("*glew*")[0])
+            build_dir = os.path.join(glew_dir, "build", "cmake", "build")
 
-            os.mkdir(os.path.join(glew_dir, "build", "cmake", "build"))
-            os.chdir(os.path.join(glew_dir, "build", "cmake", "build"))
+            os.mkdir(build_dir)
+            os.chdir(build_dir)
 
             print("    Prepearing Makefile for build ... ", end="")
-            self.call("cmake -DBUILD_SHARED_LIBS=ON ..")
+            self.call(f"cmake -DBUILD_SHARED_LIBS=ON ..")
             print("    Building GLEW ... ", end="")
             self.call("cmake --build .")
-            # TODO: Move .lib and .so to lib and bin folders
 
-            # for file in glob.glob("../../../include/GL/*"):
-            #     shutil.move(file, os.path.join(include_dir, "GL"))
-            # for file in glob.glob("./lib/Debug/*"):
-            #     shutil.move(file, lib_dir)
-            # for file in glob.glob("./bin/Debug/*"):
-            #     shutil.move(file, lib_dir)
+            print("Checking lib: ", os.path.join(build_dir, "lib", "*.a"))
+            print(glob.glob(os.path.join(build_dir, "lib", "*.*")))
+
+            # for file in glob.glob(os.path.join(build_dir, "lib", "*.a")):
+            #     print(f"Moving file: {file}, to {self.lib_dir}")
+            #     shutil.move(file, self.lib_dir)
+
+            for file in glob.glob(os.path.join(build_dir, "lib", "*so*")):
+                print(f"Moving file: {file}, to {self.lib_dir}")
+                shutil.move(file, self.lib_dir)
 
         self.include_dirs.append(os.path.join(glew_dir, "include"))
 
@@ -276,7 +289,7 @@ class CustomBuild(build.build):
 
             shutil.unpack_archive(tmp_glfw, root_dir, format="zip")
 
-            glfw_dir = glob.glob("*glfw*")[0]
+            glfw_dir = os.path.join(self.root_dir, glob.glob("*glfw*")[0])
 
             for file in glob.glob(  # Move all .lib's
                 os.path.join(
@@ -296,26 +309,22 @@ class CustomBuild(build.build):
                 shutil.move(file, self.bin_dir)
         else:
             print("    Downloading Source files ... ", end="")
-            if not self.download_release(
-                "https://api.github.com/repos/nigels-com/glew/releases/latest",
-                tmp_glfw,
-                "tgz",
-            ):
-                print("  Was not able to download latest GLEW source files ... ")
-                self.errors_count += 1
-                return
-            shutil.unpack_archive(tmp_glfw, root_dir, format="tar")
+            self.call("git clone https://github.com/glfw/glfw")
 
-            glfw_dir = glob.glob("*glfw*")[0]
+            glfw_dir = os.path.join(self.root_dir, glob.glob("*glfw*")[0])
 
-            os.mkdir(os.path.join(glfw_dir, "build", "cmake", "build"))
-            os.chdir(os.path.join(glfw_dir, "build", "cmake", "build"))
-
+            os.mkdir(os.path.join(glfw_dir, "build"))
+            os.chdir(glfw_dir)
+            print("Changing glfw version: ")
+            self.call("git checkout 201400b974b63eb7f23eb7d8563589df9c699d7c")
+            os.chdir("build")
             print("    Prepearing Makefile for build ... ", end="")
-            self.call("cmake -DBUILD_SHARED_LIBS=ON ..")
-            print("    Building GLEW ... ", end="")
+            self.call(
+                f"cmake -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF -DGLFW_INSTALL=OFF -DCMAKE_RUNTIME_OUTPUT_DIRECTORY={self.bin_dir} -DCMAKE_LIBRARY_OUTPUT_DIRECTORY={self.lib_dir} .."
+            )
+            print("    Building GLFW ... ", end="")
+            # self.call("make _POSIX_C_SOURCE=200809L")
             self.call("cmake --build .")
-
             # for file in glob.glob("../../../include/GL/*"):
             #     shutil.move(file, os.path.join(include_dir, "GL"))
             # for file in glob.glob("./lib/Debug/*"):
