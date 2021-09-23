@@ -386,7 +386,7 @@ led_module = Extension(
 )
 
 setup(
-    name="_LedCD",
+    name="main_LedCD",
     version="0.1",
     author="dk731",
     description="""Led Cube driver module""",
