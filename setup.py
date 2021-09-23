@@ -375,7 +375,7 @@ led_module = Extension(
     sources=["src/swig_module_wrap.cxx", "src/CubeDrawer.cpp"],
     define_macros=extra_macros,
     library_dirs=include_dirs,
-    extra_compile_args=["/std:c++20"]
+    extra_compile_args=["-std:c++20"]
     # extra_link_args=os.environ["LEDCD_LIB_ARGS"].split(";"),
     # library_dirs=os.environ["LEDCD_INCLUDE_DIR"].split(";"),
 )
