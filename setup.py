@@ -378,7 +378,9 @@ led_module = Extension(
     ],
     define_macros=extra_macros,
     library_dirs=include_dirs,
-    extra_compile_args=["-std:c++20"]
+    extra_compile_args=[
+        "-std:c++2{}".format("0" if platform.system() == "Windows" else "a")
+    ]
     # extra_link_args=os.environ["LEDCD_LIB_ARGS"].split(";"),
     # library_dirs=os.environ["LEDCD_INCLUDE_DIR"].split(";"),
 )
