@@ -413,9 +413,14 @@ void CubeDrawer::init_gl()
         std::cout << "Failed to initialize GLFW" << std::endl;
         return;
     }
+    // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
 
 #ifndef DEBUG_VIEW
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
@@ -431,6 +436,8 @@ void CubeDrawer::init_gl()
     }
     glfwMakeContextCurrent(context);
 
+    std::cout << glGetString(GL_VERSION) << std::endl;
+
     GLenum err = glewInit();
     if (err != GLEW_OK)
     {
@@ -439,12 +446,12 @@ void CubeDrawer::init_gl()
     }
 
 #ifndef DYNAMIC_SHADER_INCLUDE
-    std::ifstream in("./shaders/main.vert");
+    std::ifstream in(".\\src\\shaders\\main.vert");
     std::string tmp_vert = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     const char *vert_str = tmp_vert.c_str();
     in.close();
 
-    in = std::ifstream("./shaders/main.frag");
+    in = std::ifstream(".\\src\\shaders\\main.frag");
     std::string tmp_frag = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     const char *frag_str = tmp_frag.c_str();
     in.close();
@@ -457,12 +464,13 @@ void CubeDrawer::init_gl()
     glShaderSource(vert_shade, 1, (const char **)&vert_str, NULL);
     glCompileShader(vert_shade);
     check_compile(vert_shade);
+    std::cout << "1" << std::endl;
 
     GLuint frag_shade = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(frag_shade, 1, (const char **)&frag_str, NULL);
     glCompileShader(frag_shade);
     check_compile(frag_shade);
-
+    std::cout << "2" << std::endl;
     main_prog = glCreateProgram();
 
     glAttachShader(main_prog, vert_shade);
@@ -471,6 +479,7 @@ void CubeDrawer::init_gl()
     int success;
     char infoLog[512];
     glLinkProgram(main_prog);
+    std::cout << "3" << std::endl;
     glGetProgramiv(main_prog, GL_LINK_STATUS, &success);
     if (!success)
     {
@@ -479,6 +488,7 @@ void CubeDrawer::init_gl()
                   << infoLog << std::endl;
     }
     glUseProgram(main_prog);
+    std::cout << "4" << std::endl;
 
     glDeleteShader(vert_shade);
     glDeleteShader(frag_shade);
@@ -502,29 +512,33 @@ void CubeDrawer::init_gl()
     //// Init vertices data
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 12288, gl_vertices, GL_STATIC_DRAW);
-
+    std::cout << "5" << std::endl;
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void *)0);
     ////
-
+    std::cout << "6" << std::endl;
     //// Init draw calls data
     glBindBuffer(GL_ARRAY_BUFFER, dc_vbo);
 
     for (int i = 1; i < 7; i++)
         glEnableVertexAttribArray(i);
+    std::cout << "7" << std::endl;
 
     int dc_str_size = sizeof(DrawCall);
 
     glVertexAttribIPointer(1, 1, GL_INT, dc_str_size, (GLvoid *)offsetof(DrawCall, type));
     glVertexAttribPointer(2, 3, GL_UNSIGNED_BYTE, GL_FALSE, dc_str_size, (GLvoid *)offsetof(DrawCall, color));
-
+    std::cout << "8" << std::endl;
     for (int i = 0; i < 4; i++)
         glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, dc_str_size, (GLvoid *)(offsetof(DrawCall, data) + sizeof(float) * 4 * i));
-
+    std::cout << "9" << std::endl;
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     for (int i = 1; i < 7; i++)
+    {
+        std::cout << "    " << i << std::endl;
         glVertexAttribDivisor(i, 1);
-
+    }
+    std::cout << "10" << std::endl;
     glBindVertexArray(0);
     ////
 
@@ -553,14 +567,14 @@ void CubeDrawer::init_gl()
         return;
     }
 #endif
-
+    std::cout << "11" << std::endl;
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-
+    std::cout << "12" << std::endl;
     std::thread tmp_t(&CubeDrawer::pool_events, this);
     tmp_t.detach();
-
-    glViewport(0, 0, 16, 256);
+    std::cout << "13" << std::endl;
+    // glViewport(0, 0, 16, 256);
 
     // DrawCall *new_point_call = new DrawCall({
     //     .type = CALL_SPHERE_TYPE,
@@ -581,6 +595,7 @@ bool CubeDrawer::check_compile(GLuint obj)
         glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &length);
         std::vector<char> log(length);
         glGetShaderInfoLog(obj, length, NULL, &log[0]);
+        std::cout << std::endl << "Error compiling shader: " << obj << std::endl;
         std::cerr << &log[0];
         return false;
     }

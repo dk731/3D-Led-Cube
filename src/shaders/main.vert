@@ -1,4 +1,4 @@
-#version 330 core
+#version 310 es
 
 //// Call type defines section
 #define CALL_POINT_TYPE 0 // 1D Point; 3D Solid Sphere
@@ -43,13 +43,13 @@ bool fsphere_check();
 
 void main()
 {
-  id = gl_InstanceID / float(prim_calls_sum);  
+  id = float(gl_InstanceID) / float(prim_calls_sum);  
   color = cur_color / 255.0;
   // color = vec3(1.0, 0.0, 0.0);
   
   if (check_bind())
   // if (true)
-    gl_Position = vec4(-0.875 + in_pos.x * 0.125, -0.9921875 + (in_pos.y + in_pos.z * 16) * 0.0078125, 0.0, 1.0);
+    gl_Position = vec4(-0.875 + in_pos.x * 0.125, -0.9921875 + (in_pos.y + in_pos.z * 16.0) * 0.0078125, 0.0, 1.0);
   else
     gl_Position = vec4(-1.0); // spawn point outside window
 }
@@ -114,7 +114,8 @@ bool poly_check()
   for (int i = 0; i < 9; i+= 3)
   {
     vec3 tmpxx = parray[i + 2] - parray[i + 1];
-    vec3 m = dot(in_pos - parray[i + 1], tmpxx) / pow(length(tmpxx), 2) * tmpxx + parray[i + 1];
+    float ltmpxx = length(tmpxx);
+    vec3 m = dot(in_pos - parray[i + 1], tmpxx) / (ltmpxx * ltmpxx) * tmpxx + parray[i + 1];
 
     if (dot(in_pos - m, parray[i] - m) < -EPSILON)
       return false;
@@ -201,7 +202,7 @@ bool cicle_check()
     return false;
 
   vec2 res_vec = (new_pos.xy * new_pos.xy) / (r * r);
-  return abs(res_vec.x + res_vec.y - 1) <= line_width;
+  return abs(res_vec.x + res_vec.y - 1.0) <= line_width;
 }
 
 // FCIRCLE_CHECK(MAT4X3 MODEL_MAT; VEC2 R, FLOAT Z_HEIGHT)
@@ -231,7 +232,7 @@ bool fcircle_check()
     return false;
 
   vec2 res_vec = (new_pos.xy * new_pos.xy) / (r * r);
-  return res_vec.x + res_vec.y <= 1;
+  return res_vec.x + res_vec.y <= 1.0;
 }
 
 // FCIRCLE_CHECK(MAT4X3 MODEL_MAT; VEC3 R, FLOAT LINE_WIDTH)
@@ -258,7 +259,7 @@ bool sphere_check()
   vec3 new_pos = (inv_mat * vec4(in_pos, 1.0)).xyz;
 
   vec3 res_vec = (new_pos * new_pos) / (r * r);
-  return abs(res_vec.x + res_vec.y + res_vec.z - 1) <= line_width;
+  return abs(res_vec.x + res_vec.y + res_vec.z - 1.0) <= line_width;
 }
 
 // FCIRCLE_CHECK(MAT4X3 MODEL_MAT; VEC3 R)
@@ -284,5 +285,5 @@ bool fsphere_check()
   vec3 new_pos = (inv_mat * vec4(in_pos, 1.0)).xyz;
 
   vec3 res_vec = (new_pos * new_pos) / (r * r);
-  return res_vec.x + res_vec.y + res_vec.z <= 1;
+  return res_vec.x + res_vec.y + res_vec.z <= 1.0;
 }

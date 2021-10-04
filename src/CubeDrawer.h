@@ -14,14 +14,10 @@
 #include <Python.h>
 #include <stdint.h>
 
-// #include <unistd.h>
 #include <time.h>
 #include <string.h>
-// #include <pthread.h>
 #include <thread>
-// #include <fcntl.h>
 #include <stdio.h>
-// #include <cblas.h>
 
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
@@ -31,7 +27,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#define VIRT_CUBE
+// #define VIRT_CUBE
 // #define DYNAMIC_SHADER_INCLUDE
 
 #ifdef DYNAMIC_SHADER_INCLUDE
@@ -46,6 +42,9 @@
 #include <websocketpp/server.hpp>
 
 #else
+
+#include <fcntl.h>
+#include <unistd.h>
 
 #include <sys/shm.h>
 #include <sys/mman.h>

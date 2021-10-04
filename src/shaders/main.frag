@@ -1,4 +1,6 @@
-#version 330 core
+#version 310 es
+precision mediump float;
+
 layout (location = 0) out vec3 out_col;
 
 in float id;
