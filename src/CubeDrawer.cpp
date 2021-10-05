@@ -435,15 +435,16 @@ void CubeDrawer::init_gl()
         return;
     }
     glfwMakeContextCurrent(context);
+    gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress);
 
     std::cout << glGetString(GL_VERSION) << std::endl;
 
-    GLenum err = glewInit();
-    if (err != GLEW_OK)
-    {
-        std::cout << "Failed initializing GLEW, error code: " << err << std::endl;
-        return;
-    }
+    // GLenum err = glewInit();
+    // if (err != GLEW_OK)
+    // {
+    //     std::cout << "Failed initializing GLEW, error code: " << err << std::endl;
+    //     return;
+    // }
 
 #ifndef DYNAMIC_SHADER_INCLUDE
     std::ifstream in(".\\src\\shaders\\main.vert");
@@ -460,6 +461,7 @@ void CubeDrawer::init_gl()
     const char *vert_str = src_shaders_main_vert;
     const char *frag_str = src_shaders_main_frag;
 #endif
+    std::cout << "0" << std::endl;
     GLuint vert_shade = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vert_shade, 1, (const char **)&vert_str, NULL);
     glCompileShader(vert_shade);
@@ -533,6 +535,8 @@ void CubeDrawer::init_gl()
         glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, dc_str_size, (GLvoid *)(offsetof(DrawCall, data) + sizeof(float) * 4 * i));
     std::cout << "9" << std::endl;
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // glVertexAttribDivisor = (PFNGLVERTEXATTRIBDIVISORPROC) glfwGetProcAddress("glVertexAttribDivisor");
+    // glFramebufferTexture = (PFNGLFRAMEBUFFERTEXTUREPROC) glfwGetProcAddress("glFramebufferTexture");
     for (int i = 1; i < 7; i++)
     {
         std::cout << "    " << i << std::endl;
@@ -556,7 +560,7 @@ void CubeDrawer::init_gl()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, text, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, text, 0);
 
     GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
     glDrawBuffers(1, DrawBuffers);

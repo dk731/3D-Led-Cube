@@ -367,7 +367,7 @@ class CustomBuild(build.build):
 os.chdir(root_dir)
 src_dir = os.path.join(root_dir, "src")
 extra_macros = [
-    ("VIRT_CUBE", None),
+    # ("VIRT_CUBE", None),
     # ("DYNAMIC_SHADER_INCLUDE", None),
 ]
 led_module = Extension(
@@ -375,6 +375,7 @@ led_module = Extension(
     sources=[
         os.path.join(src_dir, "swig_module_wrap.cxx"),
         os.path.join(src_dir, "CubeDrawer.cpp"),
+        os.path.join(src_dir, "glad.c"),
     ],
     define_macros=extra_macros,
     library_dirs=include_dirs,
@@ -392,6 +393,6 @@ setup(
     description="""Led Cube driver module""",
     ext_modules=[led_module],
     py_modules=["ledcd"],
-    package_dir={"": "src"},
+    package_dir={"": src_dir},
     cmdclass={"build": CustomBuild},
 )
