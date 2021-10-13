@@ -86,7 +86,7 @@ class CustomBuild(build.build):
         self.install_wsspp()
 
         print("  * Installing GLEW ... [3/4]: ")
-        self.install_glew()
+        # self.install_glew()
 
         print("  * Installing GLFW ... [4/4]: ")
         self.install_glfw()
@@ -341,8 +341,8 @@ class CustomBuild(build.build):
             0
             if subprocess.call(
                 call_str,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
+                #stdout=subprocess.DEVNULL,
+                #stderr=subprocess.DEVNULL,
                 shell=True,
             )
             == 0
@@ -368,7 +368,7 @@ os.chdir(root_dir)
 src_dir = os.path.join(root_dir, "src")
 extra_macros = [
     # ("VIRT_CUBE", None),
-    # ("DYNAMIC_SHADER_INCLUDE", None),
+    ("DYNAMIC_SHADER_INCLUDE", None),
 ]
 led_module = Extension(
     "_ledcd",
