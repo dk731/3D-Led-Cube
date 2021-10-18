@@ -83,7 +83,7 @@ class CustomBuild(build.build):
         self.install_glm()
 
         print("  * Installing WebSocket++ ... [2/4]: ")
-        self.install_wsspp()
+        #self.install_wsspp()
 
         print("  * Installing GLEW ... [3/4]: ")
         # self.install_glew()
@@ -368,7 +368,9 @@ os.chdir(root_dir)
 src_dir = os.path.join(root_dir, "src")
 extra_macros = [
     # ("VIRT_CUBE", None),
-    ("DYNAMIC_SHADER_INCLUDE", None),
+   ("DYNAMIC_SHADER_INCLUDE", None),
+    # ("DEBUG_VIEW", None),
+    # ("SKIP_SHOW", None)
 ]
 led_module = Extension(
     "_ledcd",

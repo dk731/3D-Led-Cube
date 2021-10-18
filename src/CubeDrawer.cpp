@@ -305,6 +305,7 @@ void CubeDrawer::show()
         SLEEP_MICROS(delta);
     }
 
+#ifndef SKIP_SHOW
 #ifdef VIRT_CUBE
     if (wait_cube)
         while (!virt_hdls.size())
@@ -327,7 +328,7 @@ void CubeDrawer::show()
     shm_buf->flags.frame_shown = 0;
     shm_buf->flags.lock = 0;
 #endif
-
+#endif
     delta_time = (GET_MICROS() - prev_show_time) / 1000000.0f;
     prev_show_time = GET_MICROS();
 }
@@ -447,12 +448,12 @@ void CubeDrawer::init_gl()
     // }
 
 #ifndef DYNAMIC_SHADER_INCLUDE
-    std::ifstream in(".\\src\\shaders\\main.vert");
+    std::ifstream in("/home/pi/tmp/3D-Led-Cube/src/shaders/main.vert");
     std::string tmp_vert = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     const char *vert_str = tmp_vert.c_str();
     in.close();
 
-    in = std::ifstream(".\\src\\shaders\\main.frag");
+    in = std::ifstream("/home/pi/tmp/3D-Led-Cube/src/shaders/main.frag");
     std::string tmp_frag = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     const char *frag_str = tmp_frag.c_str();
     in.close();
