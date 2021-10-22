@@ -180,29 +180,18 @@ bool line_check()
 ///////////////////
 bool cicle_check()
 {
-  mat4 inv_mat = inverse(
-    mat4(
-      vec4(call_data[0].xyz, 0.0), 
-      vec4(call_data[1].xyz, 0.0), 
-      vec4(call_data[2].xyz, 0.0), 
-      vec4(call_data[3].xyz, 1.0)
-    )
+  mat4 inv_mat = mat4(
+    vec4(call_data[0].xyz, 0.0), 
+    vec4(call_data[1].xyz, 0.0), 
+    vec4(call_data[2].xyz, 0.0), 
+    vec4(call_data[3].xyz, 1.0)
   );
-  // color = call_data[3].xyz;
+
+  vec3 res_vec = (inv_mat * vec4(in_pos, 1.0)).xyz;
+  float res_len = length(res_vec.xy);
+  float width = call_data[2].w / length(vec2(call_data[0].w, call_data[1].w) * normalize(res_vec.xy));
   
-  // return true;
-
-  vec2 r = vec2(call_data[0].w, call_data[1].w);
-  float line_width = call_data[2].w;
-  float z_height = call_data[3].w;
-
-  vec3 new_pos = (inv_mat * vec4(in_pos, 1.0)).xyz;
-
-  if (abs(new_pos.z) > z_height)
-    return false;
-
-  vec2 res_vec = (new_pos.xy * new_pos.xy) / (r * r);
-  return abs(res_vec.x + res_vec.y - 1.0) <= line_width;
+  return abs(res_vec.z) <= call_data[3].w && 1.0 - width <= res_len && res_len <= 1.0 + width;
 }
 
 // FCIRCLE_CHECK(MAT4X3 MODEL_MAT; VEC2 R, FLOAT Z_HEIGHT)
@@ -221,16 +210,9 @@ bool fcircle_check()
     vec4(call_data[3].xyz, 1.0)
   );
 
-  vec2 r = vec2(call_data[0].w, call_data[1].w);
-  float z_height = call_data[3].w;
-
-  vec3 new_pos = (inv_mat * vec4(in_pos, 1.0)).xyz;
-
-  if (abs(new_pos.z) > z_height)
-    return false;
-
-  vec2 res_vec = (new_pos.xy * new_pos.xy) / (r * r);
-  return res_vec.x + res_vec.y <= 1.0;
+  vec3 res_vec = (inv_mat * vec4(in_pos, 1.0)).xyz;
+  
+  return abs(res_vec.z) <= call_data[3].w && length(res_vec.xy) <= 1.0;
 }
 
 // FCIRCLE_CHECK(MAT4X3 MODEL_MAT; VEC3 R, FLOAT LINE_WIDTH)
@@ -248,9 +230,10 @@ bool sphere_check()
     vec4(call_data[2].xyz, 0.0), 
     vec4(call_data[3].xyz, 1.0)
   );
-  float res_len = length((inv_mat * vec4(in_pos, 1.0)).xyz);
-  float width = call_data[3].w / length(vec3(call_data[0].w, call_data[1].w, call_data[2].w));
-  
+  vec3 res_vec = (inv_mat * vec4(in_pos, 1.0)).xyz;
+  float res_len = length(res_vec);
+  float width = call_data[3].w / length(vec3(call_data[0].w, call_data[1].w, call_data[2].w) * normalize(res_vec));
+
   return 1.0 - width <= res_len && res_len <= 1.0 + width;
 }
 

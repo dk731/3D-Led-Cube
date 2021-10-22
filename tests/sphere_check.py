@@ -15,7 +15,7 @@ while True:
     drawer.translate(7.5, 7.5, 7.5)
     drawer.rotate(sin(t), sin(t / 2), 0)
 
-    drawer.filled_sphere(0, 0, 0, 10, 7, 7)
+    drawer.sphere(0, 0, 0, 10, 7, 7, 2)
     t += drawer.delta_time / 10
 
     drawer.show()

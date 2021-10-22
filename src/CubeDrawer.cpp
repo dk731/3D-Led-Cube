@@ -447,21 +447,13 @@ void CubeDrawer::init_gl()
     // }
 
 #ifndef DYNAMIC_SHADER_INCLUDE
-<<<<<<< HEAD
     std::cout << "IMINSHADER" << std::endl;
     std::ifstream in("C:\\Users\\user\\Desktop\\3D-Led-Cube\\src\\shaders\\main.vert");
-=======
-    std::ifstream in("/home/pi/tmp/3D-Led-Cube/src/shaders/main.vert");
->>>>>>> 3f475bc0cf110d7433668ea6ad5b11469a73e80d
     std::string tmp_vert = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     const char *vert_str = tmp_vert.c_str();
     in.close();
 
-<<<<<<< HEAD
     in = std::ifstream("C:\\Users\\user\\Desktop\\3D-Led-Cube\\src\\shaders\\main.frag");
-=======
-    in = std::ifstream("/home/pi/tmp/3D-Led-Cube/src/shaders/main.frag");
->>>>>>> 3f475bc0cf110d7433668ea6ad5b11469a73e80d
     std::string tmp_frag = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     const char *frag_str = tmp_frag.c_str();
     in.close();
@@ -517,10 +509,7 @@ void CubeDrawer::init_gl()
     //// Init vertices data
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 12288, gl_vertices, GL_STATIC_DRAW);
-<<<<<<< HEAD
 
-=======
->>>>>>> 3f475bc0cf110d7433668ea6ad5b11469a73e80d
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void *)0);
     ////
@@ -534,15 +523,10 @@ void CubeDrawer::init_gl()
 
     glVertexAttribIPointer(1, 1, GL_INT, dc_str_size, (GLvoid *)offsetof(DrawCall, type));
     glVertexAttribPointer(2, 3, GL_UNSIGNED_BYTE, GL_FALSE, dc_str_size, (GLvoid *)offsetof(DrawCall, color));
-<<<<<<< HEAD
 
     for (int i = 0; i < 4; i++)
         glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, dc_str_size, (GLvoid *)(offsetof(DrawCall, data) + sizeof(float) * 4 * i));
 
-=======
-    for (int i = 0; i < 4; i++)
-        glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, dc_str_size, (GLvoid *)(offsetof(DrawCall, data) + sizeof(float) * 4 * i));
->>>>>>> 3f475bc0cf110d7433668ea6ad5b11469a73e80d
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     for (int i = 1; i < 7; i++)
@@ -577,15 +561,10 @@ void CubeDrawer::init_gl()
 #endif
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-<<<<<<< HEAD
 
     std::thread tmp_t(&CubeDrawer::pool_events, this);
     tmp_t.detach();
 
-=======
-    std::thread tmp_t(&CubeDrawer::pool_events, this);
-    tmp_t.detach();
->>>>>>> 3f475bc0cf110d7433668ea6ad5b11469a73e80d
     // glViewport(0, 0, 16, 256);
 
     // DrawCall *new_point_call = new DrawCall({
@@ -621,17 +600,17 @@ void CubeDrawer::render_texture()
     {
         // Update draw calls data
         glBindBuffer(GL_ARRAY_BUFFER, dc_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(DrawCall) * draw_calls_arr.size(), &draw_calls_arr[0], GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, dc_vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(DrawCall) * draw_calls_arr.size(), &draw_calls_arr[0], GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, dc_vbo);
         // Clear deph buffer
         glClear(GL_DEPTH_BUFFER_BIT);
         glUseProgram(main_prog);
-	glBindVertexArray(vao);
-	glBindFramebuffer(GL_FRAMEBUFFER, pix_buf);
+        glBindVertexArray(vao);
+        glBindFramebuffer(GL_FRAMEBUFFER, pix_buf);
         // glViewport(0, 0, 16, 768);
         // Setup uniforms
         GLuint tmp_val = glGetUniformLocation(main_prog, "prim_calls_sum");
-	glUniform1i(tmp_val, draw_calls_arr.size());
+        glUniform1i(tmp_val, draw_calls_arr.size());
         // Render
         glDrawArraysInstanced(GL_POINTS, 0, 4096, draw_calls_arr.size());
 #ifndef DEBUG_VIEW
@@ -735,12 +714,12 @@ void CubeDrawer::acircle(glm::highp_mat4 &model_mat, float *r, bool filled, floa
 
     DrawCall *cur_call = &(draw_calls_arr[draw_calls_arr.size() - 1]);
 
-    memcpy(cur_call->data, model_mat, MAT4_SIZE);
+    memcpy(cur_call->data, glm::value_ptr(model_mat), MAT4_SIZE);
 
     cur_call->data[3] = r[0];
     cur_call->data[7] = r[1];
     cur_call->data[11] = line_width / 2.0f;
-    cur_call->data[15] = z_height;
+    cur_call->data[15] = z_height / 2.0f;
 
     if (draw_immediate)
         show();
@@ -790,20 +769,6 @@ void CubeDrawer::point(PyObject *p)
         return;
 
     point(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2]);
-}
-void CubeDrawer::filled_sphere(float x, float y, float z, float r)
-{
-    float p[4] = {x, y, z, 1.0f};
-    apply_transforms(p);
-    apoint(p, r);
-}
-
-void CubeDrawer::filled_sphere(PyObject *p, float r)
-{
-    if (parse_num_input(p, 3) < 0)
-        return;
-
-    filled_sphere(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2], r);
 }
 
 // CALL_POLYGON_TYPE
@@ -904,46 +869,25 @@ void CubeDrawer::line(PyObject *p1, PyObject *p2, float line_width)
 
     aline(pp1, pp2, line_width);
 }
-void CubeDrawer::cylinder(float x, float y, float z, float r, float height)
-{
-    float pdir[4] = {0.0f, height / 2.0f, 0.0f, 0.0f};
-    float tmp_pos[4] = {x, y, z, 1.0f};
-    apply_transforms(pdir);
-    apply_transforms(tmp_pos);
-
-    float pp1[4] = {tmp_pos[0] + pdir[0], tmp_pos[1] + pdir[1], tmp_pos[2] + pdir[2]}, pp2[4] = {tmp_pos[0] - pdir[0], tmp_pos[1] - pdir[1], tmp_pos[2] - pdir[2]};
-    aline(pp1, pp2, r);
-}
-void CubeDrawer::cylinder(PyObject *p1, float r, float height)
-{
-    if (parse_num_input(p1, 3) < 0)
-        return;
-
-    cylinder(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2], r, height);
-}
-void CubeDrawer::filled_circle(float x, float y, float z, float r)
-{
-    cylinder(x, y, z, r, 0.5f);
-}
-void CubeDrawer::filled_circle(PyObject *p, float r)
-{
-    if (parse_num_input(p, 3) < 0)
-        return;
-    cylinder(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2], r, 0.5f);
-}
-
 // CALL_CIRCLE_TYPE
 void CubeDrawer::circle(float x, float y, float z, float rx, float ry, float line_width, float thickness)
 {
-    float mat[16];
-    // get_mat_offset(mat, x, y, z);
-    float rr[2] = {rx, ry};
+    glm::mat4 local_mat;
 
-    acircle(mat, rr, false, thickness, line_width);
+    update_matrix();
+    memcpy(glm::value_ptr(local_mat), glm::value_ptr(transform_list.back()->final), MAT4_SIZE);
+
+    local_mat = glm::translate(local_mat, glm::vec3(x, y, z));
+    local_mat = glm::scale(local_mat, glm::vec3(rx, ry, 1));
+
+    float rr[2] = {rx, ry};
+    local_mat = glm::inverse(local_mat);
+
+    acircle(local_mat, rr, false, thickness, line_width);
 }
 void CubeDrawer::circle(float x, float y, float z, float r)
 {
-    circle(x, y, z, r, r, 0.2f);
+    circle(x, y, z, r, r, 1.0f);
 }
 
 void CubeDrawer::circle(PyObject *p, float r, float line_width, float thickness)
@@ -966,11 +910,17 @@ void CubeDrawer::circle(PyObject *p, PyObject *r, float line_width, float thickn
 // CALL_FCIRCLE_TYPE
 void CubeDrawer::filled_circle(float x, float y, float z, float rx, float ry, float thickness)
 {
-    float mat[16];
-    // get_mat_offset(mat, x, y, z);
+    glm::mat4 local_mat;
+
+    update_matrix();
+    memcpy(glm::value_ptr(local_mat), glm::value_ptr(transform_list.back()->final), MAT4_SIZE);
+
+    local_mat = glm::translate(local_mat, glm::vec3(x, y, z));
+    local_mat = glm::scale(local_mat, glm::vec3(rx, ry, 1));
 
     float rr[2] = {rx, ry};
-    acircle(mat, rr, true, thickness, 0.0f);
+    local_mat = glm::inverse(local_mat);
+    acircle(local_mat, rr, true, thickness, 0.0f);
 }
 
 void CubeDrawer::filled_circle(PyObject *p, PyObject *r, float thickness)
@@ -983,20 +933,15 @@ void CubeDrawer::filled_circle(PyObject *p, PyObject *r, float thickness)
         return;
     filled_circle(pp[0], pp[1], pp[2], cur_parsed_args[0], cur_parsed_args[1], thickness);
 }
-
-void CubeDrawer::cylinder(float x, float y, float z, float rx, float ry, float height)
+void CubeDrawer::filled_circle(float x, float y, float z, float r)
 {
-    filled_circle(x, y, z, rx, ry, height);
+    filled_circle(x, y, z, r, r);
 }
-void CubeDrawer::cylinder(PyObject *p, PyObject *r, float height)
+void CubeDrawer::filled_circle(PyObject *p, float r)
 {
-    float pp[3];
     if (parse_num_input(p, 3) < 0)
         return;
-    memcpy(pp, &cur_parsed_args[0], sizeof(float) * 3);
-    if (parse_num_input(r, 2) < 0)
-        return;
-    filled_circle(pp[0], pp[1], pp[2], cur_parsed_args[0], cur_parsed_args[1], height);
+    filled_circle(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2], r, r);
 }
 
 // CALL_SPHERE_TYPE
@@ -1045,6 +990,19 @@ void CubeDrawer::filled_sphere(float x, float y, float z, float rx, float ry, fl
     float rr[3] = {rx, ry, rz};
     local_mat = glm::inverse(local_mat);
     asphere(local_mat, rr, true, 0.0f);
+}
+
+void CubeDrawer::filled_sphere(float x, float y, float z, float r)
+{
+    filled_sphere(x, y, z, r, r, r);
+}
+
+void CubeDrawer::filled_sphere(PyObject *p, float r)
+{
+    if (parse_num_input(p, 3) < 0)
+        return;
+
+    filled_sphere(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2], r, r, r);
 }
 
 void CubeDrawer::filled_sphere(PyObject *p, PyObject *r)

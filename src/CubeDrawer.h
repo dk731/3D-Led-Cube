@@ -226,7 +226,7 @@ private:
     void apoly(float *p1, float *p2, float *p3, float z_height);
     void apoly_pyr(float *p1, float *p2, float *p3, float *p4);
     void aline(float *p1, float *p2, float line_width);
-    void acircle(float *model_mat, float *r, bool filled, float z_height, float line_width);
+    void acircle(glm::highp_mat4 &model_mat, float *r, bool filled, float z_height, float line_width);
     void asphere(glm::highp_mat4 &model_mat, float *r, bool filled, float line_width);
 
     void get_mat_offset(float *mat, float x, float y, float z);
@@ -292,8 +292,6 @@ public:
     // CALL_POINT_TYPE !
     void point(float x, float y, float z);
     void point(PyObject *p); // tuple with 3 values
-    void filled_sphere(float x, float y, float z, float r);
-    void filled_sphere(PyObject *p, float r);
 
     // CALL_POLYGON_TYPE
     // Not working with transformations
@@ -308,8 +306,6 @@ public:
     // CALL_LINE_TYPE !
     void line(float x1, float y1, float z1, float x2, float y2, float z2, float line_width = DEF_LINEW);
     void line(PyObject *p1, PyObject *p2, float line_width = DEF_LINEW);
-    void cylinder(float x, float y, float z, float r, float height);
-    void cylinder(PyObject *p1, float r, float height);
     void filled_circle(float x, float y, float z, float r);
     void filled_circle(PyObject *p, float r);
 
@@ -322,18 +318,16 @@ public:
     // CALL_FCIRCLE_TYPE !
     void filled_circle(float x, float y, float z, float rx, float ry, float thickness = DEF_ZHEIGHT);
     void filled_circle(PyObject *p, PyObject *r, float thickness = DEF_ZHEIGHT);
-    void cylinder(float x, float y, float z, float rx, float ry, float height);
-    void cylinder(PyObject *p, PyObject *r, float height);
 
     // CALL_SPHERE_TYPE
-    //not working
     void sphere(float x, float y, float z, float rx, float ry, float rz, float line_width = DEF_LINEW);
     void sphere(float x, float y, float z, float r, float line_width = DEF_LINEW);
     void sphere(PyObject *p, PyObject *r, float line_width = DEF_LINEW);
 
     // CALL_FSPHERE_TYPE
-    //not working
     void filled_sphere(float x, float y, float z, float rx, float ry, float rz);
     void filled_sphere(PyObject *p, PyObject *r);
+    void filled_sphere(float x, float y, float z, float r);
+    void filled_sphere(PyObject *p, float r);
     //// \User friendly API Calls overloads
 };

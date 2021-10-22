@@ -51,10 +51,7 @@ class CustomBuild(build.build):
         led_module.include_dirs = self.include_dirs
         if self.system == "Windows":
             # lib_files = glob.glob(os.path.join(self.lib_dir, "*.*"))
-            lib_files = [
-                os.path.join(self.lib_dir, file)
-                for file in ["glew32.lib", "glfw3dll.lib"]
-            ]
+            lib_files = [os.path.join(self.lib_dir, file) for file in ["glfw3dll.lib"]]
             lib_files.append("opengl32.lib")
 
             led_module.extra_link_args = [f"/DEFAULTLIB:{lib}" for lib in lib_files]
@@ -83,7 +80,7 @@ class CustomBuild(build.build):
         self.install_glm()
 
         print("  * Installing WebSocket++ ... [2/4]: ")
-        #self.install_wsspp()
+        self.install_wsspp()
 
         print("  * Installing GLEW ... [3/4]: ")
         # self.install_glew()
@@ -341,8 +338,8 @@ class CustomBuild(build.build):
             0
             if subprocess.call(
                 call_str,
-                #stdout=subprocess.DEVNULL,
-                #stderr=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
                 shell=True,
             )
             == 0
@@ -367,15 +364,8 @@ class CustomBuild(build.build):
 os.chdir(root_dir)
 src_dir = os.path.join(root_dir, "src")
 extra_macros = [
-<<<<<<< HEAD
     ("VIRT_CUBE", None),
     # ("DYNAMIC_SHADER_INCLUDE", None),
-=======
-    # ("VIRT_CUBE", None),
-   ("DYNAMIC_SHADER_INCLUDE", None),
-    # ("DEBUG_VIEW", None),
-    # ("SKIP_SHOW", None)
->>>>>>> 3f475bc0cf110d7433668ea6ad5b11469a73e80d
 ]
 led_module = Extension(
     "_ledcd",
