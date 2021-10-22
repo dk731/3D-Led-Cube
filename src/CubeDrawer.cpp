@@ -304,6 +304,7 @@ void CubeDrawer::show()
         SLEEP_MICROS(delta);
     }
 
+#ifndef SKIP_SHOW
 #ifdef VIRT_CUBE
     if (wait_cube)
         while (!virt_hdls.size())
@@ -326,7 +327,7 @@ void CubeDrawer::show()
     shm_buf->flags.frame_shown = 0;
     shm_buf->flags.lock = 0;
 #endif
-
+#endif
     delta_time = (GET_MICROS() - prev_show_time) / 1000000.0f;
     prev_show_time = GET_MICROS();
 }
@@ -446,13 +447,21 @@ void CubeDrawer::init_gl()
     // }
 
 #ifndef DYNAMIC_SHADER_INCLUDE
+<<<<<<< HEAD
     std::cout << "IMINSHADER" << std::endl;
     std::ifstream in("C:\\Users\\user\\Desktop\\3D-Led-Cube\\src\\shaders\\main.vert");
+=======
+    std::ifstream in("/home/pi/tmp/3D-Led-Cube/src/shaders/main.vert");
+>>>>>>> 3f475bc0cf110d7433668ea6ad5b11469a73e80d
     std::string tmp_vert = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     const char *vert_str = tmp_vert.c_str();
     in.close();
 
+<<<<<<< HEAD
     in = std::ifstream("C:\\Users\\user\\Desktop\\3D-Led-Cube\\src\\shaders\\main.frag");
+=======
+    in = std::ifstream("/home/pi/tmp/3D-Led-Cube/src/shaders/main.frag");
+>>>>>>> 3f475bc0cf110d7433668ea6ad5b11469a73e80d
     std::string tmp_frag = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     const char *frag_str = tmp_frag.c_str();
     in.close();
@@ -460,18 +469,15 @@ void CubeDrawer::init_gl()
     const char *vert_str = src_shaders_main_vert;
     const char *frag_str = src_shaders_main_frag;
 #endif
-    std::cout << "0" << std::endl;
     GLuint vert_shade = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vert_shade, 1, (const char **)&vert_str, NULL);
     glCompileShader(vert_shade);
     check_compile(vert_shade);
-    std::cout << "1" << std::endl;
 
     GLuint frag_shade = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(frag_shade, 1, (const char **)&frag_str, NULL);
     glCompileShader(frag_shade);
     check_compile(frag_shade);
-    std::cout << "2" << std::endl;
     main_prog = glCreateProgram();
 
     glAttachShader(main_prog, vert_shade);
@@ -480,7 +486,6 @@ void CubeDrawer::init_gl()
     int success;
     char infoLog[512];
     glLinkProgram(main_prog);
-    std::cout << "3" << std::endl;
     glGetProgramiv(main_prog, GL_LINK_STATUS, &success);
     if (!success)
     {
@@ -489,7 +494,6 @@ void CubeDrawer::init_gl()
                   << infoLog << std::endl;
     }
     glUseProgram(main_prog);
-    std::cout << "4" << std::endl;
 
     glDeleteShader(vert_shade);
     glDeleteShader(frag_shade);
@@ -513,7 +517,10 @@ void CubeDrawer::init_gl()
     //// Init vertices data
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 12288, gl_vertices, GL_STATIC_DRAW);
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3f475bc0cf110d7433668ea6ad5b11469a73e80d
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void *)0);
     ////
@@ -527,10 +534,15 @@ void CubeDrawer::init_gl()
 
     glVertexAttribIPointer(1, 1, GL_INT, dc_str_size, (GLvoid *)offsetof(DrawCall, type));
     glVertexAttribPointer(2, 3, GL_UNSIGNED_BYTE, GL_FALSE, dc_str_size, (GLvoid *)offsetof(DrawCall, color));
+<<<<<<< HEAD
 
     for (int i = 0; i < 4; i++)
         glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, dc_str_size, (GLvoid *)(offsetof(DrawCall, data) + sizeof(float) * 4 * i));
 
+=======
+    for (int i = 0; i < 4; i++)
+        glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, dc_str_size, (GLvoid *)(offsetof(DrawCall, data) + sizeof(float) * 4 * i));
+>>>>>>> 3f475bc0cf110d7433668ea6ad5b11469a73e80d
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     for (int i = 1; i < 7; i++)
@@ -565,10 +577,15 @@ void CubeDrawer::init_gl()
 #endif
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+<<<<<<< HEAD
 
     std::thread tmp_t(&CubeDrawer::pool_events, this);
     tmp_t.detach();
 
+=======
+    std::thread tmp_t(&CubeDrawer::pool_events, this);
+    tmp_t.detach();
+>>>>>>> 3f475bc0cf110d7433668ea6ad5b11469a73e80d
     // glViewport(0, 0, 16, 256);
 
     // DrawCall *new_point_call = new DrawCall({
@@ -604,31 +621,25 @@ void CubeDrawer::render_texture()
     {
         // Update draw calls data
         glBindBuffer(GL_ARRAY_BUFFER, dc_vbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(DrawCall) * draw_calls_arr.size(), &draw_calls_arr[0], GL_DYNAMIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, dc_vbo);
-
+	glBufferData(GL_ARRAY_BUFFER, sizeof(DrawCall) * draw_calls_arr.size(), &draw_calls_arr[0], GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, dc_vbo);
         // Clear deph buffer
         glClear(GL_DEPTH_BUFFER_BIT);
-
         glUseProgram(main_prog);
-        glBindVertexArray(vao);
-        glBindFramebuffer(GL_FRAMEBUFFER, pix_buf);
+	glBindVertexArray(vao);
+	glBindFramebuffer(GL_FRAMEBUFFER, pix_buf);
         // glViewport(0, 0, 16, 768);
-
         // Setup uniforms
         GLuint tmp_val = glGetUniformLocation(main_prog, "prim_calls_sum");
-        glUniform1i(tmp_val, draw_calls_arr.size());
-
+	glUniform1i(tmp_val, draw_calls_arr.size());
         // Render
         glDrawArraysInstanced(GL_POINTS, 0, 4096, draw_calls_arr.size());
-
 #ifndef DEBUG_VIEW
         glBindFramebuffer(GL_FRAMEBUFFER, pix_buf);
         glReadPixels(0, 0, 16, 256, GL_RGB, GL_UNSIGNED_BYTE, back_buf);
 #else
         glfwSwapBuffers(context);
 #endif
-
         clear_draw_call_buf();
     }
 }

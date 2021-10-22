@@ -43,7 +43,7 @@ bool fsphere_check();
 
 void main()
 {
-  id = float(gl_InstanceID) / float(prim_calls_sum);  
+  id = 0.999 - float(gl_InstanceID) / float(prim_calls_sum);  
   color = cur_color / 255.0;
   // color = vec3(1.0, 0.0, 0.0);
   
