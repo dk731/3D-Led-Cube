@@ -19,6 +19,7 @@
 #include <thread>
 #include <stdio.h>
 
+#include <glm/gtx/io.hpp>
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -82,6 +83,8 @@
 #define EPSILON 0.00001f
 #define DEF_LINEW 0.5f - EPSILON
 #define DEF_ZHEIGHT 0.5f - EPSILON
+
+const int MAT4_SIZE = sizeof(float) * 16;
 
 struct Brush
 {
@@ -224,7 +227,7 @@ private:
     void apoly_pyr(float *p1, float *p2, float *p3, float *p4);
     void aline(float *p1, float *p2, float line_width);
     void acircle(float *model_mat, float *r, bool filled, float z_height, float line_width);
-    void asphere(float *model_mat, float *r, bool filled, float line_width);
+    void asphere(glm::highp_mat4 &model_mat, float *r, bool filled, float line_width);
 
     void get_mat_offset(float *mat, float x, float y, float z);
     // \OpenGL Renderer API Binds
@@ -251,6 +254,7 @@ public:
 
     void push_matrix();
     void pop_matrix();
+    void update_matrix();
 
     void translate(float x, float y, float z);
     void translate(PyObject *input);

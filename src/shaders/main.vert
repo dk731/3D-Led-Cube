@@ -214,13 +214,11 @@ bool cicle_check()
 ///////////////////
 bool fcircle_check()
 {
-  mat4 inv_mat = inverse(
-    mat4(
-      vec4(call_data[0].xyz, 0.0), 
-      vec4(call_data[1].xyz, 0.0), 
-      vec4(call_data[2].xyz, 0.0), 
-      vec4(call_data[3].xyz, 1.0)
-    )
+  mat4 inv_mat = mat4(
+    vec4(call_data[0].xyz, 0.0), 
+    vec4(call_data[1].xyz, 0.0), 
+    vec4(call_data[2].xyz, 0.0), 
+    vec4(call_data[3].xyz, 1.0)
   );
 
   vec2 r = vec2(call_data[0].w, call_data[1].w);
@@ -244,22 +242,16 @@ bool fcircle_check()
 ///////////////////
 bool sphere_check()
 {
-  mat4 inv_mat = inverse(
-    mat4(
-      vec4(call_data[0].xyz, 0.0), 
-      vec4(call_data[1].xyz, 0.0), 
-      vec4(call_data[2].xyz, 0.0), 
-      vec4(call_data[3].xyz, 1.0)
-    )
+  mat4 inv_mat = mat4(
+    vec4(call_data[0].xyz, 0.0), 
+    vec4(call_data[1].xyz, 0.0),
+    vec4(call_data[2].xyz, 0.0), 
+    vec4(call_data[3].xyz, 1.0)
   );
-
-  vec3 r = vec3(call_data[0].w, call_data[1].w, call_data[2].w);
-  float line_width = call_data[3].w;
-
-  vec3 new_pos = (inv_mat * vec4(in_pos, 1.0)).xyz;
-
-  vec3 res_vec = (new_pos * new_pos) / (r * r);
-  return abs(res_vec.x + res_vec.y + res_vec.z - 1.0) <= line_width;
+  float res_len = length((inv_mat * vec4(in_pos, 1.0)).xyz);
+  float width = call_data[3].w / length(vec3(call_data[0].w, call_data[1].w, call_data[2].w));
+  
+  return 1.0 - width <= res_len && res_len <= 1.0 + width;
 }
 
 // FCIRCLE_CHECK(MAT4X3 MODEL_MAT; VEC3 R)
@@ -271,19 +263,12 @@ bool sphere_check()
 ///////////////////
 bool fsphere_check()
 {
-  mat4 inv_mat = inverse(
-    mat4(
-      vec4(call_data[0].xyz, 0.0), 
-      vec4(call_data[1].xyz, 0.0), 
-      vec4(call_data[2].xyz, 0.0), 
-      vec4(call_data[3].xyz, 1.0)
-    )
+  mat4 inv_mat = mat4(
+    vec4(call_data[0].xyz, 0.0), 
+    vec4(call_data[1].xyz, 0.0),
+    vec4(call_data[2].xyz, 0.0), 
+    vec4(call_data[3].xyz, 1.0)
   );
 
-  vec3 r = vec3(call_data[0].w, call_data[1].w, call_data[2].w);
-
-  vec3 new_pos = (inv_mat * vec4(in_pos, 1.0)).xyz;
-
-  vec3 res_vec = (new_pos * new_pos) / (r * r);
-  return res_vec.x + res_vec.y + res_vec.z <= 1.0;
+  return length((inv_mat * vec4(in_pos, 1.0)).xyz) <= 1.0;
 }
