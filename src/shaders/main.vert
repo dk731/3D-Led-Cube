@@ -89,7 +89,7 @@ bool check_bind()
 ///////////////////
 bool point_check()
 {
-  return length(in_pos - call_data[0].xyz) <= call_data[1].x;
+  return length(in_pos - call_data[0].xyz) <= call_data[0].w;
 }
 
 // POLY_CHECK(VEC3 POS1, VEC3 POS2, VEC3 POS3, FLOAT Z_HEIGHT)

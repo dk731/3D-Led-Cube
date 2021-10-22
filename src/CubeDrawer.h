@@ -199,7 +199,7 @@ private:
     int parse_num_input(PyObject *input, int req_len = 0);
     ParseFuncs parse_funcs[2];
     PyObject *py_exception = PyErr_NewException("ledcd.CubeDrawer", NULL, NULL);
-    void apply_transforms(float *cur_vec);
+    void apply_transforms(glm::vec4 &cur_vec);
 
     //opengl
     GLuint vbo, vao, dc_vbo; // main vbo/vao and draw calls data vbo
@@ -226,8 +226,8 @@ private:
     void apoly(float *p1, float *p2, float *p3, float z_height);
     void apoly_pyr(float *p1, float *p2, float *p3, float *p4);
     void aline(float *p1, float *p2, float line_width);
-    void acircle(glm::highp_mat4 &model_mat, float *r, bool filled, float z_height, float line_width);
-    void asphere(glm::highp_mat4 &model_mat, float *r, bool filled, float line_width);
+    void acircle(float *model_mat, float *r, bool filled, float z_height, float line_width);
+    void asphere(float *model_mat, float *r, bool filled, float line_width);
 
     void get_mat_offset(float *mat, float x, float y, float z);
     // \OpenGL Renderer API Binds
