@@ -229,9 +229,9 @@ void CubeDrawer::rotate(PyObject *input)
 
 void CubeDrawer::scale(float x, float y, float z)
 {
-    transform_list.back()->scale[0].x += x;
-    transform_list.back()->scale[1].y += y;
-    transform_list.back()->scale[2].z += z;
+    transform_list.back()->scale[0].x *= x;
+    transform_list.back()->scale[1].y *= y;
+    transform_list.back()->scale[2].z *= z;
 
     transform_list.back()->local_recalc = true;
 }
