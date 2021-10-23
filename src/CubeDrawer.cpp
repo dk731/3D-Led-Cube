@@ -447,13 +447,13 @@ void CubeDrawer::init_gl()
     // }
 
 #ifndef DYNAMIC_SHADER_INCLUDE
-    std::cout << "IMINSHADER" << std::endl;
-    std::ifstream in("C:\\Users\\user\\Desktop\\3D-Led-Cube\\src\\shaders\\main.vert");
+    std::ifstream in("/home/pi/tmp/3D-Led-Cube/src/shaders/main.vert");
+
     std::string tmp_vert = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     const char *vert_str = tmp_vert.c_str();
     in.close();
 
-    in = std::ifstream("C:\\Users\\user\\Desktop\\3D-Led-Cube\\src\\shaders\\main.frag");
+    in = std::ifstream("/home/pi/tmp/3D-Led-Cube/src/shaders/main.frag");
     std::string tmp_frag = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     const char *frag_str = tmp_frag.c_str();
     in.close();
@@ -523,7 +523,7 @@ void CubeDrawer::init_gl()
 
     glVertexAttribIPointer(1, 1, GL_INT, dc_str_size, (GLvoid *)offsetof(DrawCall, type));
     glVertexAttribPointer(2, 3, GL_UNSIGNED_BYTE, GL_FALSE, dc_str_size, (GLvoid *)offsetof(DrawCall, color));
-
+  
     for (int i = 0; i < 4; i++)
         glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, dc_str_size, (GLvoid *)(offsetof(DrawCall, data) + sizeof(float) * 4 * i));
 
@@ -561,7 +561,6 @@ void CubeDrawer::init_gl()
 #endif
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-
     std::thread tmp_t(&CubeDrawer::pool_events, this);
     tmp_t.detach();
 
@@ -602,15 +601,17 @@ void CubeDrawer::render_texture()
         glBindBuffer(GL_ARRAY_BUFFER, dc_vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(DrawCall) * draw_calls_arr.size(), &draw_calls_arr[0], GL_DYNAMIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, dc_vbo);
+
         // Clear deph buffer
         glClear(GL_DEPTH_BUFFER_BIT);
         glUseProgram(main_prog);
-        glBindVertexArray(vao);
-        glBindFramebuffer(GL_FRAMEBUFFER, pix_buf);
+	      glBindVertexArray(vao);
+	      glBindFramebuffer(GL_FRAMEBUFFER, pix_buf);
         // glViewport(0, 0, 16, 768);
         // Setup uniforms
         GLuint tmp_val = glGetUniformLocation(main_prog, "prim_calls_sum");
         glUniform1i(tmp_val, draw_calls_arr.size());
+
         // Render
         glDrawArraysInstanced(GL_POINTS, 0, 4096, draw_calls_arr.size());
 #ifndef DEBUG_VIEW
