@@ -62,7 +62,10 @@
         "mutex": "cpp",
         "forward_list": "cpp",
         "xmemory": "cpp",
-        "xlocale": "cpp"
+        "xlocale": "cpp",
+        "charconv": "cpp",
+        "xstring": "cpp",
+        "xutility": "cpp"
     },
     "python.pythonPath": "/usr/local/bin/python3.9"
 }

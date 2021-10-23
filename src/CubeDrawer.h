@@ -19,6 +19,7 @@
 #include <thread>
 #include <stdio.h>
 
+#include <glm/gtx/io.hpp>
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -83,6 +84,8 @@
 #define DEF_LINEW 0.5f - EPSILON
 #define DEF_ZHEIGHT 0.5f - EPSILON
 
+const int MAT4_SIZE = sizeof(float) * 16;
+
 struct Brush
 {
     unsigned char g;
@@ -128,7 +131,7 @@ enum DrawCallTypes
 {
     CALL_POINT_TYPE = 0,
     CALL_POLYGON_TYPE = 1,
-    CALL_POLYPYR_TYPE = 2,
+    CALL_TETR_TYPE = 2,
     CALL_LINE_TYPE = 3,
     CALL_CIRCLE_TYPE = 4,
     CALL_FCIRCLE_TYPE = 5,
@@ -196,7 +199,7 @@ private:
     int parse_num_input(PyObject *input, int req_len = 0);
     ParseFuncs parse_funcs[2];
     PyObject *py_exception = PyErr_NewException("ledcd.CubeDrawer", NULL, NULL);
-    void apply_transforms(float *cur_vec);
+    void apply_transforms(glm::vec4 &cur_vec);
 
     //opengl
     GLuint vbo, vao, dc_vbo; // main vbo/vao and draw calls data vbo
@@ -221,7 +224,7 @@ private:
     // OpenGL Renderer API Binds
     void apoint(float *p, float line_width);
     void apoly(float *p1, float *p2, float *p3, float z_height);
-    void apoly_pyr(float *p1, float *p2, float *p3, float *p4);
+    void atetr(float *p1, float *p2, float *p3, float *p4);
     void aline(float *p1, float *p2, float line_width);
     void acircle(float *model_mat, float *r, bool filled, float z_height, float line_width);
     void asphere(float *model_mat, float *r, bool filled, float line_width);
@@ -251,6 +254,7 @@ public:
 
     void push_matrix();
     void pop_matrix();
+    void update_matrix();
 
     void translate(float x, float y, float z);
     void translate(PyObject *input);
@@ -288,8 +292,6 @@ public:
     // CALL_POINT_TYPE !
     void point(float x, float y, float z);
     void point(PyObject *p); // tuple with 3 values
-    void filled_sphere(float x, float y, float z, float r);
-    void filled_sphere(PyObject *p, float r);
 
     // CALL_POLYGON_TYPE
     // Not working with transformations
@@ -298,14 +300,12 @@ public:
 
     // CALL_POLYPYR_TYPE
     // Not wrking
-    void poly_pyr(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4);
-    void poly_pyr(PyObject *p1, PyObject *p2, PyObject *p3, PyObject *p4);
+    void tetr(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4);
+    void tetr(PyObject *p1, PyObject *p2, PyObject *p3, PyObject *p4);
 
     // CALL_LINE_TYPE !
     void line(float x1, float y1, float z1, float x2, float y2, float z2, float line_width = DEF_LINEW);
     void line(PyObject *p1, PyObject *p2, float line_width = DEF_LINEW);
-    void cylinder(float x, float y, float z, float r, float height);
-    void cylinder(PyObject *p1, float r, float height);
     void filled_circle(float x, float y, float z, float r);
     void filled_circle(PyObject *p, float r);
 
@@ -318,18 +318,16 @@ public:
     // CALL_FCIRCLE_TYPE !
     void filled_circle(float x, float y, float z, float rx, float ry, float thickness = DEF_ZHEIGHT);
     void filled_circle(PyObject *p, PyObject *r, float thickness = DEF_ZHEIGHT);
-    void cylinder(float x, float y, float z, float rx, float ry, float height);
-    void cylinder(PyObject *p, PyObject *r, float height);
 
     // CALL_SPHERE_TYPE
-    //not working
     void sphere(float x, float y, float z, float rx, float ry, float rz, float line_width = DEF_LINEW);
     void sphere(float x, float y, float z, float r, float line_width = DEF_LINEW);
     void sphere(PyObject *p, PyObject *r, float line_width = DEF_LINEW);
 
     // CALL_FSPHERE_TYPE
-    //not working
     void filled_sphere(float x, float y, float z, float rx, float ry, float rz);
     void filled_sphere(PyObject *p, PyObject *r);
+    void filled_sphere(float x, float y, float z, float r);
+    void filled_sphere(PyObject *p, float r);
     //// \User friendly API Calls overloads
 };

@@ -51,10 +51,7 @@ class CustomBuild(build.build):
         led_module.include_dirs = self.include_dirs
         if self.system == "Windows":
             # lib_files = glob.glob(os.path.join(self.lib_dir, "*.*"))
-            lib_files = [
-                os.path.join(self.lib_dir, file)
-                for file in ["glew32.lib", "glfw3dll.lib"]
-            ]
+            lib_files = [os.path.join(self.lib_dir, file) for file in ["glfw3dll.lib"]]
             lib_files.append("opengl32.lib")
 
             led_module.extra_link_args = [f"/DEFAULTLIB:{lib}" for lib in lib_files]
@@ -367,10 +364,8 @@ class CustomBuild(build.build):
 os.chdir(root_dir)
 src_dir = os.path.join(root_dir, "src")
 extra_macros = [
-    # ("VIRT_CUBE", None),
-   ("DYNAMIC_SHADER_INCLUDE", None),
-    # ("DEBUG_VIEW", None),
-    # ("SKIP_SHOW", None)
+    ("VIRT_CUBE", None),
+    # ("DYNAMIC_SHADER_INCLUDE", None),
 ]
 led_module = Extension(
     "_ledcd",
