@@ -9,11 +9,7 @@ bin
 glm
 glew*
 glfw*
-include
 wsServer
 websocketpp
 clean.bat
-
-!/include/GL
-!/include/GL/glu.h
-!/include/GL/gl.h
+tools/cube_writer/.vscode

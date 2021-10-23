@@ -8,7 +8,10 @@ def bytes_to_c_arr(data, lowercase=True):
 def file_to_array(file, var_name):
     with open(file, "rb") as f:
         res_str = "const char " + var_name + "[] = {"
-        for i, b in enumerate(bytes_to_c_arr(f.read())):
+        bytes_arr = bytes_to_c_arr(f.read())
+        if bytes_arr[-1] != "0x00":
+            bytes_arr.append("0x00")
+        for i, b in enumerate(bytes_arr):
             if i % 10 == 0:
                 res_str += "\n        "
             res_str += b + ", "

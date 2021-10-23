@@ -51,10 +51,7 @@ class CustomBuild(build.build):
         led_module.include_dirs = self.include_dirs
         if self.system == "Windows":
             # lib_files = glob.glob(os.path.join(self.lib_dir, "*.*"))
-            lib_files = [
-                os.path.join(self.lib_dir, file)
-                for file in ["glew32.lib", "glfw3dll.lib"]
-            ]
+            lib_files = [os.path.join(self.lib_dir, file) for file in ["glfw3dll.lib"]]
             lib_files.append("opengl32.lib")
 
             led_module.extra_link_args = [f"/DEFAULTLIB:{lib}" for lib in lib_files]
@@ -83,10 +80,10 @@ class CustomBuild(build.build):
         self.install_glm()
 
         print("  * Installing WebSocket++ ... [2/4]: ")
-        self.install_wsspp()
+        #self.install_wsspp()
 
         print("  * Installing GLEW ... [3/4]: ")
-        self.install_glew()
+        # self.install_glew()
 
         print("  * Installing GLFW ... [4/4]: ")
         self.install_glfw()
@@ -341,8 +338,8 @@ class CustomBuild(build.build):
             0
             if subprocess.call(
                 call_str,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
+                #stdout=subprocess.DEVNULL,
+                #stderr=subprocess.DEVNULL,
                 shell=True,
             )
             == 0
@@ -368,13 +365,14 @@ os.chdir(root_dir)
 src_dir = os.path.join(root_dir, "src")
 extra_macros = [
     ("VIRT_CUBE", None),
-    ("DYNAMIC_SHADER_INCLUDE", None),
+    # ("DYNAMIC_SHADER_INCLUDE", None),
 ]
 led_module = Extension(
     "_ledcd",
     sources=[
         os.path.join(src_dir, "swig_module_wrap.cxx"),
         os.path.join(src_dir, "CubeDrawer.cpp"),
+        os.path.join(src_dir, "glad.c"),
     ],
     define_macros=extra_macros,
     library_dirs=include_dirs,
@@ -392,6 +390,6 @@ setup(
     description="""Led Cube driver module""",
     ext_modules=[led_module],
     py_modules=["ledcd"],
-    package_dir={"": "src"},
+    package_dir={"": src_dir},
     cmdclass={"build": CustomBuild},
 )
