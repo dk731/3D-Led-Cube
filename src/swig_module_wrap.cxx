@@ -7115,7 +7115,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_CubeDrawer_poly_pyr__SWIG_0(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
+SWIGINTERN PyObject *_wrap_CubeDrawer_tetr__SWIG_0(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
   CubeDrawer *arg1 = (CubeDrawer *) 0 ;
   float arg2 ;
@@ -7160,70 +7160,70 @@ SWIGINTERN PyObject *_wrap_CubeDrawer_poly_pyr__SWIG_0(PyObject *SWIGUNUSEDPARM(
   if ((nobjs < 13) || (nobjs > 13)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_CubeDrawer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_poly_pyr" "', argument " "1"" of type '" "CubeDrawer *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_tetr" "', argument " "1"" of type '" "CubeDrawer *""'"); 
   }
   arg1 = reinterpret_cast< CubeDrawer * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "CubeDrawer_poly_pyr" "', argument " "2"" of type '" "float""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "CubeDrawer_tetr" "', argument " "2"" of type '" "float""'");
   } 
   arg2 = static_cast< float >(val2);
   ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "CubeDrawer_poly_pyr" "', argument " "3"" of type '" "float""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "CubeDrawer_tetr" "', argument " "3"" of type '" "float""'");
   } 
   arg3 = static_cast< float >(val3);
   ecode4 = SWIG_AsVal_float(swig_obj[3], &val4);
   if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "CubeDrawer_poly_pyr" "', argument " "4"" of type '" "float""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "CubeDrawer_tetr" "', argument " "4"" of type '" "float""'");
   } 
   arg4 = static_cast< float >(val4);
   ecode5 = SWIG_AsVal_float(swig_obj[4], &val5);
   if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "CubeDrawer_poly_pyr" "', argument " "5"" of type '" "float""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "CubeDrawer_tetr" "', argument " "5"" of type '" "float""'");
   } 
   arg5 = static_cast< float >(val5);
   ecode6 = SWIG_AsVal_float(swig_obj[5], &val6);
   if (!SWIG_IsOK(ecode6)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "CubeDrawer_poly_pyr" "', argument " "6"" of type '" "float""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "CubeDrawer_tetr" "', argument " "6"" of type '" "float""'");
   } 
   arg6 = static_cast< float >(val6);
   ecode7 = SWIG_AsVal_float(swig_obj[6], &val7);
   if (!SWIG_IsOK(ecode7)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "CubeDrawer_poly_pyr" "', argument " "7"" of type '" "float""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "CubeDrawer_tetr" "', argument " "7"" of type '" "float""'");
   } 
   arg7 = static_cast< float >(val7);
   ecode8 = SWIG_AsVal_float(swig_obj[7], &val8);
   if (!SWIG_IsOK(ecode8)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "CubeDrawer_poly_pyr" "', argument " "8"" of type '" "float""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "CubeDrawer_tetr" "', argument " "8"" of type '" "float""'");
   } 
   arg8 = static_cast< float >(val8);
   ecode9 = SWIG_AsVal_float(swig_obj[8], &val9);
   if (!SWIG_IsOK(ecode9)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "CubeDrawer_poly_pyr" "', argument " "9"" of type '" "float""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "CubeDrawer_tetr" "', argument " "9"" of type '" "float""'");
   } 
   arg9 = static_cast< float >(val9);
   ecode10 = SWIG_AsVal_float(swig_obj[9], &val10);
   if (!SWIG_IsOK(ecode10)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode10), "in method '" "CubeDrawer_poly_pyr" "', argument " "10"" of type '" "float""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode10), "in method '" "CubeDrawer_tetr" "', argument " "10"" of type '" "float""'");
   } 
   arg10 = static_cast< float >(val10);
   ecode11 = SWIG_AsVal_float(swig_obj[10], &val11);
   if (!SWIG_IsOK(ecode11)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode11), "in method '" "CubeDrawer_poly_pyr" "', argument " "11"" of type '" "float""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode11), "in method '" "CubeDrawer_tetr" "', argument " "11"" of type '" "float""'");
   } 
   arg11 = static_cast< float >(val11);
   ecode12 = SWIG_AsVal_float(swig_obj[11], &val12);
   if (!SWIG_IsOK(ecode12)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode12), "in method '" "CubeDrawer_poly_pyr" "', argument " "12"" of type '" "float""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode12), "in method '" "CubeDrawer_tetr" "', argument " "12"" of type '" "float""'");
   } 
   arg12 = static_cast< float >(val12);
   ecode13 = SWIG_AsVal_float(swig_obj[12], &val13);
   if (!SWIG_IsOK(ecode13)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode13), "in method '" "CubeDrawer_poly_pyr" "', argument " "13"" of type '" "float""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode13), "in method '" "CubeDrawer_tetr" "', argument " "13"" of type '" "float""'");
   } 
   arg13 = static_cast< float >(val13);
-  (arg1)->poly_pyr(arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13);
+  (arg1)->tetr(arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -7231,7 +7231,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_CubeDrawer_poly_pyr__SWIG_1(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
+SWIGINTERN PyObject *_wrap_CubeDrawer_tetr__SWIG_1(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
   CubeDrawer *arg1 = (CubeDrawer *) 0 ;
   PyObject *arg2 = (PyObject *) 0 ;
@@ -7244,14 +7244,14 @@ SWIGINTERN PyObject *_wrap_CubeDrawer_poly_pyr__SWIG_1(PyObject *SWIGUNUSEDPARM(
   if ((nobjs < 5) || (nobjs > 5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_CubeDrawer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_poly_pyr" "', argument " "1"" of type '" "CubeDrawer *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_tetr" "', argument " "1"" of type '" "CubeDrawer *""'"); 
   }
   arg1 = reinterpret_cast< CubeDrawer * >(argp1);
   arg2 = swig_obj[1];
   arg3 = swig_obj[2];
   arg4 = swig_obj[3];
   arg5 = swig_obj[4];
-  (arg1)->poly_pyr(arg2,arg3,arg4,arg5);
+  (arg1)->tetr(arg2,arg3,arg4,arg5);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -7259,13 +7259,13 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_CubeDrawer_poly_pyr(PyObject *self, PyObject *args) {
+SWIGINTERN PyObject *_wrap_CubeDrawer_tetr(PyObject *self, PyObject *args) {
   Py_ssize_t argc;
   PyObject *argv[14] = {
     0
   };
   
-  if (!(argc = SWIG_Python_UnpackTuple(args, "CubeDrawer_poly_pyr", 0, 13, argv))) SWIG_fail;
+  if (!(argc = SWIG_Python_UnpackTuple(args, "CubeDrawer_tetr", 0, 13, argv))) SWIG_fail;
   --argc;
   if (argc == 5) {
     int _v;
@@ -7281,7 +7281,7 @@ SWIGINTERN PyObject *_wrap_CubeDrawer_poly_pyr(PyObject *self, PyObject *args) {
           if (_v) {
             _v = (argv[4] != 0);
             if (_v) {
-              return _wrap_CubeDrawer_poly_pyr__SWIG_1(self, argc, argv);
+              return _wrap_CubeDrawer_tetr__SWIG_1(self, argc, argv);
             }
           }
         }
@@ -7354,7 +7354,7 @@ SWIGINTERN PyObject *_wrap_CubeDrawer_poly_pyr(PyObject *self, PyObject *args) {
                               _v = SWIG_CheckState(res);
                             }
                             if (_v) {
-                              return _wrap_CubeDrawer_poly_pyr__SWIG_0(self, argc, argv);
+                              return _wrap_CubeDrawer_tetr__SWIG_0(self, argc, argv);
                             }
                           }
                         }
@@ -7371,10 +7371,10 @@ SWIGINTERN PyObject *_wrap_CubeDrawer_poly_pyr(PyObject *self, PyObject *args) {
   }
   
 fail:
-  SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'CubeDrawer_poly_pyr'.\n"
+  SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'CubeDrawer_tetr'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    CubeDrawer::poly_pyr(float,float,float,float,float,float,float,float,float,float,float,float)\n"
-    "    CubeDrawer::poly_pyr(PyObject *,PyObject *,PyObject *,PyObject *)\n");
+    "    CubeDrawer::tetr(float,float,float,float,float,float,float,float,float,float,float,float)\n"
+    "    CubeDrawer::tetr(PyObject *,PyObject *,PyObject *,PyObject *)\n");
   return 0;
 }
 
@@ -9848,7 +9848,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "CubeDrawer_set_color", _wrap_CubeDrawer_set_color, METH_VARARGS, NULL},
 	 { "CubeDrawer_point", _wrap_CubeDrawer_point, METH_VARARGS, NULL},
 	 { "CubeDrawer_poly", _wrap_CubeDrawer_poly, METH_VARARGS, NULL},
-	 { "CubeDrawer_poly_pyr", _wrap_CubeDrawer_poly_pyr, METH_VARARGS, NULL},
+	 { "CubeDrawer_tetr", _wrap_CubeDrawer_tetr, METH_VARARGS, NULL},
 	 { "CubeDrawer_line", _wrap_CubeDrawer_line, METH_VARARGS, NULL},
 	 { "CubeDrawer_circle", _wrap_CubeDrawer_circle, METH_VARARGS, NULL},
 	 { "CubeDrawer_filled_circle", _wrap_CubeDrawer_filled_circle, METH_VARARGS, NULL},
@@ -10681,7 +10681,7 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "PY_LIST_PARSE",SWIG_From_int(static_cast< int >(PY_LIST_PARSE)));
   SWIG_Python_SetConstant(d, "CALL_POINT_TYPE",SWIG_From_int(static_cast< int >(CALL_POINT_TYPE)));
   SWIG_Python_SetConstant(d, "CALL_POLYGON_TYPE",SWIG_From_int(static_cast< int >(CALL_POLYGON_TYPE)));
-  SWIG_Python_SetConstant(d, "CALL_POLYPYR_TYPE",SWIG_From_int(static_cast< int >(CALL_POLYPYR_TYPE)));
+  SWIG_Python_SetConstant(d, "CALL_TETR_TYPE",SWIG_From_int(static_cast< int >(CALL_TETR_TYPE)));
   SWIG_Python_SetConstant(d, "CALL_LINE_TYPE",SWIG_From_int(static_cast< int >(CALL_LINE_TYPE)));
   SWIG_Python_SetConstant(d, "CALL_CIRCLE_TYPE",SWIG_From_int(static_cast< int >(CALL_CIRCLE_TYPE)));
   SWIG_Python_SetConstant(d, "CALL_FCIRCLE_TYPE",SWIG_From_int(static_cast< int >(CALL_FCIRCLE_TYPE)));

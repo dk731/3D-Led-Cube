@@ -131,7 +131,7 @@ enum DrawCallTypes
 {
     CALL_POINT_TYPE = 0,
     CALL_POLYGON_TYPE = 1,
-    CALL_POLYPYR_TYPE = 2,
+    CALL_TETR_TYPE = 2,
     CALL_LINE_TYPE = 3,
     CALL_CIRCLE_TYPE = 4,
     CALL_FCIRCLE_TYPE = 5,
@@ -224,7 +224,7 @@ private:
     // OpenGL Renderer API Binds
     void apoint(float *p, float line_width);
     void apoly(float *p1, float *p2, float *p3, float z_height);
-    void apoly_pyr(float *p1, float *p2, float *p3, float *p4);
+    void atetr(float *p1, float *p2, float *p3, float *p4);
     void aline(float *p1, float *p2, float line_width);
     void acircle(float *model_mat, float *r, bool filled, float z_height, float line_width);
     void asphere(float *model_mat, float *r, bool filled, float line_width);
@@ -300,8 +300,8 @@ public:
 
     // CALL_POLYPYR_TYPE
     // Not wrking
-    void poly_pyr(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4);
-    void poly_pyr(PyObject *p1, PyObject *p2, PyObject *p3, PyObject *p4);
+    void tetr(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4);
+    void tetr(PyObject *p1, PyObject *p2, PyObject *p3, PyObject *p4);
 
     // CALL_LINE_TYPE !
     void line(float x1, float y1, float z1, float x2, float y2, float z2, float line_width = DEF_LINEW);

@@ -142,7 +142,7 @@ PY_TUPLE_PARSE = _ledcd.PY_TUPLE_PARSE
 PY_LIST_PARSE = _ledcd.PY_LIST_PARSE
 CALL_POINT_TYPE = _ledcd.CALL_POINT_TYPE
 CALL_POLYGON_TYPE = _ledcd.CALL_POLYGON_TYPE
-CALL_POLYPYR_TYPE = _ledcd.CALL_POLYPYR_TYPE
+CALL_TETR_TYPE = _ledcd.CALL_TETR_TYPE
 CALL_LINE_TYPE = _ledcd.CALL_LINE_TYPE
 CALL_CIRCLE_TYPE = _ledcd.CALL_CIRCLE_TYPE
 CALL_FCIRCLE_TYPE = _ledcd.CALL_FCIRCLE_TYPE
@@ -246,8 +246,8 @@ class CubeDrawer(object):
     def poly(self, *args):
         return _ledcd.CubeDrawer_poly(self, *args)
 
-    def poly_pyr(self, *args):
-        return _ledcd.CubeDrawer_poly_pyr(self, *args)
+    def tetr(self, *args):
+        return _ledcd.CubeDrawer_tetr(self, *args)
 
     def line(self, *args):
         return _ledcd.CubeDrawer_line(self, *args)

@@ -3,7 +3,7 @@
 //// Call type defines section
 #define CALL_POINT_TYPE 0 // 1D Point; 3D Solid Sphere
 #define CALL_POLYGON_TYPE 1 // 2D Triangle; 3D Triangle Prism
-#define CALL_POLYPYR_TYPE 2 // 3D Triangle Pyramid
+#define CALL_TETR_TYPE 2 // 3D Triangle Pyramid
 #define CALL_LINE_TYPE 3 // 2D Line; 3D Cylider; 2D Circle
 #define CALL_CIRCLE_TYPE 4 // 2D Circle line; 2D Ellipse Line; 3D Elliptic Cylinder without foundations
 #define CALL_FCIRCLE_TYPE 5 // 2D Ellipse; 3D Elliptic Cylinder
@@ -34,7 +34,7 @@ bool check_bind();
 
 bool point_check();
 bool poly_check();
-bool polypyr_check();
+bool tetr_check();
 bool line_check();
 bool cicle_check();
 bool fcircle_check();
@@ -62,8 +62,8 @@ bool check_bind()
     return point_check();
   case CALL_POLYGON_TYPE:
     return poly_check();
-  case CALL_POLYPYR_TYPE:
-    return polypyr_check();
+  case CALL_TETR_TYPE:
+    return tetr_check();
   case CALL_LINE_TYPE:
     return line_check();
   case CALL_CIRCLE_TYPE:
@@ -130,23 +130,25 @@ bool poly_check()
 // x y z .  <- POS3
 // x y z .  <- POS4
 ///////////////////
-bool polypyr_check() 
+bool same_side(vec3 v1, vec3 v2, vec3 v3, vec3 v4)
+{
+  vec3 normal = cross(v2 - v1, v3 - v1);
+  float dot_p = dot(normal, in_pos - v1);
+
+  return sign(dot(normal, v4 - v1)) == sign(dot_p) || dot_p == 0.0;
+}
+
+bool tetr_check() 
 {
   vec3 p1 = call_data[0].xyz;
   vec3 p2 = call_data[1].xyz;
   vec3 p3 = call_data[2].xyz;
   vec3 p4 = call_data[3].xyz;
 
-  if (determinant(mat3(p2 - p1, p3 - p1, in_pos - p1)) < -EPSILON)
-      return false;
-  if (determinant(mat3(p3 - p2, p4 - p2, in_pos - p2)) < -EPSILON)
-      return false;
-  if (determinant(mat3(p4 - p3, p1 - p3, in_pos - p3)) < -EPSILON)
-      return false;
-  if (determinant(mat3(p1 - p4, p2 - p4, in_pos - p4)) < -EPSILON)
-      return false;
-
-  return true;
+  return same_side(p1, p2, p3, p4) && 
+         same_side(p2, p3, p4, p1) && 
+         same_side(p3, p4, p1, p2) && 
+         same_side(p4, p1, p2, p3);
 }
 
 // LINE_CHECK(VEC3 POS1, VEC3 POS2, FLOAT LINE_WIDTH)

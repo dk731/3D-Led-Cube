@@ -673,10 +673,10 @@ void CubeDrawer::apoly(float *p1, float *p2, float *p3, float z_height)
         show();
 }
 
-void CubeDrawer::apoly_pyr(float *p1, float *p2, float *p3, float *p4)
+void CubeDrawer::atetr(float *p1, float *p2, float *p3, float *p4)
 {
     draw_calls_arr.push_back({
-        .type = CALL_POLYPYR_TYPE,
+        .type = CALL_TETR_TYPE,
         .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
         .data = {
             p1[0], p1[1], p1[2], 0.0f,
@@ -805,7 +805,7 @@ void CubeDrawer::poly(PyObject *p1, PyObject *p2, PyObject *p3, float height)
 }
 
 // CALL_POLYPYR_TYPE
-void CubeDrawer::poly_pyr(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4)
+void CubeDrawer::tetr(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4)
 {
     glm::vec4 p1(x1, y1, z1, 1.0f), p2(x2, y2, z2, 1.0f), p3(x3, y3, z3, 1.0f), p4(x4, y4, z4, 1.0f);
 
@@ -814,10 +814,10 @@ void CubeDrawer::poly_pyr(float x1, float y1, float z1, float x2, float y2, floa
     apply_transforms(p3);
     apply_transforms(p4);
 
-    apoly_pyr(glm::value_ptr(p1), glm::value_ptr(p2), glm::value_ptr(p3), glm::value_ptr(p4));
+    atetr(glm::value_ptr(p1), glm::value_ptr(p2), glm::value_ptr(p3), glm::value_ptr(p4));
 }
 
-void CubeDrawer::poly_pyr(PyObject *p1, PyObject *p2, PyObject *p3, PyObject *p4)
+void CubeDrawer::tetr(PyObject *p1, PyObject *p2, PyObject *p3, PyObject *p4)
 {
     glm::vec4 pp1(1.0f), pp2(1.0f), pp3(1.0f), pp4(1.0f);
 
@@ -839,7 +839,7 @@ void CubeDrawer::poly_pyr(PyObject *p1, PyObject *p2, PyObject *p3, PyObject *p4
     apply_transforms(pp3);
     apply_transforms(pp4);
 
-    apoly_pyr(glm::value_ptr(pp1), glm::value_ptr(pp2), glm::value_ptr(pp3), glm::value_ptr(pp4));
+    atetr(glm::value_ptr(pp1), glm::value_ptr(pp2), glm::value_ptr(pp3), glm::value_ptr(pp4));
 }
 
 // CALL_LINE_TYPE
