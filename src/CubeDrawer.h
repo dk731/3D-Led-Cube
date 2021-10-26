@@ -53,6 +53,8 @@
 
 #endif
 
+#include <GLES3/gl32.h>
+
 #define THROW_EXP(msg, ret)                 \
     {                                       \
         PyErr_SetString(py_exception, msg); \
@@ -104,15 +106,11 @@ struct Pixel
     unsigned char b;
 };
 
-struct ShmFlags
-{
-    uint8_t frame_shown : 1, lock : 1, other : 6;
-};
-
 struct ShmBuf
 {
+    pthread_mutex_t shm_buf_lock;
+    pthread_mutex_t new_frame_lock;
     Pixel buf[4096];
-    ShmFlags flags;
 };
 
 struct ParseFuncs
@@ -201,7 +199,7 @@ private:
     PyObject *py_exception = PyErr_NewException("ledcd.CubeDrawer", NULL, NULL);
     void apply_transforms(glm::vec4 &cur_vec);
 
-    //opengl
+    // opengl
     GLuint vbo, vao, dc_vbo; // main vbo/vao and draw calls data vbo
     GLuint main_prog;
     GLuint pix_buf;
@@ -218,7 +216,7 @@ private:
     void clear_draw_call_buf();
     //
 
-    CubeDrawer(float brightness = 1.0, bool sync = false, int fps_cap = 70);
+    CubeDrawer(float brightness = 1.0, bool sync = false, int fps_cap = 100);
     ~CubeDrawer(){};
 
     // OpenGL Renderer API Binds

@@ -92,19 +92,19 @@ typedef struct smi_cs_f
         write : 1, _x1 : 2, teen : 1, intd : 1, intt : 1,
         intr : 1, pvmode : 1, seterr : 1, pxldat : 1, edreq : 1,
         _x2 : 8, _x3 : 1, aferr : 1, txw : 1, rxr : 1,
-        txd : 1, rxd : 1, txe : 1, rxf : 1
+        txd : 1, rxd : 1, txe : 1, rxf : 1;
 } smi_cs_f;
 
 typedef struct smi_dsrw
 {
     volatile uint32_t strobe : 7, dreq : 1, pace : 7, paceall : 1, hold : 6,
-        fsetup : 1, mode68 : 1, setup : 6, width : 2
+        fsetup : 1, mode68 : 1, setup : 6, width : 2;
 } smi_dsrw;
 
 typedef struct smi_dmc
 {
     volatile uint32_t reqw : 6, reqr : 6, panicw : 6, panicr : 6, dmap : 1,
-        _x1 : 3, dmaen : 1
+        _x1 : 3, dmaen : 1;
 } smi_dmc;
 
 typedef struct memory_buf
@@ -137,10 +137,10 @@ typedef struct DMA_CB
 
 typedef struct smi_fields
 {
-    smi_cs_f *cs;
-    smi_dsrw *dsr;
-    smi_dsrw *dsw;
-    smi_dmc *dmc;
+    volatile smi_cs_f *cs;
+    volatile smi_dsrw *dsr;
+    volatile smi_dsrw *dsw;
+    volatile smi_dmc *dmc;
 } smi_fields;
 
 typedef struct smi_obj_struct
@@ -157,15 +157,11 @@ typedef struct smi_obj_struct
     uint16_t *tmp_buf;
 } smi_obj_struct;
 
-typedef struct shm_flags
+typedef struct ShmBuf
 {
-    uint8_t frame_ready : 1, lock : 1, sync : 1, other : 5;
-} shm_flags;
-
-typedef struct buf_struct
-{
-    uint8_t buf[SHM_BUF_SIZE];
-    shm_flags flags;
+    pthread_mutex_t shm_buf_lock;
+    pthread_mutex_t new_frame_lock;
+    char buf[SHM_BUF_SIZE];
 } buf_struct;
 
 smi_obj_struct smi_obj;
@@ -186,7 +182,8 @@ void setup_smi();
 void setup_gpio();
 int setup_dma();
 
-void *writer_thread(void *vargp);
+// void *writer_thread(void *vargp);
+void writer_thread();
 
 void unmap_periph_mem(void *mp);
 void clear_mem();

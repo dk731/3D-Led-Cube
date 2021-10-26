@@ -38,7 +38,7 @@ int mmap_mem()
 
 void setup_smi()
 {
-    int setup = 5, width = 5, ns = 15, strobe = 5, hold = 5;
+    int setup = 5, width = 1, ns = 15, strobe = 5, hold = 5;
 
     *(volatile uint32_t *)(smi_obj.smi_reg + SMI_CS) = 0;
     *(volatile uint32_t *)(smi_obj.smi_reg + SMI_L) = 0;
@@ -112,7 +112,7 @@ void setup_gpio()
 
 int setup_dma()
 {
-    if (1)
+    if (fps_count == 0)
     {
         printf("Memory prikols\n");
         smi_obj.mem_buf.size = DATA_SIZE;
@@ -133,7 +133,6 @@ int setup_dma()
         }
 
         smi_obj.cbs = smi_obj.mem_buf.virt;
-        // printf("CBS: %p", smi_obj.cbs);
         smi_obj.data_buf = (uint16_t *)(smi_obj.cbs + 1);
     }
 
@@ -199,11 +198,12 @@ void draw()
     // PRINT_REG("3: ", smi_obj.smi_fields.cs);
     *(volatile uint32_t *)(smi_obj.dma_reg + DMA_CHAN * 0x100 + DMA_CS) = 1;
     smi_obj.smi_fields.cs->start = 1;
+
     while ((*(volatile uint32_t *)(smi_obj.dma_reg + DMA_CHAN * 0x100 + DMA_CS)) & 1)
         usleep(10);
-    //    printf("Delay: %.6f\n ms", ((double) (clock() - prev_draw)) / CLOCKS_PER_SEC / 1000.0f);
-    //  prev_draw = clock();
-    //usleep(250000);
+
+    //     printf("Delay: %.6f\n ms", ((double) (clock() - prev_draw)) / CLOCKS_PER_SEC / 1000.0f);
+    //   prev_draw = clock();
     fps_count++;
 }
 
@@ -257,13 +257,13 @@ int init_shm()
         return 1;
     }
 
-    if (ftruncate(shm_id, sizeof(struct buf_struct)) < 0)
+    if (ftruncate(shm_id, sizeof(buf_struct)) < 0)
     {
         printf("\033[38;2;255;0;0mERROR\x1b[0m Unable perform ftruncate\n");
         return 1;
     }
 
-    shm_buf = (buf_struct *)mmap(NULL, sizeof(struct buf_struct), PROT_READ | PROT_WRITE, MAP_SHARED, shm_id, 0);
+    shm_buf = (buf_struct *)mmap(NULL, sizeof(buf_struct), PROT_READ | PROT_WRITE, MAP_SHARED, shm_id, 0);
 
     if (shm_buf == MAP_FAILED)
     {
@@ -271,21 +271,43 @@ int init_shm()
         return 1;
     }
 
-    shm_buf->flags.frame_ready = 0;
+    pthread_mutexattr_t attr;
+
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_setpshared(&attr, PTHREAD_PROCESS_SHARED);
+
+    if (pthread_mutex_init(&(shm_buf->new_frame_lock), NULL))
+        printf("\033[38;2;255;0;0mERROR\x1b[0m Was unable to initialize data_transfer_lock mutex\n");
+
+    if (pthread_mutex_init(&(shm_buf->new_frame_lock), NULL))
+        printf("\033[38;2;255;0;0mERROR\x1b[0m Was unable to initialize data_transfer_lock mutex\n");
+
+    if (pthread_mutex_unlock(&(shm_buf->shm_buf_lock)))
+        printf("Error during unclocking shm lock\n");
+
+    if (pthread_mutex_lock(&(shm_buf->new_frame_lock)))
+        printf("Error during locking new frame lock\n");
 
     printf("\033[38;2;0;255;0mOK\x1b[0m Successfully initialized shared memmory object\n");
+
+    memset(shm_buf->buf, 0, SHM_BUF_SIZE);
     return 0;
 }
 
-void *writer_thread(void *vargp)
+// void *writer_thread(void *vargp)
+void writer_thread()
 {
     prev_draw = clock();
     printf("starting thread\n");
     while (1)
     {
+        printf("Locking frame lock\n");
+        if (pthread_mutex_lock(&(shm_buf->new_frame_lock)))
+            printf("Error during locking new frame lock\n");
 
-        //        while (!shm_buf->flags.frame_ready)
-        //         usleep(10);
+        printf("New Frame arrived!, Loking shm bufe lock\n");
+
+        pthread_mutex_lock(&(shm_buf->shm_buf_lock)); // Wait for drawer programm to copy data to shared memory
         memset(smi_obj.tmp_buf, 0, RGB_DATA_SIZE);
 
         for (int i = 0; i < (RGB_DATA_SIZE >> 3); i++)
@@ -293,8 +315,6 @@ void *writer_thread(void *vargp)
 
         int tmpx;
         int tmpz;
-
-        shm_buf->flags.lock = 1;
 
         for (int y = 15; y >= 0; y--)
         {
@@ -333,21 +353,18 @@ void *writer_thread(void *vargp)
                 }
             }
         }
-        shm_buf->flags.frame_ready = 1;
-        shm_buf->flags.lock = 0;
-        usleep(20000);
-        // PRINT_REG("Before draw: ", smi_obj.smi_fields.cs);
-        draw();
-        // PRINT_REG("After draw: ", smi_obj.smi_fields.cs);
+        pthread_mutex_unlock(&(shm_buf->shm_buf_lock));
+        printf("Unlocking shm buf lock\n");
 
-        //        if (shm_buf->flags.sync)
-        //          shm_buf->flags.frame_ready = 0;
+        draw();
     }
 }
 
 int init_cube()
 {
+    printf("Res: %d\n", _POSIX_THREAD_PROCESS_SHARED);
     fps_count = 0;
+
     srand(time(NULL));
 
     if (init_shm())
@@ -363,8 +380,9 @@ int init_cube()
     smi_obj.tmp_buf = (uint16_t *)malloc(RGB_DATA_SIZE);
     // PRINT_REG("After malloc: ", smi_obj.smi_fields.cs);
 
-    pthread_create(&writer_thread_id, NULL, writer_thread, NULL);
-    pthread_detach(writer_thread_id);
+    //    pthread_create(&writer_thread_id, NULL, writer_thread, NULL);
+    //    pthread_detach(writer_thread_id);
+    writer_thread();
 
     return 0;
 }
