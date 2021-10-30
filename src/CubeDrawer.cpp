@@ -7,10 +7,13 @@ CubeDrawer &CubeDrawer::get_obj()
     CubeDrawer::mutex_.lock();
     static CubeDrawer instance;
     CubeDrawer::mutex_.unlock();
+    if (!instance.init_suc)
+        std::cout << "Was not able to initialized Cube driver" << std::endl;
+
     return instance;
 }
 
-#ifdef VIRT_CUBE
+#ifdef VIRTUAL_RENDER
 void onopen(websocketpp::connection_hdl hdl)
 {
     SLEEP_MICROS(500000);
@@ -32,7 +35,7 @@ void onclose(websocketpp::connection_hdl hdl)
     std::cout << "Virtual cube disconnected" << std::endl;
 }
 
-int CubeDrawer::_get_virt_amount_()
+int CubeDrawer::get_virt_amount()
 {
     return virt_hdls.size();
 }
@@ -40,6 +43,8 @@ int CubeDrawer::_get_virt_amount_()
 
 CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(GET_MICROS()), is_sync(sync), delta_time(0)
 {
+    init_suc = false;
+
     init_gl();
     parse_funcs[0].get_size = PyTuple_Size;
     parse_funcs[0].get_item = PyTuple_GetItem;
@@ -50,7 +55,7 @@ CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(GE
     transform_list.push_back(new Transform()); // First matrix not editable
     transform_list[0]->recalc = false;
     transform_list.push_back(new Transform());
-#ifdef VIRT_CUBE
+#if defined(VIRTUAL_RENDER)
     ws_server.clear_access_channels(websocketpp::log::alevel::all);
     ws_server.init_asio();
 
@@ -64,7 +69,7 @@ CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(GE
                             { CubeDrawer::get_obj().ws_server.run(); });
     virt_server.detach();
 
-#else
+#elif defined(RASPI_RENDER)
     int fd = shm_open("VirtualCubeSHMemmory", O_RDWR, 0);
     if (fd < 0)
     {
@@ -82,6 +87,28 @@ CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(GE
 
     shm_buf->flags.lock = 0;
     shm_buf->flags.frame_shown = 1;
+#elif defined(REMOTE_RENDER)
+    WSADATA wsa;
+    struct sockaddr_in server;
+
+    if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+    {
+        printf("Failed. Error Code : %d", WSAGetLastError());
+        THROW_EXP("ERROR During WSAStartup...", )
+    }
+
+    if ((raspi_soc = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
+    {
+        printf("Could not create socket : %d", WSAGetLastError());
+        THROW_EXP("ERROR Socket initialization...", )
+    }
+
+    server.sin_addr.s_addr = inet_addr("127.0.0.1");
+    server.sin_family = AF_INET;
+    server.sin_port = htons(50256);
+
+    if (connect(raspi_soc, (struct sockaddr *)&server, sizeof(server)) < 0)
+        THROW_EXP("ERROR Was Not able to connet to raspi server...", )
 #endif
 
     set_fps_cap(fps);
@@ -89,6 +116,8 @@ CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(GE
     memset(back_buf, 0, 12288);
     cur_brush.brigthness = 1.0f;
     set_color(255);
+
+    init_suc = true;
 }
 
 int CubeDrawer::parse_num_input(PyObject *input, int req_len)
@@ -107,7 +136,7 @@ int CubeDrawer::parse_num_input(PyObject *input, int req_len)
     if (req_len == 0 ? 0 : inp_len != req_len)
     {
         char tmp_str[86];
-        sprintf(tmp_str, "Invalid input, was expecting object with size: %d, but %ld elements were given", req_len, inp_len);
+        sprintf(tmp_str, "Invalid input, was expecting object with size: %d, but %zd elements were given", req_len, inp_len);
         THROW_EXP(tmp_str, -1)
     }
 
@@ -305,7 +334,7 @@ void CubeDrawer::show()
     }
 
 #ifndef SKIP_SHOW
-#ifdef VIRT_CUBE
+#if defined(VIRTUAL_RENDER)
     if (wait_cube)
         while (!virt_hdls.size())
         {
@@ -315,7 +344,7 @@ void CubeDrawer::show()
     // Send back_buf to all oppened sockets
     for (auto t = virt_hdls.begin(); t != virt_hdls.end(); t++)
         ws_server.send(*t, (void *)back_buf, 12288, websocketpp::frame::opcode::BINARY);
-#else
+#elif defined(RASPI_RENDER)
     while (shm_buf->flags.lock || (is_sync && !shm_buf->flags.frame_shown))
         usleep(100);
     // {
@@ -326,6 +355,8 @@ void CubeDrawer::show()
     memcpy(shm_buf->buf, back_buf, 12288);
     shm_buf->flags.frame_shown = 0;
     shm_buf->flags.lock = 0;
+#elif defined(REMOTE_RENDER)
+    send(raspi_soc, (const char *)back_buf, 12288, 0);
 #endif
 #endif
     delta_time = (GET_MICROS() - prev_show_time) / 1000000.0f;
@@ -385,7 +416,7 @@ void CubeDrawer::set_color(float r, float g, float b)
     if (r < 0.0f || r > 1.0f || g < 0.0f || g > 1.0f || b < 0.0f || b > 1.0f)
         THROW_EXP("Invalid input, values must be in range [0.0, 1.0]", )
 
-    set_color((int)r * 255, (int)g * 255, (int)b * 255);
+    set_color(r * 255, g * 255, b * 255);
 }
 
 void CubeDrawer::set_color(float rgb)
@@ -523,7 +554,7 @@ void CubeDrawer::init_gl()
 
     glVertexAttribIPointer(1, 1, GL_INT, dc_str_size, (GLvoid *)offsetof(DrawCall, type));
     glVertexAttribPointer(2, 3, GL_UNSIGNED_BYTE, GL_FALSE, dc_str_size, (GLvoid *)offsetof(DrawCall, color));
-  
+
     for (int i = 0; i < 4; i++)
         glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, dc_str_size, (GLvoid *)(offsetof(DrawCall, data) + sizeof(float) * 4 * i));
 
@@ -605,8 +636,8 @@ void CubeDrawer::render_texture()
         // Clear deph buffer
         glClear(GL_DEPTH_BUFFER_BIT);
         glUseProgram(main_prog);
-	      glBindVertexArray(vao);
-	      glBindFramebuffer(GL_FRAMEBUFFER, pix_buf);
+        glBindVertexArray(vao);
+        glBindFramebuffer(GL_FRAMEBUFFER, pix_buf);
         // glViewport(0, 0, 16, 768);
         // Setup uniforms
         GLuint tmp_val = glGetUniformLocation(main_prog, "prim_calls_sum");
@@ -1026,3 +1057,11 @@ void CubeDrawer::filled_sphere(PyObject *p, PyObject *r)
     sphere(pp[0], pp[1], pp[2], cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[1]);
 }
 //// \User friendly API Calls overloads
+
+CubeDrawer::~CubeDrawer()
+{
+#if defined(REMOTE_RENDER)
+    closesocket(raspi_soc);
+    WSACleanup();
+#endif
+}

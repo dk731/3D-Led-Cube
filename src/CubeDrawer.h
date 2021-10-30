@@ -1,13 +1,15 @@
+#define REMOTE_RENDER
+
 #include <iostream>
 #include <exception>
 
 #include <chrono>
 
 #include <cmath>
+#include <mutex>
 
 #include <fstream>
 #include <thread>
-#include <mutex>
 #include <list>
 #include <vector>
 #include <map>
@@ -28,21 +30,18 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-// #define VIRT_CUBE
-// #define DYNAMIC_SHADER_INCLUDE
-
 #ifdef DYNAMIC_SHADER_INCLUDE
 #include "shaders.h"
 #endif
 
-#ifdef VIRT_CUBE
+#if defined(VIRTUAL_RENDER)
 
 #define ASIO_STANDALONE
 #define _WEBSOCKETPP_CPP11_TYPE_TRAITS_
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
 
-#else
+#elif defined(RASPI_RENDER)
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -50,6 +49,17 @@
 #include <sys/shm.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
+
+#elif defined(REMOTE_RENDER)
+
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+#include <winsock2.h>
+
+#pragma comment(lib, "ws2_32.lib") //Winsock Library
+
+#else
+
+#error "Rendering Option was not defined! (VIRTUAL_RENDER)"
 
 #endif
 
@@ -182,6 +192,7 @@ struct Transform
 class CubeDrawer
 {
 private:
+    bool init_suc;
     Brush cur_brush;
     Pixel back_buf[4096];
     long min_show_delay = 0;
@@ -192,8 +203,10 @@ private:
     long long min_frame_delay;
     static std::mutex mutex_;
 
-#ifndef VIRT_CUBE
+#if defined(VIRTUAL_RENDER)
     ShmBuf *shm_buf;
+#elif defined(REMOTE_RENDER)
+    SOCKET raspi_soc;
 #endif
 
     int parse_num_input(PyObject *input, int req_len = 0);
@@ -219,7 +232,7 @@ private:
     //
 
     CubeDrawer(float brightness = 1.0, bool sync = false, int fps_cap = 70);
-    ~CubeDrawer(){};
+    ~CubeDrawer();
 
     // OpenGL Renderer API Binds
     void apoint(float *p, float line_width);
@@ -241,9 +254,9 @@ public:
     void operator=(const CubeDrawer &) = delete;
 
     bool draw_immediate = false;
-#ifdef VIRT_CUBE
+#ifdef VIRTUAL_RENDER
     std::list<websocketpp::connection_hdl> virt_hdls;
-    int _get_virt_amount_();
+    int get_virt_amount();
     bool wait_cube = true;
     websocketpp::server<websocketpp::config::asio> ws_server;
 #endif
