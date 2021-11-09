@@ -56,7 +56,7 @@ class CustomBuild(build.build):
 
             led_module.extra_link_args = [f"/DEFAULTLIB:{lib}" for lib in lib_files]
         else:
-            led_module.extra_link_args = ["-lGLEW", "-lglfw"]
+            led_module.extra_link_args = ["-lglfw"]
             led_module.library_dirs = [self.lib_dir]
             led_module.runtime_library_dirs = [self.bin_dir]
 
