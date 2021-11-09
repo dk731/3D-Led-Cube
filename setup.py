@@ -386,9 +386,11 @@ led_module = Extension(
 
 setup(
     name="main_LedCD",
-    version="0.1",
+    version="1.0",
     author="dk731",
+    author_email="demid.kaidalov@gmail.com",
     description="""Led Cube driver module""",
+    url="https://github.com/dk731/3D-Led-Cube",
     ext_modules=[led_module],
     py_modules=["ledcd"],
     package_dir={"": src_dir},
