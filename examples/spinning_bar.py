@@ -1,5 +1,4 @@
 from ledcd import CubeDrawer
-import time
 from math import sin
 
 cd = CubeDrawer.get_obj()

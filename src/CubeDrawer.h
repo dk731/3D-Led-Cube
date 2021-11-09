@@ -1,5 +1,3 @@
-#define REMOTE_RENDER
-
 #include <iostream>
 #include <exception>
 
@@ -207,6 +205,7 @@ private:
     ShmBuf *shm_buf;
 #elif defined(REMOTE_RENDER)
     SOCKET raspi_soc;
+    struct sockaddr_in server;
 #endif
 
     int parse_num_input(PyObject *input, int req_len = 0);

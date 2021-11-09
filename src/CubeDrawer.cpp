@@ -18,7 +18,7 @@ void onopen(websocketpp::connection_hdl hdl)
 {
     SLEEP_MICROS(500000);
     CubeDrawer::get_obj().virt_hdls.push_back(hdl);
-    std::cout << "Virtual cube connected" << std::endl;
+    // std::cout << "Virtual cube connected" << std::endl;
 }
 
 void onclose(websocketpp::connection_hdl hdl)
@@ -32,7 +32,7 @@ void onclose(websocketpp::connection_hdl hdl)
                                                   return false;
                                               });
 
-    std::cout << "Virtual cube disconnected" << std::endl;
+    // std::cout << "Virtual cube disconnected" << std::endl;
 }
 
 int CubeDrawer::get_virt_amount()
@@ -83,13 +83,13 @@ CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(GE
         THROW_EXP("Invalid input, values only in range [0, 1] are allowed", )
     }
 
-    std::cout << "Successfuly oppened shared memmory object" << std::endl;
+    // std::cout << "Successfuly oppened shared memmory object" << std::endl;
 
     shm_buf->flags.lock = 0;
     shm_buf->flags.frame_shown = 1;
 #elif defined(REMOTE_RENDER)
     WSADATA wsa;
-    struct sockaddr_in server;
+    server;
 
     if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
     {
@@ -98,17 +98,28 @@ CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(GE
     }
 
     if ((raspi_soc = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
+    // if ((raspi_soc = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == INVALID_SOCKET)
     {
         printf("Could not create socket : %d", WSAGetLastError());
         THROW_EXP("ERROR Socket initialization...", )
     }
 
-    server.sin_addr.s_addr = inet_addr("127.0.0.1");
+    // int enable = 1;
+    // if (setsockopt(raspi_soc, SOL_SOCKET, 65536, (const char *)&enable, sizeof(int)) < 0)
+    //     std::cout << "Was not able to set send buffer size..." << std::endl;
+
+    // u_long mode = 1;
+    // ioctlsocket(raspi_soc, FIONBIO, &mode);
+
+    server.sin_addr.s_addr = inet_addr("192.168.1.43");
     server.sin_family = AF_INET;
     server.sin_port = htons(50256);
 
     if (connect(raspi_soc, (struct sockaddr *)&server, sizeof(server)) < 0)
+    {
+        std::cout << "ERROR Was Not able to connet to raspi server..." << std::endl;
         THROW_EXP("ERROR Was Not able to connet to raspi server...", )
+    }
 #endif
 
     set_fps_cap(fps);
@@ -326,12 +337,16 @@ void CubeDrawer::clear(PyObject *input)
 void CubeDrawer::show()
 {
     render_texture();
+
     long long delta = min_frame_delay - (GET_MICROS() - prev_show_time);
     if (delta > 0)
     {
         // std::cout << "Sleeping: " << delta << "   min_del: " << min_frame_delay << "   prev_show_time: " << prev_show_time << "    cur_time: " << GET_MICROS() << std::endl;
         SLEEP_MICROS(delta);
     }
+
+    delta_time = (GET_MICROS() - prev_show_time) / 1000000.0f;
+    prev_show_time = GET_MICROS();
 
 #ifndef SKIP_SHOW
 #if defined(VIRTUAL_RENDER)
@@ -356,11 +371,14 @@ void CubeDrawer::show()
     shm_buf->flags.frame_shown = 0;
     shm_buf->flags.lock = 0;
 #elif defined(REMOTE_RENDER)
+
     send(raspi_soc, (const char *)back_buf, 12288, 0);
+
+    // if (sendto(raspi_soc, (const char *)back_buf, 12288, 0, (struct sockaddr *)&server, sizeof(server)) == SOCKET_ERROR)
+    //     std::cout << "Was not able to send packet..." << std::endl;
+
 #endif
 #endif
-    delta_time = (GET_MICROS() - prev_show_time) / 1000000.0f;
-    prev_show_time = GET_MICROS();
 }
 
 void CubeDrawer::set_fps_cap(int fps)
@@ -370,7 +388,7 @@ void CubeDrawer::set_fps_cap(int fps)
     else
         min_frame_delay = (1.0 / (float)fps) * 1000000.0f;
 
-    std::cout << "Changed fps cap to be: " << fps << " fps or " << min_frame_delay << " us or " << min_frame_delay / 1000.0 << " ms" << std::endl;
+    // std::cout << "Changed fps cap to be: " << fps << " fps or " << min_frame_delay << " us or " << min_frame_delay / 1000.0 << " ms" << std::endl;
 }
 
 ////////// Color
@@ -468,7 +486,7 @@ void CubeDrawer::init_gl()
     glfwMakeContextCurrent(context);
     gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress);
 
-    std::cout << glGetString(GL_VERSION) << std::endl;
+    // std::cout << glGetString(GL_VERSION) << std::endl;
 
     // GLenum err = glewInit();
     // if (err != GLEW_OK)
