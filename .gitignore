@@ -13,3 +13,5 @@ wsServer
 websocketpp
 clean.bat
 tools/cube_writer/.vscode
+
+*.wav
