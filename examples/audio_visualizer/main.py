@@ -17,6 +17,7 @@ def smooth_fourie(arr):
 
 drawer = cd.get_obj()
 drawer.translate(7.5, 7.5, 7.5)
+drawer.set_fps_cap(0)
 sp = OffsetSphere(drawer)
 
 file_name = (
@@ -37,28 +38,32 @@ frame_size = rate // 2
 
 
 # xf = np.log(rfftfreq(frame_size, 1 / rate) + 25)
-
+smooth_window = 10
 
 threading.Thread(target=lambda: playsound(file_name), daemon=True).start()
 
 start_time = time.time()
 while True:
-    yfl = (
-        np.clip(
-            np.abs(rfft(data[start_frame : start_frame + frame_size, 0])), 0.1, 35000000
-        )
-        / 35000000
-    )
-    yfr = (
-        np.clip(
-            np.abs(rfft(data[start_frame : start_frame + frame_size, 1])), 0.1, 35000000
-        )
-        / 35000000
-    )
+    yfl = np.abs(rfft(data[start_frame : start_frame + frame_size, 0]))
+    yfr = np.abs(rfft(data[start_frame : start_frame + frame_size, 1]))
+
+    cumsum_vecl = np.cumsum(np.insert(yfl, 0, 0))
+    cumsum_vecr = np.cumsum(np.insert(yfr, 0, 0))
+
+    yfl = (cumsum_vecl[smooth_window:] - cumsum_vecl[:-smooth_window]) / smooth_window
+    yfr = (cumsum_vecr[smooth_window:] - cumsum_vecr[:-smooth_window]) / smooth_window
+
+    yfl *= np.exp(np.arange(-1, stop=0, step=1 / len(yfl)))
+    yfr *= np.exp(np.arange(-1, stop=0, step=1 / len(yfr)))
+
+    yfl /= np.max(yfl)
+    yfr /= np.max(yfr)
+
+    # (np.exp(np.arange(-1, stop=0, step=1 / len(xf)) * 2))
 
     drawer.clear()
-    drawer.rotate(drawer.delta_time / 4, drawer.delta_time / 8, 0)
-    sp.update_points(1.5, 2.5, yfl * 12, yfr * 12, 1.5)
+    drawer.rotate(drawer.delta_time * 4, drawer.delta_time * 2, drawer.delta_time)
+    sp.update_points(1.5, 3.5, yfl * 8, yfr * 8, 2)
     sp.draw()
 
     drawer.show()
