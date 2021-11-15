@@ -29,8 +29,7 @@ void onclose(websocketpp::connection_hdl hdl)
                                                   std::shared_ptr<void> sp = p.lock();
                                                   if (swp && sp)
                                                       return swp == sp;
-                                                  return false;
-                                              });
+                                                  return false; });
 
     // std::cout << "Virtual cube disconnected" << std::endl;
 }
@@ -41,7 +40,7 @@ int CubeDrawer::get_virt_amount()
 }
 #endif
 
-CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(GET_MICROS()), is_sync(sync), delta_time(0)
+CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(GET_MICROS()), is_sync(sync), delta_time(1.0f)
 {
     init_suc = false;
 
@@ -55,8 +54,15 @@ CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(GE
     transform_list.push_back(new Transform()); // First matrix not editable
     transform_list[0]->recalc = false;
     transform_list.push_back(new Transform());
+<<<<<<< HEAD
 #if defined(VIRTUAL_RENDER)
+=======
+
+#ifdef VIRT_CUBE
+>>>>>>> 85bfca5b7a3b063ab61811741f3f4cdc646aef3a
     ws_server.clear_access_channels(websocketpp::log::alevel::all);
+    ws_server.clear_access_channels(websocketpp::log::alevel::frame_payload);
+
     ws_server.init_asio();
 
     ws_server.set_open_handler(&onopen);
@@ -67,9 +73,14 @@ CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(GE
 
     std::thread virt_server([]()
                             { CubeDrawer::get_obj().ws_server.run(); });
-    virt_server.detach();
 
+<<<<<<< HEAD
 #elif defined(RASPI_RENDER)
+=======
+    virt_server.detach();
+#else
+#ifdef CUBE_WRITING
+>>>>>>> 85bfca5b7a3b063ab61811741f3f4cdc646aef3a
     int fd = shm_open("VirtualCubeSHMemmory", O_RDWR, 0);
     if (fd < 0)
     {
@@ -80,11 +91,12 @@ CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(GE
 
     if (shm_buf == MAP_FAILED)
     {
-        THROW_EXP("Invalid input, values only in range [0, 1] are allowed", )
+        THROW_EXP("Was not able to mmap shared memory", )
     }
 
     // std::cout << "Successfuly oppened shared memmory object" << std::endl;
 
+<<<<<<< HEAD
     shm_buf->flags.lock = 0;
     shm_buf->flags.frame_shown = 1;
 #elif defined(REMOTE_RENDER)
@@ -120,6 +132,9 @@ CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(GE
         std::cout << "ERROR Was Not able to connet to raspi server..." << std::endl;
         THROW_EXP("ERROR Was Not able to connet to raspi server...", )
     }
+=======
+#endif
+>>>>>>> 85bfca5b7a3b063ab61811741f3f4cdc646aef3a
 #endif
 
     set_fps_cap(fps);
@@ -147,7 +162,11 @@ int CubeDrawer::parse_num_input(PyObject *input, int req_len)
     if (req_len == 0 ? 0 : inp_len != req_len)
     {
         char tmp_str[86];
+<<<<<<< HEAD
         sprintf(tmp_str, "Invalid input, was expecting object with size: %d, but %zd elements were given", req_len, inp_len);
+=======
+        sprintf(tmp_str, "Invalid input, was expecting object with size: %d, but %d elements were given", req_len, inp_len);
+>>>>>>> 85bfca5b7a3b063ab61811741f3f4cdc646aef3a
         THROW_EXP(tmp_str, -1)
     }
 
@@ -204,10 +223,11 @@ void CubeDrawer::pop_matrix()
     {
         Transform *cur_trans = transform_list[1];
 
-        memcpy(&(cur_trans->translation[0])[0], &(transform_list[0]->final[0])[0], sizeof(float) * 16);
-        memcpy(&(cur_trans->rotation[0])[0], &(transform_list[0]->final[0])[0], sizeof(float) * 16);
-        memcpy(&(cur_trans->scale[0])[0], &(transform_list[0]->final[0])[0], sizeof(float) * 16);
-        memcpy(&(cur_trans->final[0])[0], &(transform_list[0]->final[0])[0], sizeof(float) * 16);
+        void *ind_ptr = glm::value_ptr(transform_list[0]->final);
+        memcpy(glm::value_ptr(cur_trans->translation), ind_ptr, sizeof(float) * 16);
+        memcpy(glm::value_ptr(cur_trans->rotation), ind_ptr, sizeof(float) * 16);
+        memcpy(glm::value_ptr(cur_trans->scale), ind_ptr, sizeof(float) * 16);
+        memcpy(glm::value_ptr(cur_trans->final), ind_ptr, sizeof(float) * 16);
 
         cur_trans->rx = 0.0f;
         cur_trans->ry = 0.0f;
@@ -340,16 +360,18 @@ void CubeDrawer::show()
 
     long long delta = min_frame_delay - (GET_MICROS() - prev_show_time);
     if (delta > 0)
-    {
-        // std::cout << "Sleeping: " << delta << "   min_del: " << min_frame_delay << "   prev_show_time: " << prev_show_time << "    cur_time: " << GET_MICROS() << std::endl;
         SLEEP_MICROS(delta);
-    }
 
+<<<<<<< HEAD
     delta_time = (GET_MICROS() - prev_show_time) / 1000000.0f;
     prev_show_time = GET_MICROS();
 
 #ifndef SKIP_SHOW
 #if defined(VIRTUAL_RENDER)
+=======
+#ifdef CUBE_WRITING
+#ifdef VIRT_CUBE
+>>>>>>> 85bfca5b7a3b063ab61811741f3f4cdc646aef3a
     if (wait_cube)
         while (!virt_hdls.size())
         {
@@ -359,15 +381,24 @@ void CubeDrawer::show()
     // Send back_buf to all oppened sockets
     for (auto t = virt_hdls.begin(); t != virt_hdls.end(); t++)
         ws_server.send(*t, (void *)back_buf, 12288, websocketpp::frame::opcode::BINARY);
+<<<<<<< HEAD
 #elif defined(RASPI_RENDER)
     while (shm_buf->flags.lock || (is_sync && !shm_buf->flags.frame_shown))
         usleep(100);
     // {
     //     std::cout << "Lock: " << shm_buf->flags.lock << " shown: " << shm_buf->flags.frame_shown << std::endl;
     // }
+=======
+#else
+>>>>>>> 85bfca5b7a3b063ab61811741f3f4cdc646aef3a
 
-    shm_buf->flags.lock = 1;
+    std::cout << "Lokcing buf lock" << std::endl;
+    if (pthread_mutex_lock(&(shm_buf->shm_buf_lock)))
+        std::cout << "Was unable to lock shm buf!!!!!" << std::endl;
+
+    std::cout << "After data transfer" << std::endl;
     memcpy(shm_buf->buf, back_buf, 12288);
+<<<<<<< HEAD
     shm_buf->flags.frame_shown = 0;
     shm_buf->flags.lock = 0;
 #elif defined(REMOTE_RENDER)
@@ -379,6 +410,20 @@ void CubeDrawer::show()
 
 #endif
 #endif
+=======
+
+    std::cout << "Unlocking buf and new frame lock" << std::endl;
+
+    if (pthread_mutex_unlock(&(shm_buf->shm_buf_lock)))
+        std::cout << "Was unable to unlock shm buf!!!!!" << std::endl;
+    if (pthread_mutex_unlock(&(shm_buf->new_frame_lock)))
+        std::cout << "Was unable to unlock new frame!!!!!" << std::endl;
+#endif
+#endif
+
+    delta_time = (GET_MICROS() - prev_show_time) / 1000000.0f;
+    prev_show_time = GET_MICROS();
+>>>>>>> 85bfca5b7a3b063ab61811741f3f4cdc646aef3a
 }
 
 void CubeDrawer::set_fps_cap(int fps)
@@ -454,6 +499,19 @@ void CubeDrawer::set_color(PyObject *input)
 
 ////////// \Color
 
+void GLAPIENTRY msg_clb(GLenum source,
+                        GLenum type,
+                        GLuint id,
+                        GLenum severity,
+                        GLsizei length,
+                        const GLchar *message,
+                        const void *userParam)
+{
+    fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+            (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+            type, severity, message);
+}
+
 ////////// OpenGL
 void CubeDrawer::init_gl()
 {
@@ -462,14 +520,13 @@ void CubeDrawer::init_gl()
         std::cout << "Failed to initialize GLFW" << std::endl;
         return;
     }
-    // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
+
+    // glfwWindowHint(GLFW_CONTEXT_DEBUG, true);
 
 #ifndef DEBUG_VIEW
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
@@ -485,15 +542,17 @@ void CubeDrawer::init_gl()
     }
     glfwMakeContextCurrent(context);
     gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress);
+    // glEnable( GL_DEBUG_OUTPUT );
+    // glDebugMessageCallback( msg_clb, 0 );
 
+<<<<<<< HEAD
     // std::cout << glGetString(GL_VERSION) << std::endl;
+=======
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+>>>>>>> 85bfca5b7a3b063ab61811741f3f4cdc646aef3a
 
-    // GLenum err = glewInit();
-    // if (err != GLEW_OK)
-    // {
-    //     std::cout << "Failed initializing GLEW, error code: " << err << std::endl;
-    //     return;
-    // }
+    std::cout << glGetString(GL_VERSION) << std::endl;
 
 #ifndef DYNAMIC_SHADER_INCLUDE
     std::ifstream in("/home/pi/tmp/3D-Led-Cube/src/shaders/main.vert");
@@ -608,8 +667,13 @@ void CubeDrawer::init_gl()
         return;
     }
 #endif
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+    // GLint rf, rt;
+
+    // glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, &rf);
+    // glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_TYPE, &rt);
+
+    // std::cout << "After initialization: " << std::endl << "Read format: " << rf << std::endl << "Read type: " << rt << std::endl;
+
     std::thread tmp_t(&CubeDrawer::pool_events, this);
     tmp_t.detach();
 
@@ -665,7 +729,20 @@ void CubeDrawer::render_texture()
         glDrawArraysInstanced(GL_POINTS, 0, 4096, draw_calls_arr.size());
 #ifndef DEBUG_VIEW
         glBindFramebuffer(GL_FRAMEBUFFER, pix_buf);
-        glReadPixels(0, 0, 16, 256, GL_RGB, GL_UNSIGNED_BYTE, back_buf);
+
+        // GLint rf, rt;
+
+        // glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, &rf);
+        // glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_TYPE, &rt);
+
+        // std::cout << "Before Read: " << std::endl << "Read format: " << rf << std::endl << "Read type: " << rt << std::endl;
+        unsigned char tmp_buf[16384];
+
+        glReadPixels(0, 0, 16, 256, GL_RGBA, GL_UNSIGNED_BYTE, tmp_buf);
+
+        for (int i = 0; i < 4096; i++)
+            memcpy(&(back_buf[i]), &(tmp_buf[i << 2]), 3);
+
 #else
         glfwSwapBuffers(context);
 #endif
