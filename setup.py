@@ -364,16 +364,9 @@ class CustomBuild(build.build):
 os.chdir(root_dir)
 src_dir = os.path.join(root_dir, "src")
 extra_macros = [
-<<<<<<< HEAD
     # ("REMOTE_RENDER", None),
     ("VIRTUAL_RENDER", None),
     ("DYNAMIC_SHADER_INCLUDE", None),
-=======
-    # ("VIRT_CUBE", None),
-    ("CUBE_WRITING", None),
-    ("DYNAMIC_SHADER_INCLUDE", None),
-    # ("DEBUG_VIEW", None)
->>>>>>> 85bfca5b7a3b063ab61811741f3f4cdc646aef3a
 ]
 led_module = Extension(
     "_ledcd",
