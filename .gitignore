@@ -16,3 +16,4 @@ tools/cube_writer/.vscode
 
 *.wav
 .vscode
+*.out
