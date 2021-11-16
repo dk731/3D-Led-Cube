@@ -7,9 +7,12 @@ from random import random
 
 class OffsetSphere:
     EPSILON = 0.0000000000001
+    HPI = pi / 2
 
-    def __init__(self, screen):
-        self.spehres = []
+    # fade - duration in frames count
+    def __init__(self, screen, fade=1):
+        self.fade_delay = fade
+        self.frames_list = [[] for _ in range(fade)]
         self.screen = screen
         self.global_offset = random()
 
@@ -30,7 +33,13 @@ class OffsetSphere:
         return arr[curp_id] + (arr[nextp_id] - arr[curp_id]) * (float_id - curp_id)
 
     def update_points(
-        self, r=3, resolution=5, offsets_xy=[], offsets_xz=[], line_width=0.8
+        self,
+        r=3,
+        offset_max_r=8,
+        resolution=5,
+        offsets_xy=[],
+        offsets_xz=[],
+        line_width=0.8,
     ):
         self.r = r
         self.sphere_res = radians(resolution)  # Place point every 'resolution' degrees
@@ -38,15 +47,27 @@ class OffsetSphere:
         xy_off_len = len(offsets_xy)
         xz_off_len = len(offsets_xz)
 
-        self.spehres.clear()
+        self.frames_list.pop(0)
+        cur_frame = []
 
         for y_a in np.arange(0.0, pi + self.EPSILON, self.sphere_res):
             sin_y = sin(y_a)
 
-            xy_offset = self.__get_real_offset(offsets_xy, xy_off_len, y_a / pi) * abs(
-                cos(y_a)
-            )
-            pass
+            if y_a < self.HPI:
+                cur_offset = (
+                    self.__get_real_offset(offsets_xy, xy_off_len, y_a / self.HPI)
+                    * abs(cos(y_a))
+                    * offset_max_r
+                )
+            else:
+                cur_offset = (
+                    self.__get_real_offset(
+                        offsets_xz, xz_off_len, (y_a - self.HPI) / self.HPI
+                    )
+                    * abs(cos(y_a))
+                    * offset_max_r
+                )
+
             for x_a in np.arange(
                 0.0, tau + self.EPSILON, self.sphere_res / (sin_y + self.EPSILON)
             ):
@@ -54,33 +75,37 @@ class OffsetSphere:
                     offsets_xz, xz_off_len, x_a / tau
                 ) * abs(sin(y_a))
 
-                cur_r = abs(sin_y) * self.r
+                rr = self.r + cur_offset
+                cur_r = abs(sin_y) * rr
 
-                x = sin(x_a) * (cur_r + xy_offset + xz_offset)
-                y = (cos(y_a) * (self.r + xy_offset)) * -1
+                x = sin(x_a) * (cur_r + xz_offset)
+                y = (cos(y_a) * rr) * -1
                 z = cos(x_a) * (cur_r + xz_offset)
 
-                self.spehres.append(((x, y, z), line_width))
+                dist = (x ** 2 + y ** 2 + z ** 2) ** 0.5 / offset_max_r
+
+                cur_frame.append(
+                    (
+                        (x, y, z),
+                        line_width,
+                        colorsys.hsv_to_rgb(self.global_offset + dist, 1, 1),
+                    )
+                )
+
+        self.frames_list.append(cur_frame)
 
     def draw(self, colored=True):
         self.screen.push_matrix()
 
-        for spehre in self.spehres:
-            pos, width = spehre
-            if colored:
-                dist = (pos[0] ** 2 + pos[1] ** 2 + pos[2] ** 2) ** 0.5
-                self.screen.set_color(
-                    *[
-                        int(c * 255)
-                        for c in colorsys.hsv_to_rgb(
-                            self.global_offset + dist / 10, 1, 1
-                        )
-                    ]
-                )
+        for i, frame in enumerate(self.frames_list):
+            col_mult = (i + 1) / self.fade_delay
+            for spehre in frame:
+                pos, width, col = spehre
+                if colored:
+                    self.screen.set_color(*[int(c * col_mult * 255) for c in col])
+                    self.screen.filled_sphere(pos, width)
 
-            self.screen.filled_sphere(pos, width)
-
-        self.global_offset += self.screen.delta_time / 15
+        self.global_offset += self.screen.delta_time / 20
         self.screen.pop_matrix()
 
 

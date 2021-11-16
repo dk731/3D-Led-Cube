@@ -55,9 +55,9 @@
 
 #pragma comment(lib, "ws2_32.lib") //Winsock Library
 
-#else
+// #else
 
-#error "Rendering Option was not defined! (VIRTUAL_RENDER)"
+// #error "Rendering Option was not defined!"
 
 #endif
 

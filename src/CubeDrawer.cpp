@@ -496,13 +496,13 @@ void CubeDrawer::init_gl()
     // }
 
 #ifndef DYNAMIC_SHADER_INCLUDE
-    std::ifstream in("/home/pi/tmp/3D-Led-Cube/src/shaders/main.vert");
+    std::ifstream in("C:\\Users\\user\\Desktop\\3D-Led-Cube\\src\\shaders\\main.vert");
 
     std::string tmp_vert = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     const char *vert_str = tmp_vert.c_str();
     in.close();
 
-    in = std::ifstream("/home/pi/tmp/3D-Led-Cube/src/shaders/main.frag");
+    in = std::ifstream("C:\\Users\\user\\Desktop\\3D-Led-Cube\\src\\shaders\\main.frag");
     std::string tmp_frag = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     const char *frag_str = tmp_frag.c_str();
     in.close();
@@ -745,8 +745,8 @@ void CubeDrawer::aline(float *p1, float *p2, float line_width)
         .type = CALL_LINE_TYPE,
         .color = {.g = cur_brush.g, .r = cur_brush.r, .b = cur_brush.b},
         .data = {
-            p1[0], p1[1], p1[1], 0.0f,
-            p2[0], p2[1], p2[1], 0.0f,
+            p1[0], p1[1], p1[2], 0.0f,
+            p2[0], p2[1], p2[2], 0.0f,
             line_width, 0.0f, 0.0f, 0.0f,
             0.0f, 0.0f, 0.0f, 0.0f},
     });
@@ -910,7 +910,7 @@ void CubeDrawer::line(PyObject *p1, PyObject *p2, float line_width)
     memcpy(glm::value_ptr(pp1), &cur_parsed_args[0], sizeof(float) * 3);
     if (parse_num_input(p2, 3) < 0)
         return;
-    memcpy(glm::value_ptr(pp1), &cur_parsed_args[0], sizeof(float) * 3);
+    memcpy(glm::value_ptr(pp2), &cur_parsed_args[0], sizeof(float) * 3);
 
     apply_transforms(pp1);
     apply_transforms(pp2);

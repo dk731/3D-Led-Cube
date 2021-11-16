@@ -6,7 +6,7 @@ from scipy.io import wavfile
 import numpy as np
 import time
 
-from playsound import playsound
+import simpleaudio as sa
 import threading
 from offset_sphere import OffsetSphere
 
@@ -18,10 +18,10 @@ def smooth_fourie(arr):
 drawer = cd.get_obj()
 drawer.translate(7.5, 7.5, 7.5)
 drawer.set_fps_cap(0)
-sp = OffsetSphere(drawer)
+sp = OffsetSphere(drawer, 3)
 
 file_name = (
-    "C://Users//user//Desktop//3D-Led-Cube//examples//audio_visualizer//song.wav"
+    "C://Users//user//Desktop//3D-Led-Cube//examples//audio_visualizer//song3.wav"
 )
 
 rate, data = wavfile.read(file_name)
@@ -32,18 +32,33 @@ if len(data.shape) != 2:
     (shape_size,) = data.shape
     data = np.concatenate([data, data], axis=None).reshape((shape_size, 2))
 
-
 start_frame = 0
-frame_size = rate // 2
+frame_size = rate // 15
 
+smooth_window = 30
+norm_vec = np.exp(
+    np.arange(-1, stop=0, step=1 / ((frame_size + 3 - smooth_window * 2) / 2)) * 2
+)
 
-# xf = np.log(rfftfreq(frame_size, 1 / rate) + 25)
-smooth_window = 10
-
-threading.Thread(target=lambda: playsound(file_name), daemon=True).start()
-
+wave_obj = sa.WaveObject.from_wave_file(file_name)
+play_obj = wave_obj.play()
 start_time = time.time()
+
+fpss = 0
+
+
+def fpsss():
+    global fpss
+    while True:
+        print(fpss)
+        fpss = 0
+        time.sleep(1)
+
+
+threading.Thread(target=fpsss).start()
+
 while True:
+    start_frame = int((time.time() - start_time) * rate)
     yfl = np.abs(rfft(data[start_frame : start_frame + frame_size, 0]))
     yfr = np.abs(rfft(data[start_frame : start_frame + frame_size, 1]))
 
@@ -53,19 +68,17 @@ while True:
     yfl = (cumsum_vecl[smooth_window:] - cumsum_vecl[:-smooth_window]) / smooth_window
     yfr = (cumsum_vecr[smooth_window:] - cumsum_vecr[:-smooth_window]) / smooth_window
 
-    yfl *= np.exp(np.arange(-1, stop=0, step=1 / len(yfl)))
-    yfr *= np.exp(np.arange(-1, stop=0, step=1 / len(yfr)))
+    yfl *= norm_vec
+    yfr *= norm_vec
 
     yfl /= np.max(yfl)
     yfr /= np.max(yfr)
 
-    # (np.exp(np.arange(-1, stop=0, step=1 / len(xf)) * 2))
-
     drawer.clear()
-    drawer.rotate(drawer.delta_time * 4, drawer.delta_time * 2, drawer.delta_time)
-    sp.update_points(1.5, 3.5, yfl * 8, yfr * 8, 2)
+    drawer.rotate(drawer.delta_time * 2, drawer.delta_time, drawer.delta_time / 4)
+    sp.update_points(1.5, 8, 6, yfl, yfr, 2)
     sp.draw()
 
     drawer.show()
 
-    start_frame = int((time.time() - start_time) * rate)
+    fpss += 1
