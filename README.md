@@ -73,7 +73,7 @@ As potential max refrash rate could be >100 per second, another solution had to 
 
 - Dmitry Kaidalov - help with soldering and general design tips
 - Anna Kacane - logo design
-- Anastsija Sirotkina - help with soldering
+- Anastasija Sirotkina - help with soldering
 
 ## Contact
 
