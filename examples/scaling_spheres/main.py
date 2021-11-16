@@ -14,7 +14,7 @@ ANIM_CLEAR_TIME = 10
 
 def random_spawner():
     global spheres_list
-    DELTA_SLEEP = 1.5
+    DELTA_SLEEP = 1
     MIN_SLEEP = 0.5
     while True:
         spheres_list.append(
@@ -23,7 +23,7 @@ def random_spawner():
                 [c * 255 for c in colorsys.hsv_to_rgb(random(), 1, 1)],
                 [random() * 15 for _ in range(3)],
                 1,
-                random() * 5 + 3,
+                random() * 7 + 5,
                 random() + 0.5,
             )
         )

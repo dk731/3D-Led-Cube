@@ -12,7 +12,7 @@ WAVE_SPEED = 4
 
 while True:
     drawer.clear()
-    drawer.rotate(tau * drawer.delta_time / 6, tau * drawer.delta_time / 24, 0)
+    # drawer.rotate(tau * drawer.delta_time / 6, tau * drawer.delta_time / 24, 0)
     for z in range(32):
         for x in range(32):
             zz = z - 15
