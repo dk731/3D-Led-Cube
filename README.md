@@ -67,6 +67,8 @@ After some additional research was found that microchips used in arduino but wit
 
 As potential max refrash rate could be >100 per second, another solution had to be developed, after long time span of researching different approaches, this [article about Raspberry PI SMI perephiral](https://iosoft.blog/2020/07/16/raspberry-pi-smi/) was discovered. Mentioned SMI device allows to write big amount of data with high precision on 16 GPIO's at the same time directly from Raspberry borad, so everythink had to be re-done 4th time, simple PCB with level shifter and some indecational lights was designed and tested. This appered to work as excpected.
 
+<img src="https://i.ibb.co/bJzXKJt/photo-2021-11-19-16-39-26.jpg" width="25%">
+
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Contributions
