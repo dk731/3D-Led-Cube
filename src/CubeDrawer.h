@@ -246,6 +246,7 @@ private:
     // \OpenGL Renderer API Binds
 
     static void err_clb(int i);
+    bool draw_immediate = false;
 
 public:
     static CubeDrawer &get_obj();
@@ -253,7 +254,6 @@ public:
     CubeDrawer(CubeDrawer &other) = delete;
     void operator=(const CubeDrawer &) = delete;
 
-    bool draw_immediate = false;
 #ifdef VIRTUAL_RENDER
     std::list<websocketpp::connection_hdl> virt_hdls;
     int get_virt_amount();
@@ -279,14 +279,14 @@ public:
     void scale(PyObject *input);
 
     void clear(float r, float g, float b);
-    void clear(float rgb = 0.0);
+    void clear(float rgb = 0.0f);
     void clear(int rgb);
     void clear(int r, int g, int b);
     void clear(PyObject *input);
 
     void show();
 
-    void set_fps_cap(int fps);
+    void set_fps_cap(float fps);
 
     //
     void set_brigthness(float b);
@@ -299,19 +299,17 @@ public:
     void set_color(float rgb);
 
     void set_color(PyObject *input);
-    //
+
+    void set_immediate(bool v);
 
     //// User API Calls overloads
 
-    // CALL_POINT_TYPE - DONE
     void point(float x, float y, float z);
-    void point(PyObject *p); // tuple with 3 values
+    void point(PyObject *p);
 
-    // CALL_LINE_TYPE - DONE
     void line(float x1, float y1, float z1, float x2, float y2, float z2, float line_width = DEF_LINEW1);
     void line(PyObject *p1, PyObject *p2, float line_width = DEF_LINEW1);
 
-    // CALL_CIRCLE_TYPE - DONE
     void circle(float x, float y, float z, float r, float line_width = DEF_LINEW1, float thickness = DEF_ZHEIGHT);
     void circle(PyObject *p, float r, float line_width = DEF_LINEW1, float thickness = DEF_ZHEIGHT);
 
@@ -324,7 +322,6 @@ public:
     void filled_ellipse(float x, float y, float z, float rx, float ry, float thickness = DEF_ZHEIGHT);
     void filled_ellipse(PyObject *p, PyObject *r, float thickness = DEF_ZHEIGHT);
 
-    // CALL_SPHERE_TYPE
     void sphere(float x, float y, float z, float r, float line_width = DEF_LINEW2);
     void sphere(PyObject *p, float r, float line_width = DEF_LINEW2);
 
@@ -337,17 +334,9 @@ public:
     void filled_ellipsoid(float x, float y, float z, float rx, float ry, float rz);
     void filled_ellipsoid(PyObject *p, PyObject *r);
 
-    // CALL_POLYGON_TYPE
     void poly(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float height = DEF_ZHEIGHT);
     void poly(PyObject *p1, PyObject *p2, PyObject *p3, float height = DEF_ZHEIGHT);
 
-    // CALL_POLYPYR_TYPE
     void tetr(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4);
     void tetr(PyObject *p1, PyObject *p2, PyObject *p3, PyObject *p4);
-
-    // CALL_FCIRCLE_TYPE !
-
-    // CALL_FSPHERE_TYPE
-
-    //// \User friendly API Calls overloads
 };

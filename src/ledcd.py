@@ -62,7 +62,8 @@ class _SwigNonDynamicMeta(type):
 
 
 EPSILON = _ledcd.EPSILON
-DEF_LINEW = _ledcd.DEF_LINEW
+DEF_LINEW1 = _ledcd.DEF_LINEW1
+DEF_LINEW2 = _ledcd.DEF_LINEW2
 DEF_ZHEIGHT = _ledcd.DEF_ZHEIGHT
 class Brush(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
@@ -200,7 +201,6 @@ class CubeDrawer(object):
     @staticmethod
     def get_obj():
         return _ledcd.CubeDrawer_get_obj()
-    draw_immediate = property(_ledcd.CubeDrawer_draw_immediate_get, _ledcd.CubeDrawer_draw_immediate_set)
     is_sync = property(_ledcd.CubeDrawer_is_sync_get, _ledcd.CubeDrawer_is_sync_set)
     delta_time = property(_ledcd.CubeDrawer_delta_time_get, _ledcd.CubeDrawer_delta_time_set)
 
@@ -239,6 +239,9 @@ class CubeDrawer(object):
 
     def set_color(self, *args):
         return _ledcd.CubeDrawer_set_color(self, *args)
+
+    def set_immediate(self, v):
+        return _ledcd.CubeDrawer_set_immediate(self, v)
 
     def point(self, *args):
         return _ledcd.CubeDrawer_point(self, *args)

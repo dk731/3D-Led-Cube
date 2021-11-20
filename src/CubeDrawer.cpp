@@ -289,13 +289,7 @@ void CubeDrawer::clear(float r, float g, float b)
     if (r < 0.0f || r > 1.0f || g < 0.0f || g > 1.0f || b < 0.0f || b > 1.0f)
         THROW_EXP("Invalid input, values must be in range [0, 1]", )
 
-    draw_calls_arr.push_back({.type = CALL_CLEAR_TYPE,
-                              .color = {
-                                  .g = (unsigned char)(255.0f * g),
-                                  .r = (unsigned char)(255.0f * r),
-                                  .b = (unsigned char)(255.0f * b)}});
-    if (draw_immediate)
-        show();
+    clear((int)(r * 255.0f), (int)(g * 255.0f), (int)(b * 255.0f));
 }
 
 void CubeDrawer::clear(float rgb)
@@ -305,8 +299,7 @@ void CubeDrawer::clear(float rgb)
 
 void CubeDrawer::clear(int rgb)
 {
-    float rgb2 = rgb / 255.0f;
-    clear(rgb2, rgb2, rgb2);
+    clear(rgb, rgb, rgb);
 }
 
 void CubeDrawer::clear(int r, int g, int b)
@@ -314,7 +307,13 @@ void CubeDrawer::clear(int r, int g, int b)
     if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255)
         THROW_EXP("Invalid input, values must be in range [0, 255]", )
 
-    clear(r / 255.0f, g / 255.0f, b / 255.0f);
+    draw_calls_arr.push_back({.type = CALL_CLEAR_TYPE,
+                              .color = {
+                                  .g = (unsigned char)(g),
+                                  .r = (unsigned char)(r),
+                                  .b = (unsigned char)(b)}});
+    if (draw_immediate)
+        show();
 }
 
 void CubeDrawer::clear(PyObject *input)
@@ -322,17 +321,19 @@ void CubeDrawer::clear(PyObject *input)
     if (parse_num_input(input, 3) < 0)
         return;
 
-    if (PyLong_Check(PyTuple_GetItem(input, 0)))
-        clear(cur_parsed_args[0] / 255.0f, cur_parsed_args[1] / 255.0f, cur_parsed_args[2] / 255.0f);
+    const struct ParseFuncs *cur_funcs;
+    if (PyTuple_Check(input))
+        cur_funcs = &parse_funcs[PY_TUPLE_PARSE];
+    else if (PyList_Check(input))
+        cur_funcs = &parse_funcs[PY_LIST_PARSE];
+    else
+        THROW_EXP("Invalid input, was expecting tuple or list", )
+
+    if (PyLong_Check(cur_funcs->get_item(input, 0)))
+        clear((int)cur_parsed_args[0], (int)cur_parsed_args[1], (int)cur_parsed_args[2]);
     else
         clear(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2]);
 }
-
-// void clear(float r, float g, float b);
-// void clear(float rgb = 0.0);
-// void clear(int rgb);
-// void clear(int r, int g, int b);
-// void clear(PyObject *input);
 
 void CubeDrawer::show()
 {
@@ -381,20 +382,18 @@ void CubeDrawer::show()
 #endif
 }
 
-void CubeDrawer::set_fps_cap(int fps)
+void CubeDrawer::set_fps_cap(float fps)
 {
-    if (!fps)
+    if (fps < EPSILON)
         min_frame_delay = 0;
     else
-        min_frame_delay = (1.0 / (float)fps) * 1000000.0f;
-
-    // std::cout << "Changed fps cap to be: " << fps << " fps or " << min_frame_delay << " us or " << min_frame_delay / 1000.0 << " ms" << std::endl;
+        min_frame_delay = (1.0 / fps) * 1000000.0f;
 }
 
 ////////// Color
 void CubeDrawer::set_brigthness(float b)
 {
-    if (b < 0 || b > 1)
+    if (b < 0.0 || b > 1.0)
         THROW_EXP("Invalid input, values only in range [0, 1] are allowed", )
 
     cur_brush.brigthness = b;
@@ -453,6 +452,11 @@ void CubeDrawer::set_color(PyObject *input)
 }
 
 ////////// \Color
+
+void CubeDrawer::set_immediate(bool v)
+{
+    draw_immediate = v;
+}
 
 ////////// OpenGL
 void CubeDrawer::init_gl()
@@ -612,16 +616,6 @@ void CubeDrawer::init_gl()
     glDepthFunc(GL_LESS);
     std::thread tmp_t(&CubeDrawer::pool_events, this);
     tmp_t.detach();
-
-    // glViewport(0, 0, 16, 256);
-
-    // DrawCall *new_point_call = new DrawCall({
-    //     .type = CALL_SPHERE_TYPE,
-    //     .color = {255, 0, 0},
-    //     .data = {7.5f, 7.5f, 7.5f, 1.0f, 7.0f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
-    // });
-
-    // draw_calls_arr.push_back(*new_point_call);
 }
 
 bool CubeDrawer::check_compile(GLuint obj)
@@ -797,13 +791,6 @@ void CubeDrawer::asphere(float *model_mat, float *r, bool filled, float line_wid
 }
 
 ////////// \OpenGL Renderer API Binds
-
-// void apoint(float x, float y, float z, float line_width = DEF_LINEW);
-// void apoly(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float z_height = DEF_ZHEIGHT);
-// void apoly_pyr(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4);
-// void aline(float x1, float y1, float z1, float x2, float y2, float z2, float line_width = DEF_LINEW);
-// void acircle(float *model_mat, float rx, float ry, bool filled = true, float z_height = DEF_ZHEIGHT, float line_width = DEF_LINEW);
-// void asphere(float *model_mat, float rx, float ry, float rz, bool filled = true, float line_width = DEF_LINEW);
 
 //// User API Calls overloads
 // POINT

@@ -5181,58 +5181,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_CubeDrawer_draw_immediate_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CubeDrawer *arg1 = (CubeDrawer *) 0 ;
-  bool arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  bool val2 ;
-  int ecode2 = 0 ;
-  PyObject *swig_obj[2] ;
-  
-  if (!SWIG_Python_UnpackTuple(args, "CubeDrawer_draw_immediate_set", 2, 2, swig_obj)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_CubeDrawer, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_draw_immediate_set" "', argument " "1"" of type '" "CubeDrawer *""'"); 
-  }
-  arg1 = reinterpret_cast< CubeDrawer * >(argp1);
-  ecode2 = SWIG_AsVal_bool(swig_obj[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "CubeDrawer_draw_immediate_set" "', argument " "2"" of type '" "bool""'");
-  } 
-  arg2 = static_cast< bool >(val2);
-  if (arg1) (arg1)->draw_immediate = arg2;
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_CubeDrawer_draw_immediate_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CubeDrawer *arg1 = (CubeDrawer *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject *swig_obj[1] ;
-  bool result;
-  
-  if (!args) SWIG_fail;
-  swig_obj[0] = args;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_CubeDrawer, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_draw_immediate_get" "', argument " "1"" of type '" "CubeDrawer *""'"); 
-  }
-  arg1 = reinterpret_cast< CubeDrawer * >(argp1);
-  result = (bool) ((arg1)->draw_immediate);
-  resultobj = SWIG_From_bool(static_cast< bool >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_CubeDrawer_is_sync_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CubeDrawer *arg1 = (CubeDrawer *) 0 ;
@@ -6133,10 +6081,10 @@ fail:
 SWIGINTERN PyObject *_wrap_CubeDrawer_set_fps_cap(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CubeDrawer *arg1 = (CubeDrawer *) 0 ;
-  int arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  int val2 ;
+  float val2 ;
   int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   
@@ -6146,11 +6094,11 @@ SWIGINTERN PyObject *_wrap_CubeDrawer_set_fps_cap(PyObject *SWIGUNUSEDPARM(self)
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_set_fps_cap" "', argument " "1"" of type '" "CubeDrawer *""'"); 
   }
   arg1 = reinterpret_cast< CubeDrawer * >(argp1);
-  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "CubeDrawer_set_fps_cap" "', argument " "2"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "CubeDrawer_set_fps_cap" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< int >(val2);
+  arg2 = static_cast< float >(val2);
   (arg1)->set_fps_cap(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -6543,6 +6491,35 @@ fail:
     "    CubeDrawer::set_color(float)\n"
     "    CubeDrawer::set_color(PyObject *)\n");
   return 0;
+}
+
+
+SWIGINTERN PyObject *_wrap_CubeDrawer_set_immediate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CubeDrawer *arg1 = (CubeDrawer *) 0 ;
+  bool arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  bool val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "CubeDrawer_set_immediate", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_CubeDrawer, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_set_immediate" "', argument " "1"" of type '" "CubeDrawer *""'"); 
+  }
+  arg1 = reinterpret_cast< CubeDrawer * >(argp1);
+  ecode2 = SWIG_AsVal_bool(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "CubeDrawer_set_immediate" "', argument " "2"" of type '" "bool""'");
+  } 
+  arg2 = static_cast< bool >(val2);
+  (arg1)->set_immediate(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
 }
 
 
@@ -10481,8 +10458,6 @@ static PyMethodDef SwigMethods[] = {
 	 { "Transform_swigregister", Transform_swigregister, METH_O, NULL},
 	 { "Transform_swiginit", Transform_swiginit, METH_VARARGS, NULL},
 	 { "CubeDrawer_get_obj", _wrap_CubeDrawer_get_obj, METH_NOARGS, NULL},
-	 { "CubeDrawer_draw_immediate_set", _wrap_CubeDrawer_draw_immediate_set, METH_VARARGS, NULL},
-	 { "CubeDrawer_draw_immediate_get", _wrap_CubeDrawer_draw_immediate_get, METH_O, NULL},
 	 { "CubeDrawer_is_sync_set", _wrap_CubeDrawer_is_sync_set, METH_VARARGS, NULL},
 	 { "CubeDrawer_is_sync_get", _wrap_CubeDrawer_is_sync_get, METH_O, NULL},
 	 { "CubeDrawer_delta_time_set", _wrap_CubeDrawer_delta_time_set, METH_VARARGS, NULL},
@@ -10499,6 +10474,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "CubeDrawer_set_fps_cap", _wrap_CubeDrawer_set_fps_cap, METH_VARARGS, NULL},
 	 { "CubeDrawer_set_brigthness", _wrap_CubeDrawer_set_brigthness, METH_VARARGS, NULL},
 	 { "CubeDrawer_set_color", _wrap_CubeDrawer_set_color, METH_VARARGS, NULL},
+	 { "CubeDrawer_set_immediate", _wrap_CubeDrawer_set_immediate, METH_VARARGS, NULL},
 	 { "CubeDrawer_point", _wrap_CubeDrawer_point, METH_VARARGS, NULL},
 	 { "CubeDrawer_line", _wrap_CubeDrawer_line, METH_VARARGS, NULL},
 	 { "CubeDrawer_circle", _wrap_CubeDrawer_circle, METH_VARARGS, NULL},
@@ -11320,7 +11296,8 @@ SWIG_init(void) {
   SWIG_InstallConstants(d,swig_const_table);
   
   SWIG_Python_SetConstant(d, "EPSILON",SWIG_From_double(static_cast< double >(0.00001)));
-  SWIG_Python_SetConstant(d, "DEF_LINEW",SWIG_From_double(static_cast< double >((0.5-0.00001))));
+  SWIG_Python_SetConstant(d, "DEF_LINEW1",SWIG_From_double(static_cast< double >((0.5-0.00001))));
+  SWIG_Python_SetConstant(d, "DEF_LINEW2",SWIG_From_double(static_cast< double >((1.0-0.00001))));
   SWIG_Python_SetConstant(d, "DEF_ZHEIGHT",SWIG_From_double(static_cast< double >((0.5-0.00001))));
   globals = SWIG_globals();
   if (!globals) {
