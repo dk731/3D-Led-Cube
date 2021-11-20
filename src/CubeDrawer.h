@@ -89,8 +89,8 @@
 #define SLEEP_MICROS(val) std::this_thread::sleep_for(std::chrono::microseconds(val))
 
 #define EPSILON 0.00001f
-#define DEF_LINEW 0.5f - EPSILON
-#define DEF_ZHEIGHT 0.5f - EPSILON
+#define DEF_LINEW (0.5f - EPSILON)
+#define DEF_ZHEIGHT (0.5f - EPSILON)
 
 const int MAT4_SIZE = sizeof(float) * 16;
 
@@ -300,36 +300,38 @@ public:
     void set_color(PyObject *input);
     //
 
-    //// User friendly API Calls overloads
-    // CALL_POINT_TYPE !
+    //// User API Calls overloads
+
+    // CALL_POINT_TYPE - DONE
     void point(float x, float y, float z);
     void point(PyObject *p); // tuple with 3 values
 
+    // CALL_LINE_TYPE - DONE
+    void line(float x1, float y1, float z1, float x2, float y2, float z2, float line_width = DEF_LINEW);
+    void line(PyObject *p1, PyObject *p2, float line_width = DEF_LINEW);
+
+    // CALL_CIRCLE_TYPE !
+    void circle(float x, float y, float z, float r, float line_width = DEF_LINEW, float thickness = DEF_ZHEIGHT);
+    void circle(PyObject *p, float r, float line_width = DEF_LINEW, float thickness = DEF_ZHEIGHT);
+
+    void filled_circle(float x, float y, float z, float r, float thickness = DEF_LINEW);
+    void filled_circle(PyObject *p, float r, float thickness = DEF_LINEW);
+
+    void ellipse(float x, float y, float z, float rx, float ry, float line_width = DEF_LINEW * 2, float thickness = DEF_ZHEIGHT);
+    void ellipse(PyObject *p, PyObject *r, float line_width = DEF_LINEW * 2, float thickness = DEF_ZHEIGHT);
+
+    void filled_ellipse(float x, float y, float z, float rx, float ry, float thickness = DEF_ZHEIGHT);
+    void filled_ellipse(PyObject *p, PyObject *r, float thickness = DEF_ZHEIGHT);
+
     // CALL_POLYGON_TYPE
-    // Not working with transformations
     void poly(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float height = DEF_ZHEIGHT);
     void poly(PyObject *p1, PyObject *p2, PyObject *p3, float height = DEF_ZHEIGHT);
 
     // CALL_POLYPYR_TYPE
-    // Not wrking
     void tetr(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4);
     void tetr(PyObject *p1, PyObject *p2, PyObject *p3, PyObject *p4);
 
-    // CALL_LINE_TYPE !
-    void line(float x1, float y1, float z1, float x2, float y2, float z2, float line_width = DEF_LINEW);
-    void line(PyObject *p1, PyObject *p2, float line_width = DEF_LINEW);
-    void filled_circle(float x, float y, float z, float r);
-    void filled_circle(PyObject *p, float r);
-
-    // CALL_CIRCLE_TYPE !
-    void circle(float x, float y, float z, float rx, float ry, float line_width, float thickness = DEF_ZHEIGHT);
-    void circle(float x, float y, float z, float r);
-    void circle(PyObject *p, float r, float line_width = DEF_LINEW, float thickness = DEF_ZHEIGHT);
-    void circle(PyObject *p, PyObject *r, float line_width = DEF_LINEW, float thickness = DEF_ZHEIGHT);
-
     // CALL_FCIRCLE_TYPE !
-    void filled_circle(float x, float y, float z, float rx, float ry, float thickness = DEF_ZHEIGHT);
-    void filled_circle(PyObject *p, PyObject *r, float thickness = DEF_ZHEIGHT);
 
     // CALL_SPHERE_TYPE
     void sphere(float x, float y, float z, float rx, float ry, float rz, float line_width = DEF_LINEW);

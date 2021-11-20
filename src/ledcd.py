@@ -243,12 +243,6 @@ class CubeDrawer(object):
     def point(self, *args):
         return _ledcd.CubeDrawer_point(self, *args)
 
-    def poly(self, *args):
-        return _ledcd.CubeDrawer_poly(self, *args)
-
-    def tetr(self, *args):
-        return _ledcd.CubeDrawer_tetr(self, *args)
-
     def line(self, *args):
         return _ledcd.CubeDrawer_line(self, *args)
 
@@ -257,6 +251,18 @@ class CubeDrawer(object):
 
     def filled_circle(self, *args):
         return _ledcd.CubeDrawer_filled_circle(self, *args)
+
+    def ellipse(self, *args):
+        return _ledcd.CubeDrawer_ellipse(self, *args)
+
+    def filled_ellipse(self, *args):
+        return _ledcd.CubeDrawer_filled_ellipse(self, *args)
+
+    def poly(self, *args):
+        return _ledcd.CubeDrawer_poly(self, *args)
+
+    def tetr(self, *args):
+        return _ledcd.CubeDrawer_tetr(self, *args)
 
     def sphere(self, *args):
         return _ledcd.CubeDrawer_sphere(self, *args)

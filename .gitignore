@@ -17,3 +17,4 @@ tools/cube_writer/.vscode
 *.wav
 .vscode
 *.out
+test.py

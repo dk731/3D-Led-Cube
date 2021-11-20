@@ -10,6 +10,7 @@ VOXEL_SIZE = 2
 noise = OpenSimplex(seed=int(time.time() * 1000))
 noise_scale = 0.05
 drawer = cd.get_obj()
+drawer.set_brigthness(0.5)
 
 anim_time = 0
 

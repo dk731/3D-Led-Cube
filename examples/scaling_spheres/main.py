@@ -14,8 +14,8 @@ ANIM_CLEAR_TIME = 10
 
 def random_spawner():
     global spheres_list
-    DELTA_SLEEP = 1
-    MIN_SLEEP = 0.5
+    DELTA_SLEEP = 0.8
+    MIN_SLEEP = 1
     while True:
         spheres_list.append(
             ScalingSphere(
@@ -49,6 +49,7 @@ while True:
 
     for sphere in spheres_list:
         sphere.update()
+
         sphere.draw()
 
     drawer.show()
