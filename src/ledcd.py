@@ -258,17 +258,23 @@ class CubeDrawer(object):
     def filled_ellipse(self, *args):
         return _ledcd.CubeDrawer_filled_ellipse(self, *args)
 
-    def poly(self, *args):
-        return _ledcd.CubeDrawer_poly(self, *args)
-
-    def tetr(self, *args):
-        return _ledcd.CubeDrawer_tetr(self, *args)
-
     def sphere(self, *args):
         return _ledcd.CubeDrawer_sphere(self, *args)
 
     def filled_sphere(self, *args):
         return _ledcd.CubeDrawer_filled_sphere(self, *args)
+
+    def ellipsoid(self, *args):
+        return _ledcd.CubeDrawer_ellipsoid(self, *args)
+
+    def filled_ellipsoid(self, *args):
+        return _ledcd.CubeDrawer_filled_ellipsoid(self, *args)
+
+    def poly(self, *args):
+        return _ledcd.CubeDrawer_poly(self, *args)
+
+    def tetr(self, *args):
+        return _ledcd.CubeDrawer_tetr(self, *args)
 
 # Register CubeDrawer in _ledcd:
 _ledcd.CubeDrawer_swigregister(CubeDrawer)

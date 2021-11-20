@@ -811,7 +811,7 @@ void CubeDrawer::point(float x, float y, float z)
 {
     glm::vec4 p(x, y, z, 1.0f);
     apply_transforms(p);
-    apoint(glm::value_ptr(p), DEF_LINEW);
+    apoint(glm::value_ptr(p), DEF_LINEW1);
 }
 void CubeDrawer::point(PyObject *p)
 {
@@ -929,7 +929,86 @@ void CubeDrawer::filled_ellipse(PyObject *p, PyObject *r, float thickness)
     filled_ellipse(pp[0], pp[1], pp[2], cur_parsed_args[0], cur_parsed_args[1], thickness);
 }
 
-///////////////////////////
+// SPHERE
+void CubeDrawer::sphere(float x, float y, float z, float r, float line_width)
+{
+    ellipsoid(x, y, z, r, r, r, line_width);
+}
+void CubeDrawer::sphere(PyObject *p, float r, float line_width)
+{
+    if (parse_num_input(p, 3) < 0)
+        return;
+
+    ellipsoid(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2], r, r, r, line_width);
+}
+
+void CubeDrawer::filled_sphere(float x, float y, float z, float r)
+{
+    filled_ellipsoid(x, y, z, r, r, r);
+}
+void CubeDrawer::filled_sphere(PyObject *p, float r)
+{
+    if (parse_num_input(p, 3) < 0)
+        return;
+
+    filled_ellipsoid(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2], r, r, r);
+}
+
+void CubeDrawer::ellipsoid(float x, float y, float z, float rx, float ry, float rz, float line_width)
+{
+    glm::mat4 local_mat;
+
+    update_matrix();
+    memcpy(glm::value_ptr(local_mat), glm::value_ptr(transform_list.back()->final), MAT4_SIZE);
+
+    local_mat = glm::translate(local_mat, glm::vec3(x, y, z));
+    local_mat = glm::scale(local_mat, glm::vec3(rx, ry, rz));
+
+    float rr[] = {rx, ry, rz};
+    local_mat = glm::inverse(local_mat);
+
+    asphere(glm::value_ptr(local_mat), rr, false, line_width);
+}
+void CubeDrawer::ellipsoid(PyObject *p, PyObject *r, float line_width)
+{
+    float pp[3];
+
+    if (parse_num_input(p, 3) < 0)
+        return;
+    memcpy(pp, &cur_parsed_args[0], sizeof(float) * 3);
+    if (parse_num_input(r, 3) < 0)
+        return;
+
+    ellipsoid(pp[0], pp[1], pp[2], cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2], line_width);
+}
+
+void CubeDrawer::filled_ellipsoid(float x, float y, float z, float rx, float ry, float rz)
+{
+    glm::mat4 local_mat;
+
+    update_matrix();
+    memcpy(glm::value_ptr(local_mat), glm::value_ptr(transform_list.back()->final), MAT4_SIZE);
+
+    local_mat = glm::translate(local_mat, glm::vec3(x, y, z));
+    local_mat = glm::scale(local_mat, glm::vec3(rx, ry, rz));
+
+    float rr[] = {rx, ry, rz};
+    local_mat = glm::inverse(local_mat);
+
+    asphere(glm::value_ptr(local_mat), rr, true, 0.0f);
+}
+void CubeDrawer::filled_ellipsoid(PyObject *p, PyObject *r)
+{
+    float pp[3];
+
+    if (parse_num_input(p, 3) < 0)
+        return;
+    memcpy(pp, &cur_parsed_args[0], sizeof(float) * 3);
+    if (parse_num_input(r, 3) < 0)
+        return;
+
+    filled_ellipsoid(pp[0], pp[1], pp[2], cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2]);
+}
 
 // CALL_POLYGON_TYPE
 void CubeDrawer::poly(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float height)
@@ -1002,82 +1081,7 @@ void CubeDrawer::tetr(PyObject *p1, PyObject *p2, PyObject *p3, PyObject *p4)
     atetr(glm::value_ptr(pp1), glm::value_ptr(pp2), glm::value_ptr(pp3), glm::value_ptr(pp4));
 }
 
-// CALL_SPHERE_TYPE
-void CubeDrawer::sphere(float x, float y, float z, float rx, float ry, float rz, float line_width)
-{
-    glm::mat4 local_mat;
-
-    update_matrix();
-    memcpy(glm::value_ptr(local_mat), glm::value_ptr(transform_list.back()->final), MAT4_SIZE);
-
-    local_mat = glm::translate(local_mat, glm::vec3(x, y, z));
-    local_mat = glm::scale(local_mat, glm::vec3(rx, ry, rz));
-
-    float rr[] = {rx, ry, rz};
-    local_mat = glm::inverse(local_mat);
-
-    asphere(glm::value_ptr(local_mat), rr, false, line_width);
-}
-void CubeDrawer::sphere(float x, float y, float z, float r, float line_width)
-{
-    sphere(x, y, z, r, r, r, line_width);
-}
-void CubeDrawer::sphere(PyObject *p, PyObject *r, float line_width)
-{
-    float pp[3];
-
-    if (parse_num_input(p, 3) < 0)
-        return;
-    memcpy(pp, &cur_parsed_args[0], sizeof(float) * 3);
-    if (parse_num_input(r, 3) < 0)
-        return;
-
-    sphere(pp[0], pp[1], pp[2], cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[1], line_width);
-}
-
-// CALL_FSPHERE_TYPE
-void CubeDrawer::filled_sphere(float x, float y, float z, float rx, float ry, float rz)
-{
-    glm::mat4 local_mat;
-
-    update_matrix();
-    memcpy(glm::value_ptr(local_mat), glm::value_ptr(transform_list.back()->final), MAT4_SIZE);
-
-    local_mat = glm::translate(local_mat, glm::vec3(x, y, z));
-    local_mat = glm::scale(local_mat, glm::vec3(rx, ry, rz));
-
-    float rr[] = {rx, ry, rz};
-    local_mat = glm::inverse(local_mat);
-
-    asphere(glm::value_ptr(local_mat), rr, true, 0.0f);
-}
-
-void CubeDrawer::filled_sphere(float x, float y, float z, float r)
-{
-    filled_sphere(x, y, z, r, r, r);
-}
-
-void CubeDrawer::filled_sphere(PyObject *p, float r)
-{
-    if (parse_num_input(p, 3) < 0)
-        return;
-
-    filled_sphere(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2], r, r, r);
-}
-
-void CubeDrawer::filled_sphere(PyObject *p, PyObject *r)
-{
-    float pp[3];
-
-    if (parse_num_input(p, 3) < 0)
-        return;
-    memcpy(pp, &cur_parsed_args[0], sizeof(float) * 3);
-    if (parse_num_input(r, 3) < 0)
-        return;
-
-    filled_sphere(pp[0], pp[1], pp[2], cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2]);
-}
-//// \User friendly API Calls overloads
+//// \User API Calls overloads
 
 CubeDrawer::~CubeDrawer()
 {
