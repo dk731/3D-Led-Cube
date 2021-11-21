@@ -127,6 +127,7 @@ int CubeDrawer::parse_num_input(PyObject *input, int req_len)
         cur_funcs = &parse_funcs[PY_TUPLE_PARSE];
     else if (PyList_Check(input))
         cur_funcs = &parse_funcs[PY_LIST_PARSE];
+
     else
         THROW_EXP("Invalid input, was expecting tuple or list", -1)
 
@@ -439,7 +440,14 @@ void CubeDrawer::set_color(PyObject *input)
 {
     if (parse_num_input(input, 3) < 0)
         return;
-    if (PyLong_Check(PyTuple_GetItem(input, 0)))
+
+    const struct ParseFuncs *cur_funcs;
+    if (PyTuple_Check(input))
+        cur_funcs = &parse_funcs[PY_TUPLE_PARSE];
+    else if (PyList_Check(input))
+        cur_funcs = &parse_funcs[PY_LIST_PARSE];
+
+    if (PyLong_Check(cur_funcs->get_item(input, 0)))
         set_color(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2]);
     else
         set_color((int)cur_parsed_args[0], (int)cur_parsed_args[1], (int)cur_parsed_args[2]);

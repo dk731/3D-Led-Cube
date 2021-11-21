@@ -8,7 +8,7 @@ cd = CubeDrawer.get_obj()
 deg = 0
 speed = 0.15
 while True:
-    cd.clear(*[c for c in colorsys.hsv_to_rgb(deg, 1, 1)])
+    cd.clear(colorsys.hsv_to_rgb(deg, 1, 1))
     cd.show()
     deg += speed * cd.delta_time
     if deg > 1:

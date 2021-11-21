@@ -20,7 +20,7 @@ def random_spawner():
         spheres_list.append(
             ScalingSphere(
                 drawer,
-                [c * 255 for c in colorsys.hsv_to_rgb(random(), 1, 1)],
+                colorsys.hsv_to_rgb(random(), 1, 1),
                 [random() * 15 for _ in range(3)],
                 1,
                 random() * 7 + 5,

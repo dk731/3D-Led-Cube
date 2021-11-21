@@ -52,11 +52,11 @@ class ScalingSphere:
             self.spheres_list.append(
                 (
                     t * self.scale_speed + self.start_r,
-                    [int(c * fade_prog) for c in self.color],
+                    [c * fade_prog for c in self.color],
                 )
             )
 
     def draw(self):
         for r, color in self.spheres_list:
-            self.drawer.set_color(*color)
-            self.drawer.sphere(self.pos, (r, r, r), 0.5)
+            self.drawer.set_color(tuple(color))
+            self.drawer.sphere(self.pos, r, 0.5)
