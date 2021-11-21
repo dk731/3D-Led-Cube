@@ -7,7 +7,6 @@ import numpy as np
 import time
 
 import simpleaudio as sa
-import threading
 from offset_sphere import OffsetSphere
 
 
@@ -44,18 +43,6 @@ wave_obj = sa.WaveObject.from_wave_file(file_name)
 play_obj = wave_obj.play()
 start_time = time.time()
 
-fpss = 0
-
-
-def fpsss():
-    global fpss
-    while True:
-        print(fpss)
-        fpss = 0
-        time.sleep(1)
-
-
-threading.Thread(target=fpsss).start()
 
 while True:
     start_frame = int((time.time() - start_time) * rate)
@@ -80,5 +67,3 @@ while True:
     sp.draw()
 
     drawer.show()
-
-    fpss += 1

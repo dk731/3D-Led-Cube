@@ -58,5 +58,5 @@ class ScalingSphere:
 
     def draw(self):
         for r, color in self.spheres_list:
-            self.drawer.set_color(tuple(color))
+            self.drawer.set_color(color)
             self.drawer.sphere(self.pos, r, 0.5)

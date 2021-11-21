@@ -76,21 +76,16 @@ class TreeObj:
         self.wood_height = random() * 3 + 4
         self.leaves_size = (1.8, self.wood_height / 1.8, 1.8)
 
-        self.leaves_color = [
-            int(c * 255)
-            for c in colorsys.hsv_to_rgb(
-                random() * 0.125 + 0.25, 1, 1 - (random() * 0.25 + 0.3)
-            )
-        ]
-        self.wood_color = [
-            int(c * 255)
-            for c in colorsys.hsv_to_rgb(
-                0.0972 + random() * 0.0139, 1, 1 - (random() * 0.25 + 0.3)
-            )
-        ]
+        self.leaves_color = colorsys.hsv_to_rgb(
+            random() * 0.125 + 0.25, 1, 1 - (random() * 0.25 + 0.3)
+        )
+
+        self.wood_color = colorsys.hsv_to_rgb(
+            0.0972 + random() * 0.0139, 1, 1 - (random() * 0.25 + 0.3)
+        )
 
     def draw(self, offset_x, offset_z):
-        self.drawer.set_color(*self.wood_color)
+        self.drawer.set_color(self.wood_color)
         self.drawer.line(
             (self.pos[0] + offset_x, self.pos[1], self.pos[2] + offset_z),
             (
@@ -101,8 +96,8 @@ class TreeObj:
             0.8,
         )
 
-        self.drawer.set_color(*self.leaves_color)
-        self.drawer.filled_sphere(
+        self.drawer.set_color(self.leaves_color)
+        self.drawer.filled_ellipsoid(
             (
                 self.pos[0] + offset_x,
                 self.pos[1] - self.wood_height,

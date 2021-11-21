@@ -80,8 +80,6 @@ CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(GE
         THROW_EXP("Invalid input, values only in range [0, 1] are allowed", )
     }
 
-    // std::cout << "Successfuly oppened shared memmory object" << std::endl;
-
     shm_buf->flags.lock = 0;
     shm_buf->flags.frame_shown = 1;
 #elif defined(REMOTE_RENDER)
@@ -331,10 +329,7 @@ void CubeDrawer::show()
 
     long long delta = min_frame_delay - (GET_MICROS() - prev_show_time);
     if (delta > 0)
-    {
-        // std::cout << "Sleeping: " << delta << "   min_del: " << min_frame_delay << "   prev_show_time: " << prev_show_time << "    cur_time: " << GET_MICROS() << std::endl;
         SLEEP_MICROS(delta);
-    }
 
     delta_time = (GET_MICROS() - prev_show_time) / 1000000.0f;
     prev_show_time = GET_MICROS();
@@ -353,9 +348,6 @@ void CubeDrawer::show()
 #elif defined(RASPI_RENDER)
     while (shm_buf->flags.lock || (is_sync && !shm_buf->flags.frame_shown))
         usleep(100);
-    // {
-    //     std::cout << "Lock: " << shm_buf->flags.lock << " shown: " << shm_buf->flags.frame_shown << std::endl;
-    // }
 
     shm_buf->flags.lock = 1;
     memcpy(shm_buf->buf, back_buf, 12288);
@@ -364,9 +356,6 @@ void CubeDrawer::show()
 #elif defined(REMOTE_RENDER)
 
     send(raspi_soc, (const char *)back_buf, 12288, 0);
-
-    // if (sendto(raspi_soc, (const char *)back_buf, 12288, 0, (struct sockaddr *)&server, sizeof(server)) == SOCKET_ERROR)
-    //     std::cout << "Was not able to send packet..." << std::endl;
 
 #endif
 #endif
@@ -428,7 +417,7 @@ void CubeDrawer::set_color(float r, float g, float b)
     if (r < 0.0f || r > 1.0f || g < 0.0f || g > 1.0f || b < 0.0f || b > 1.0f)
         THROW_EXP("Invalid input, values must be in range [0.0, 1.0]", )
 
-    set_color(r * 255, g * 255, b * 255);
+    set_color((int)(r * 255.0f), (int)(g * 255.0f), (int)(b * 255.0f));
 }
 
 void CubeDrawer::set_color(float rgb)
@@ -447,10 +436,14 @@ void CubeDrawer::set_color(PyObject *input)
     else if (PyList_Check(input))
         cur_funcs = &parse_funcs[PY_LIST_PARSE];
 
-    if (PyLong_Check(cur_funcs->get_item(input, 0)))
-        set_color(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2]);
-    else
+    bool res = true;
+    for (int i = 0; i < 3; i++)
+        res &= PyLong_Check(cur_funcs->get_item(input, i));
+
+    if (res)
         set_color((int)cur_parsed_args[0], (int)cur_parsed_args[1], (int)cur_parsed_args[2]);
+    else
+        set_color(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2]);
 }
 
 ////////// \Color

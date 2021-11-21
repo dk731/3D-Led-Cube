@@ -57,7 +57,7 @@ while True:
 
     terrain.update(x_offset, z_offset)
 
-    drawer.set_color(50)
+    drawer.set_color(255)
     terrain.draw()
 
     for tree in trees_list:

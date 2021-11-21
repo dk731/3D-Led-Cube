@@ -5,12 +5,12 @@ import time
 import colorsys
 
 GRID_RES = 1.5
-VOXEL_SIZE = 2
+VOXEL_SIZE = 3
 
 noise = OpenSimplex(seed=int(time.time() * 1000))
 noise_scale = 0.05
 drawer = cd.get_obj()
-drawer.set_brigthness(0.5)
+# drawer.set_brigthness(0.5)
 
 anim_time = 0
 
@@ -30,24 +30,8 @@ while True:
                     )
                     + 1
                 )
-                drawer.set_color(
-                    *[int(c * 255) for c in colorsys.hsv_to_rgb(noise_val, 1, 1)]
-                )
-                drawer.filled_sphere(
-                    (float(x), float(y), float(z)), (VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE)
-                )
+                drawer.set_color(colorsys.hsv_to_rgb(noise_val, 1, 1))
+                drawer.filled_sphere((x, y, z), VOXEL_SIZE)
 
     drawer.show()
     anim_time += drawer.delta_time / 2
-
-
-tmp = OpenSimplex(seed=int(time.time() * 1000))
-start = time.time()
-for _ in range(1000000):
-    tmp.noise4d(
-        x=10,
-        y=10,
-        z=10,
-        w=10,
-    ),
-print((time.time() - start) / 1000000)

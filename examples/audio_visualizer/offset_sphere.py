@@ -102,7 +102,7 @@ class OffsetSphere:
             for spehre in frame:
                 pos, width, col = spehre
                 if colored:
-                    self.screen.set_color(*[int(c * col_mult * 255) for c in col])
+                    self.screen.set_color([c * col_mult for c in col])
                     self.screen.filled_sphere(pos, width)
 
         self.global_offset += self.screen.delta_time / 20
