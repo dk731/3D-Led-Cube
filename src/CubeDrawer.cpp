@@ -18,7 +18,6 @@ void onopen(websocketpp::connection_hdl hdl)
 {
     SLEEP_MICROS(500000);
     CubeDrawer::get_obj().virt_hdls.push_back(hdl);
-    // std::cout << "Virtual cube connected" << std::endl;
 }
 
 void onclose(websocketpp::connection_hdl hdl)
@@ -31,8 +30,6 @@ void onclose(websocketpp::connection_hdl hdl)
                                                       return swp == sp;
                                                   return false;
                                               });
-
-    // std::cout << "Virtual cube disconnected" << std::endl;
 }
 
 int CubeDrawer::get_virt_amount()
@@ -98,18 +95,10 @@ CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(GE
     }
 
     if ((raspi_soc = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
-    // if ((raspi_soc = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == INVALID_SOCKET)
     {
         printf("Could not create socket : %d", WSAGetLastError());
         THROW_EXP("ERROR Socket initialization...", )
     }
-
-    // int enable = 1;
-    // if (setsockopt(raspi_soc, SOL_SOCKET, 65536, (const char *)&enable, sizeof(int)) < 0)
-    //     std::cout << "Was not able to set send buffer size..." << std::endl;
-
-    // u_long mode = 1;
-    // ioctlsocket(raspi_soc, FIONBIO, &mode);
 
     server.sin_addr.s_addr = inet_addr("192.168.1.8");
     server.sin_family = AF_INET;
@@ -396,7 +385,12 @@ void CubeDrawer::set_brigthness(float b)
     if (b < 0.0 || b > 1.0)
         THROW_EXP("Invalid input, values only in range [0, 1] are allowed", )
 
+#if defined(REMOTE_RENDER)
+    cur_brush.brigthness = b < 0.5f ? b : 0.5f;
+#else
     cur_brush.brigthness = b;
+#endif
+
     set_color(cur_brush.r, cur_brush.g, cur_brush.b);
 }
 
