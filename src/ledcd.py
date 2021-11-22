@@ -76,12 +76,14 @@ class CubeDrawer(object):
         signal.signal(signal.SIGINT, obj._clean_obj)
         return obj
 
-    def _clean_obj(self):
-        return _ledcd.CubeDrawer__clean_obj(self)
+    def _clean_obj(self, *_):
+        _ledcd.CubeDrawer__clean_obj(self)
+        sys.exit(0)
 
     def get_virt_amount(self):
         return _ledcd.CubeDrawer_get_virt_amount(self)
     wait_cube = property(_ledcd.CubeDrawer_wait_cube_get, _ledcd.CubeDrawer_wait_cube_set)
+    virt_hdls = property(_ledcd.CubeDrawer_virt_hdls_get, _ledcd.CubeDrawer_virt_hdls_set)
     delta_time = property(_ledcd.CubeDrawer_delta_time_get, _ledcd.CubeDrawer_delta_time_set)
 
     def get_cur_color(self):

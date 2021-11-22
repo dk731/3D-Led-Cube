@@ -1,5 +1,4 @@
 from math import sin, cos, radians, tau, pi, floor
-from matplotlib.pyplot import draw
 import numpy as np
 import colorsys
 from random import random

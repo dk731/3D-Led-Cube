@@ -1,7 +1,6 @@
 import colorsys
 from random import random
 from opensimplex import OpenSimplex
-import numpy as np
 import time
 
 

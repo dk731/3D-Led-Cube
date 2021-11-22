@@ -1,6 +1,5 @@
+# colorsys
 from ledcd import CubeDrawer
-import time
-from math import sin
 import colorsys
 
 cd = CubeDrawer.get_obj()

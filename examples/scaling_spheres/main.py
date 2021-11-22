@@ -1,3 +1,4 @@
+# colorsys, numpy
 from ledcd import CubeDrawer as cd
 from scaling_sphere import ScalingSphere
 import threading
@@ -21,7 +22,7 @@ def random_spawner():
             ScalingSphere(
                 drawer,
                 colorsys.hsv_to_rgb(random(), 1, 1),
-                [random() * 15 for _ in range(3)],
+                [random() * 21 - 3 for _ in range(3)],
                 1,
                 random() * 4 + 8,
                 random() * 0.5 + 0.3,

@@ -1,3 +1,4 @@
+# opensimplex, numpy
 from ledcd import CubeDrawer as cd
 from opensimplex import OpenSimplex
 import numpy as np
@@ -10,7 +11,6 @@ VOXEL_SIZE = 3
 noise = OpenSimplex(seed=int(time.time() * 1000))
 noise_scale = 0.05
 drawer = cd.get_obj()
-# drawer.set_brigthness(0.5)
 
 anim_time = 0
 
@@ -34,4 +34,4 @@ while True:
                 drawer.filled_sphere((x, y, z), VOXEL_SIZE)
 
     drawer.show()
-    anim_time += drawer.delta_time / 2
+    anim_time += drawer.delta_time / 6
