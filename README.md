@@ -73,10 +73,10 @@ As potential max refrash rate could be >100 per second, another solution had to 
 
 ## Contributions
 
-- Dmitry Kaidalov - help with soldering and general design tips
+- Dmitry Kaidalov - help with soldering, general design tips and Hackaton Prize Sponsor
 - Anna Kacane - logo design
 - Anastasija Sirotkina - help with soldering
-- Tom Kaidalov - help with resin works
+- Tom Kaidalov - help with resin works and Hackaton PC station provide
 
 ## Contact
 
