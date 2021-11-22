@@ -60,136 +60,8 @@ class _SwigNonDynamicMeta(type):
     """Meta class to enforce nondynamic attributes (no new attributes) for a class"""
     __setattr__ = _swig_setattr_nondynamic_class_variable(type.__setattr__)
 
-
-EPSILON = _ledcd.EPSILON
-DEF_LINEW1 = _ledcd.DEF_LINEW1
-DEF_LINEW2 = _ledcd.DEF_LINEW2
-DEF_ZHEIGHT = _ledcd.DEF_ZHEIGHT
-class Brush(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-    g = property(_ledcd.Brush_g_get, _ledcd.Brush_g_set)
-    r = property(_ledcd.Brush_r_get, _ledcd.Brush_r_set)
-    b = property(_ledcd.Brush_b_get, _ledcd.Brush_b_set)
-    rr = property(_ledcd.Brush_rr_get, _ledcd.Brush_rr_set)
-    gg = property(_ledcd.Brush_gg_get, _ledcd.Brush_gg_set)
-    bb = property(_ledcd.Brush_bb_get, _ledcd.Brush_bb_set)
-    brigthness = property(_ledcd.Brush_brigthness_get, _ledcd.Brush_brigthness_set)
-
-    def __init__(self):
-        _ledcd.Brush_swiginit(self, _ledcd.new_Brush())
-    __swig_destroy__ = _ledcd.delete_Brush
-
-# Register Brush in _ledcd:
-_ledcd.Brush_swigregister(Brush)
-cvar = _ledcd.cvar
-MAT4_SIZE = cvar.MAT4_SIZE
-
-class Pixel(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-    g = property(_ledcd.Pixel_g_get, _ledcd.Pixel_g_set)
-    r = property(_ledcd.Pixel_r_get, _ledcd.Pixel_r_set)
-    b = property(_ledcd.Pixel_b_get, _ledcd.Pixel_b_set)
-
-    def __init__(self):
-        _ledcd.Pixel_swiginit(self, _ledcd.new_Pixel())
-    __swig_destroy__ = _ledcd.delete_Pixel
-
-# Register Pixel in _ledcd:
-_ledcd.Pixel_swigregister(Pixel)
-
-class ShmFlags(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-    frame_shown = property(_ledcd.ShmFlags_frame_shown_get, _ledcd.ShmFlags_frame_shown_set)
-    lock = property(_ledcd.ShmFlags_lock_get, _ledcd.ShmFlags_lock_set)
-    other = property(_ledcd.ShmFlags_other_get, _ledcd.ShmFlags_other_set)
-
-    def __init__(self):
-        _ledcd.ShmFlags_swiginit(self, _ledcd.new_ShmFlags())
-    __swig_destroy__ = _ledcd.delete_ShmFlags
-
-# Register ShmFlags in _ledcd:
-_ledcd.ShmFlags_swigregister(ShmFlags)
-
-class ShmBuf(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-    buf = property(_ledcd.ShmBuf_buf_get, _ledcd.ShmBuf_buf_set)
-    flags = property(_ledcd.ShmBuf_flags_get, _ledcd.ShmBuf_flags_set)
-
-    def __init__(self):
-        _ledcd.ShmBuf_swiginit(self, _ledcd.new_ShmBuf())
-    __swig_destroy__ = _ledcd.delete_ShmBuf
-
-# Register ShmBuf in _ledcd:
-_ledcd.ShmBuf_swigregister(ShmBuf)
-
-class ParseFuncs(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-    get_size = property(_ledcd.ParseFuncs_get_size_get, _ledcd.ParseFuncs_get_size_set)
-    get_item = property(_ledcd.ParseFuncs_get_item_get, _ledcd.ParseFuncs_get_item_set)
-
-    def __init__(self):
-        _ledcd.ParseFuncs_swiginit(self, _ledcd.new_ParseFuncs())
-    __swig_destroy__ = _ledcd.delete_ParseFuncs
-
-# Register ParseFuncs in _ledcd:
-_ledcd.ParseFuncs_swigregister(ParseFuncs)
-
-PY_TUPLE_PARSE = _ledcd.PY_TUPLE_PARSE
-PY_LIST_PARSE = _ledcd.PY_LIST_PARSE
-CALL_POINT_TYPE = _ledcd.CALL_POINT_TYPE
-CALL_POLYGON_TYPE = _ledcd.CALL_POLYGON_TYPE
-CALL_TETR_TYPE = _ledcd.CALL_TETR_TYPE
-CALL_LINE_TYPE = _ledcd.CALL_LINE_TYPE
-CALL_CIRCLE_TYPE = _ledcd.CALL_CIRCLE_TYPE
-CALL_FCIRCLE_TYPE = _ledcd.CALL_FCIRCLE_TYPE
-CALL_SPHERE_TYPE = _ledcd.CALL_SPHERE_TYPE
-CALL_FSPHERE_TYPE = _ledcd.CALL_FSPHERE_TYPE
-CALL_CLEAR_TYPE = _ledcd.CALL_CLEAR_TYPE
-class DrawCall(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-    type = property(_ledcd.DrawCall_type_get, _ledcd.DrawCall_type_set)
-    color = property(_ledcd.DrawCall_color_get, _ledcd.DrawCall_color_set)
-    data = property(_ledcd.DrawCall_data_get, _ledcd.DrawCall_data_set)
-
-    def __init__(self):
-        _ledcd.DrawCall_swiginit(self, _ledcd.new_DrawCall())
-    __swig_destroy__ = _ledcd.delete_DrawCall
-
-# Register DrawCall in _ledcd:
-_ledcd.DrawCall_swigregister(DrawCall)
-
-class Transform(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-    translation = property(_ledcd.Transform_translation_get, _ledcd.Transform_translation_set)
-    rotation = property(_ledcd.Transform_rotation_get, _ledcd.Transform_rotation_set)
-    scale = property(_ledcd.Transform_scale_get, _ledcd.Transform_scale_set)
-    local_final = property(_ledcd.Transform_local_final_get, _ledcd.Transform_local_final_set)
-    final = property(_ledcd.Transform_final_get, _ledcd.Transform_final_set)
-    rx = property(_ledcd.Transform_rx_get, _ledcd.Transform_rx_set)
-    ry = property(_ledcd.Transform_ry_get, _ledcd.Transform_ry_set)
-    rz = property(_ledcd.Transform_rz_get, _ledcd.Transform_rz_set)
-    local_recalc = property(_ledcd.Transform_local_recalc_get, _ledcd.Transform_local_recalc_set)
-    recalc = property(_ledcd.Transform_recalc_get, _ledcd.Transform_recalc_set)
-
-    def update_local(self):
-        return _ledcd.Transform_update_local(self)
-
-    def update_global(self, prev):
-        return _ledcd.Transform_update_global(self, prev)
-
-    def __init__(self):
-        _ledcd.Transform_swiginit(self, _ledcd.new_Transform())
-    __swig_destroy__ = _ledcd.delete_Transform
-
-# Register Transform in _ledcd:
-_ledcd.Transform_swigregister(Transform)
+import signal
+import sys
 
 class CubeDrawer(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
@@ -200,8 +72,16 @@ class CubeDrawer(object):
 
     @staticmethod
     def get_obj():
-        return _ledcd.CubeDrawer_get_obj()
-    is_sync = property(_ledcd.CubeDrawer_is_sync_get, _ledcd.CubeDrawer_is_sync_set)
+        obj = _ledcd.CubeDrawer_get_obj()
+        signal.signal(signal.SIGINT, obj._clean_obj)
+        return obj
+
+    def _clean_obj(self):
+        return _ledcd.CubeDrawer__clean_obj(self)
+
+    def get_virt_amount(self):
+        return _ledcd.CubeDrawer_get_virt_amount(self)
+    wait_cube = property(_ledcd.CubeDrawer_wait_cube_get, _ledcd.CubeDrawer_wait_cube_set)
     delta_time = property(_ledcd.CubeDrawer_delta_time_get, _ledcd.CubeDrawer_delta_time_set)
 
     def get_cur_color(self):
@@ -281,9 +161,4 @@ class CubeDrawer(object):
 
 # Register CubeDrawer in _ledcd:
 _ledcd.CubeDrawer_swigregister(CubeDrawer)
-
-def CubeDrawer_get_obj():
-    return _ledcd.CubeDrawer_get_obj()
-
-
 

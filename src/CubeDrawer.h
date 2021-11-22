@@ -18,6 +18,7 @@
 #include <string.h>
 #include <thread>
 #include <stdio.h>
+#include <signal.h>
 
 #include <glm/gtx/io.hpp>
 #include <glm/vec3.hpp>
@@ -192,6 +193,8 @@ class CubeDrawer
 {
 private:
     bool init_suc;
+    bool cleaned;
+
     Brush cur_brush;
     Pixel back_buf[4096];
     long min_show_delay = 0;
@@ -203,7 +206,7 @@ private:
     static std::mutex mutex_;
 
 #if defined(VIRTUAL_RENDER)
-    ShmBuf *shm_buf;
+    websocketpp::server<websocketpp::config::asio> ws_server;
 #elif defined(REMOTE_RENDER)
     SOCKET raspi_soc;
     struct sockaddr_in server;
@@ -224,6 +227,8 @@ private:
 
     GLFWwindow *context;
 
+    void stop_cube(int);
+
     void init_gl();
     bool check_compile(GLuint obj);
     void render_texture();
@@ -231,7 +236,7 @@ private:
     void clear_draw_call_buf();
     //
 
-    CubeDrawer(float brightness = 1.0, bool sync = false, int fps_cap = 70);
+    CubeDrawer(float brightness = 1.0, int fps_cap = 70);
     ~CubeDrawer();
 
     // OpenGL Renderer API Binds
@@ -253,14 +258,14 @@ public:
 
     CubeDrawer(CubeDrawer &other) = delete;
     void operator=(const CubeDrawer &) = delete;
+    void _clean_obj();
 
 #ifdef VIRTUAL_RENDER
-    std::list<websocketpp::connection_hdl> virt_hdls;
     int get_virt_amount();
     bool wait_cube = true;
-    websocketpp::server<websocketpp::config::asio> ws_server;
+    std::list<websocketpp::connection_hdl> virt_hdls;
 #endif
-    bool is_sync;
+
     float delta_time;
 
     PyObject *get_cur_color();
@@ -288,7 +293,6 @@ public:
 
     void set_fps_cap(float fps);
 
-    //
     void set_brigthness(float b);
     void set_brigthness(int b);
 

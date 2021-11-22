@@ -19,11 +19,13 @@ drawer.translate(7.5, 7.5, 7.5)
 drawer.set_fps_cap(0)
 sp = OffsetSphere(drawer, 3)
 
-file_name = (
-    "C://Users//user//Desktop//3D-Led-Cube//examples//audio_visualizer//song3.wav"
-)
+file_path = "ENTER HERE PATH TO THE WAV FILE"
 
-rate, data = wavfile.read(file_name)
+if file_path == "ENTER HERE PATH TO THE WAV FILE":
+    print("Please provide some wav file")
+    exit(0)
+
+rate, data = wavfile.read(file_path)
 
 
 # If single channeled copy it and make 2 equal channels
@@ -39,7 +41,7 @@ norm_vec = np.exp(
     np.arange(-1, stop=0, step=1 / ((frame_size + 3 - smooth_window * 2) / 2)) * 2
 )
 
-wave_obj = sa.WaveObject.from_wave_file(file_name)
+wave_obj = sa.WaveObject.from_wave_file(file_path)
 play_obj = wave_obj.play()
 start_time = time.time()
 

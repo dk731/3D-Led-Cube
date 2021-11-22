@@ -367,7 +367,7 @@ extra_macros = [
     # ("REMOTE_RENDER", None),
     ("VIRTUAL_RENDER", None),
     ("DYNAMIC_SHADER_INCLUDE", None),
-    ("DEBUG_VIEW", None),
+    # ("DEBUG_VIEW", None),
 ]
 led_module = Extension(
     "_ledcd",

@@ -52,7 +52,9 @@ class ScalingSphere:
             self.spheres_list.append(
                 (
                     t * self.scale_speed + self.start_r,
-                    [c * fade_prog for c in self.color],
+                    [
+                        max(0.0, min(c * fade_prog, 1.0)) for c in self.color
+                    ],  # Clamp all color value to [0, 1] range
                 )
             )
 
