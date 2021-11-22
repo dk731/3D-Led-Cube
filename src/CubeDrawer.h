@@ -227,7 +227,7 @@ private:
 
     GLFWwindow *context;
 
-    void stop_cube(int);
+    void stop_cube();
 
     void init_gl();
     bool check_compile(GLuint obj);
