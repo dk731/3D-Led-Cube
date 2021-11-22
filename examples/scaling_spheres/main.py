@@ -23,8 +23,8 @@ def random_spawner():
                 colorsys.hsv_to_rgb(random(), 1, 1),
                 [random() * 15 for _ in range(3)],
                 1,
-                random() * 7 + 5,
-                random() + 0.5,
+                random() * 4 + 8,
+                random() * 0.5 + 0.3,
             )
         )
         time.sleep(random() * DELTA_SLEEP + MIN_SLEEP)

@@ -2702,9 +2702,10 @@ SWIGINTERN PyObject *SWIG_PyStaticMethod_New(PyObject *SWIGUNUSEDPARM(self), PyO
 #define SWIGTYPE_p_f_p_PyObject__Py_ssize_t swig_types[10]
 #define SWIGTYPE_p_float swig_types[11]
 #define SWIGTYPE_p_glm__mat4 swig_types[12]
-#define SWIGTYPE_p_uint8_t swig_types[13]
-static swig_type_info *swig_types[15];
-static swig_module_info swig_module = {swig_types, 14, 0, 0, 0, 0};
+#define SWIGTYPE_p_std__listT_websocketpp__connection_hdl_t swig_types[13]
+#define SWIGTYPE_p_uint8_t swig_types[14]
+static swig_type_info *swig_types[16];
+static swig_module_info swig_module = {swig_types, 15, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -5181,7 +5182,52 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_CubeDrawer_is_sync_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_CubeDrawer__clean_obj(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CubeDrawer *arg1 = (CubeDrawer *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_CubeDrawer, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer__clean_obj" "', argument " "1"" of type '" "CubeDrawer *""'"); 
+  }
+  arg1 = reinterpret_cast< CubeDrawer * >(argp1);
+  (arg1)->_clean_obj();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_CubeDrawer_get_virt_amount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CubeDrawer *arg1 = (CubeDrawer *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_CubeDrawer, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_get_virt_amount" "', argument " "1"" of type '" "CubeDrawer *""'"); 
+  }
+  arg1 = reinterpret_cast< CubeDrawer * >(argp1);
+  result = (int)(arg1)->get_virt_amount();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_CubeDrawer_wait_cube_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CubeDrawer *arg1 = (CubeDrawer *) 0 ;
   bool arg2 ;
@@ -5191,18 +5237,18 @@ SWIGINTERN PyObject *_wrap_CubeDrawer_is_sync_set(PyObject *SWIGUNUSEDPARM(self)
   int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   
-  if (!SWIG_Python_UnpackTuple(args, "CubeDrawer_is_sync_set", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "CubeDrawer_wait_cube_set", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_CubeDrawer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_is_sync_set" "', argument " "1"" of type '" "CubeDrawer *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_wait_cube_set" "', argument " "1"" of type '" "CubeDrawer *""'"); 
   }
   arg1 = reinterpret_cast< CubeDrawer * >(argp1);
   ecode2 = SWIG_AsVal_bool(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "CubeDrawer_is_sync_set" "', argument " "2"" of type '" "bool""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "CubeDrawer_wait_cube_set" "', argument " "2"" of type '" "bool""'");
   } 
   arg2 = static_cast< bool >(val2);
-  if (arg1) (arg1)->is_sync = arg2;
+  if (arg1) (arg1)->wait_cube = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -5210,7 +5256,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_CubeDrawer_is_sync_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_CubeDrawer_wait_cube_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CubeDrawer *arg1 = (CubeDrawer *) 0 ;
   void *argp1 = 0 ;
@@ -5222,11 +5268,71 @@ SWIGINTERN PyObject *_wrap_CubeDrawer_is_sync_get(PyObject *SWIGUNUSEDPARM(self)
   swig_obj[0] = args;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_CubeDrawer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_is_sync_get" "', argument " "1"" of type '" "CubeDrawer *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_wait_cube_get" "', argument " "1"" of type '" "CubeDrawer *""'"); 
   }
   arg1 = reinterpret_cast< CubeDrawer * >(argp1);
-  result = (bool) ((arg1)->is_sync);
+  result = (bool) ((arg1)->wait_cube);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_CubeDrawer_virt_hdls_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CubeDrawer *arg1 = (CubeDrawer *) 0 ;
+  std::list< websocketpp::connection_hdl > arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "CubeDrawer_virt_hdls_set", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_CubeDrawer, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_virt_hdls_set" "', argument " "1"" of type '" "CubeDrawer *""'"); 
+  }
+  arg1 = reinterpret_cast< CubeDrawer * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_std__listT_websocketpp__connection_hdl_t,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "CubeDrawer_virt_hdls_set" "', argument " "2"" of type '" "std::list< websocketpp::connection_hdl >""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "CubeDrawer_virt_hdls_set" "', argument " "2"" of type '" "std::list< websocketpp::connection_hdl >""'");
+    } else {
+      std::list< websocketpp::connection_hdl > * temp = reinterpret_cast< std::list< websocketpp::connection_hdl > * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  if (arg1) (arg1)->virt_hdls = arg2;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_CubeDrawer_virt_hdls_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CubeDrawer *arg1 = (CubeDrawer *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  std::list< websocketpp::connection_hdl > result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_CubeDrawer, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_virt_hdls_get" "', argument " "1"" of type '" "CubeDrawer *""'"); 
+  }
+  arg1 = reinterpret_cast< CubeDrawer * >(argp1);
+  result =  ((arg1)->virt_hdls);
+  resultobj = SWIG_NewPointerObj((new std::list< websocketpp::connection_hdl >(static_cast< const std::list< websocketpp::connection_hdl >& >(result))), SWIGTYPE_p_std__listT_websocketpp__connection_hdl_t, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -10458,8 +10564,12 @@ static PyMethodDef SwigMethods[] = {
 	 { "Transform_swigregister", Transform_swigregister, METH_O, NULL},
 	 { "Transform_swiginit", Transform_swiginit, METH_VARARGS, NULL},
 	 { "CubeDrawer_get_obj", _wrap_CubeDrawer_get_obj, METH_NOARGS, NULL},
-	 { "CubeDrawer_is_sync_set", _wrap_CubeDrawer_is_sync_set, METH_VARARGS, NULL},
-	 { "CubeDrawer_is_sync_get", _wrap_CubeDrawer_is_sync_get, METH_O, NULL},
+	 { "CubeDrawer__clean_obj", _wrap_CubeDrawer__clean_obj, METH_O, NULL},
+	 { "CubeDrawer_get_virt_amount", _wrap_CubeDrawer_get_virt_amount, METH_O, NULL},
+	 { "CubeDrawer_wait_cube_set", _wrap_CubeDrawer_wait_cube_set, METH_VARARGS, NULL},
+	 { "CubeDrawer_wait_cube_get", _wrap_CubeDrawer_wait_cube_get, METH_O, NULL},
+	 { "CubeDrawer_virt_hdls_set", _wrap_CubeDrawer_virt_hdls_set, METH_VARARGS, NULL},
+	 { "CubeDrawer_virt_hdls_get", _wrap_CubeDrawer_virt_hdls_get, METH_O, NULL},
 	 { "CubeDrawer_delta_time_set", _wrap_CubeDrawer_delta_time_set, METH_VARARGS, NULL},
 	 { "CubeDrawer_delta_time_get", _wrap_CubeDrawer_delta_time_get, METH_O, NULL},
 	 { "CubeDrawer_get_cur_color", _wrap_CubeDrawer_get_cur_color, METH_O, NULL},
@@ -10511,6 +10621,7 @@ static swig_type_info _swigt__p_f_p_PyObject_Py_ssize_t__p_PyObject = {"_p_f_p_P
 static swig_type_info _swigt__p_f_p_PyObject__Py_ssize_t = {"_p_f_p_PyObject__Py_ssize_t", "Py_ssize_t (*)(PyObject *)", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_float = {"_p_float", "float *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_glm__mat4 = {"_p_glm__mat4", "glm::mat4 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_std__listT_websocketpp__connection_hdl_t = {"_p_std__listT_websocketpp__connection_hdl_t", "std::list< websocketpp::connection_hdl > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint8_t = {"_p_uint8_t", "uint8_t *", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {
@@ -10527,6 +10638,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_f_p_PyObject__Py_ssize_t,
   &_swigt__p_float,
   &_swigt__p_glm__mat4,
+  &_swigt__p_std__listT_websocketpp__connection_hdl_t,
   &_swigt__p_uint8_t,
 };
 
@@ -10543,6 +10655,7 @@ static swig_cast_info _swigc__p_f_p_PyObject_Py_ssize_t__p_PyObject[] = {  {&_sw
 static swig_cast_info _swigc__p_f_p_PyObject__Py_ssize_t[] = {  {&_swigt__p_f_p_PyObject__Py_ssize_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_float[] = {  {&_swigt__p_float, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_glm__mat4[] = {  {&_swigt__p_glm__mat4, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_std__listT_websocketpp__connection_hdl_t[] = {  {&_swigt__p_std__listT_websocketpp__connection_hdl_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint8_t[] = {  {&_swigt__p_uint8_t, 0, 0, 0},{0, 0, 0, 0}};
 
 static swig_cast_info *swig_cast_initial[] = {
@@ -10559,6 +10672,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_f_p_PyObject__Py_ssize_t,
   _swigc__p_float,
   _swigc__p_glm__mat4,
+  _swigc__p_std__listT_websocketpp__connection_hdl_t,
   _swigc__p_uint8_t,
 };
 

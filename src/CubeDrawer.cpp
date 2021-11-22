@@ -38,7 +38,7 @@ int CubeDrawer::get_virt_amount()
 }
 #endif
 
-CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(GET_MICROS()), is_sync(sync), delta_time(0)
+CubeDrawer::CubeDrawer(float brightness, int fps) : prev_show_time(GET_MICROS()), delta_time(0), cleaned(false)
 {
     init_suc = false;
 
@@ -59,7 +59,7 @@ CubeDrawer::CubeDrawer(float brightness, bool sync, int fps) : prev_show_time(GE
     ws_server.set_open_handler(&onopen);
     ws_server.set_close_handler(&onclose);
 
-    ws_server.listen(8080);
+    ws_server.listen(12035);
     ws_server.start_accept();
 
     std::thread virt_server([]()
@@ -314,10 +314,12 @@ void CubeDrawer::clear(PyObject *input)
         cur_funcs = &parse_funcs[PY_TUPLE_PARSE];
     else if (PyList_Check(input))
         cur_funcs = &parse_funcs[PY_LIST_PARSE];
-    else
-        THROW_EXP("Invalid input, was expecting tuple or list", )
 
-    if (PyLong_Check(cur_funcs->get_item(input, 0)))
+    bool res = true;
+    for (int i = 0; i < 3; i++)
+        res &= PyLong_Check(cur_funcs->get_item(input, i));
+
+    if (res)
         clear((int)cur_parsed_args[0], (int)cur_parsed_args[1], (int)cur_parsed_args[2]);
     else
         clear(cur_parsed_args[0], cur_parsed_args[1], cur_parsed_args[2]);
@@ -346,7 +348,7 @@ void CubeDrawer::show()
     for (auto t = virt_hdls.begin(); t != virt_hdls.end(); t++)
         ws_server.send(*t, (void *)back_buf, 12288, websocketpp::frame::opcode::BINARY);
 #elif defined(RASPI_RENDER)
-    while (shm_buf->flags.lock || (is_sync && !shm_buf->flags.frame_shown))
+    while (shm_buf->flags.lock || (!shm_buf->flags.frame_shown))
         usleep(100);
 
     shm_buf->flags.lock = 1;
@@ -1065,10 +1067,32 @@ void CubeDrawer::tetr(PyObject *p1, PyObject *p2, PyObject *p3, PyObject *p4)
 
 //// \User API Calls overloads
 
+void CubeDrawer::_clean_obj()
+{
+    if (!cleaned)
+    {
+#if defined(VIRTUAL_RENDER)
+        ws_server.stop_perpetual();
+        ws_server.stop();
+#elif defined(REMOTE_RENDER)
+        closesocket(raspi_soc);
+        WSACleanup();
+#endif
+        cleaned = true;
+    }
+}
+
 CubeDrawer::~CubeDrawer()
 {
-#if defined(REMOTE_RENDER)
-    closesocket(raspi_soc);
-    WSACleanup();
+    if (!cleaned)
+    {
+#if defined(VIRTUAL_RENDER)
+        ws_server.stop_perpetual();
+        ws_server.stop();
+#elif defined(REMOTE_RENDER)
+        closesocket(raspi_soc);
+        WSACleanup();
 #endif
+        cleaned = true;
+    }
 }
