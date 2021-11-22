@@ -78,6 +78,14 @@ As potential max refrash rate could be >100 per second, another solution had to 
 - Anastasija Sirotkina - help with soldering
 - Tom Kaidalov - help with resin works and Hackaton PC station provide
 
+## Additional Tools
+
+For project were also create additional web pages with docs, emulator and submition platform:
+
+- [Cube Doc](https://github.com/dk731/cube-doc) - documention page (_[doc.trycubic.com](https://doc.trycubic.com/)_)
+- [Cube Emulator](https://github.com/dk731/cube-emulator) - emulator page (_[cube.trycubic.com](https://cube.trycubic.com/)_)
+- [Code Submition](https://github.com/dk731/cube-submit) - submition platform (_[trycubic.com](https://trycubic.com/)_)
+
 ## Contact
 
 demid.kaidalov@gmail.com
