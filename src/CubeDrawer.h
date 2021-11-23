@@ -184,7 +184,10 @@ struct Transform
         if (local_recalc)
             update_local();
 
-        final = prev->local_final * local_final;
+        if (recalc)
+            final = prev->final * local_final;
+
+        local_recalc = false;
         recalc = false;
     }
 };
@@ -234,6 +237,7 @@ private:
     void render_texture();
     void pool_events();
     void clear_draw_call_buf();
+    void update_matrix();
     //
 
     CubeDrawer(float brightness = 1.0, int fps_cap = 70);
@@ -263,6 +267,7 @@ public:
 #ifdef VIRTUAL_RENDER
     int get_virt_amount();
     bool wait_cube = true;
+    void set_wait_cube(bool v);
     std::list<websocketpp::connection_hdl> virt_hdls;
 #endif
 
@@ -272,7 +277,7 @@ public:
 
     void push_matrix();
     void pop_matrix();
-    void update_matrix();
+    void pop_all_matrix();
 
     void translate(float x, float y, float z);
     void translate(PyObject *input);

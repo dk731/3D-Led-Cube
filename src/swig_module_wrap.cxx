@@ -5279,6 +5279,35 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_CubeDrawer_set_wait_cube(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CubeDrawer *arg1 = (CubeDrawer *) 0 ;
+  bool arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  bool val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "CubeDrawer_set_wait_cube", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_CubeDrawer, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_set_wait_cube" "', argument " "1"" of type '" "CubeDrawer *""'"); 
+  }
+  arg1 = reinterpret_cast< CubeDrawer * >(argp1);
+  ecode2 = SWIG_AsVal_bool(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "CubeDrawer_set_wait_cube" "', argument " "2"" of type '" "bool""'");
+  } 
+  arg2 = static_cast< bool >(val2);
+  (arg1)->set_wait_cube(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_CubeDrawer_virt_hdls_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CubeDrawer *arg1 = (CubeDrawer *) 0 ;
@@ -5458,7 +5487,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_CubeDrawer_update_matrix(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_CubeDrawer_pop_all_matrix(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CubeDrawer *arg1 = (CubeDrawer *) 0 ;
   void *argp1 = 0 ;
@@ -5469,10 +5498,10 @@ SWIGINTERN PyObject *_wrap_CubeDrawer_update_matrix(PyObject *SWIGUNUSEDPARM(sel
   swig_obj[0] = args;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_CubeDrawer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_update_matrix" "', argument " "1"" of type '" "CubeDrawer *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CubeDrawer_pop_all_matrix" "', argument " "1"" of type '" "CubeDrawer *""'"); 
   }
   arg1 = reinterpret_cast< CubeDrawer * >(argp1);
-  (arg1)->update_matrix();
+  (arg1)->pop_all_matrix();
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -10568,6 +10597,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "CubeDrawer_get_virt_amount", _wrap_CubeDrawer_get_virt_amount, METH_O, NULL},
 	 { "CubeDrawer_wait_cube_set", _wrap_CubeDrawer_wait_cube_set, METH_VARARGS, NULL},
 	 { "CubeDrawer_wait_cube_get", _wrap_CubeDrawer_wait_cube_get, METH_O, NULL},
+	 { "CubeDrawer_set_wait_cube", _wrap_CubeDrawer_set_wait_cube, METH_VARARGS, NULL},
 	 { "CubeDrawer_virt_hdls_set", _wrap_CubeDrawer_virt_hdls_set, METH_VARARGS, NULL},
 	 { "CubeDrawer_virt_hdls_get", _wrap_CubeDrawer_virt_hdls_get, METH_O, NULL},
 	 { "CubeDrawer_delta_time_set", _wrap_CubeDrawer_delta_time_set, METH_VARARGS, NULL},
@@ -10575,7 +10605,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "CubeDrawer_get_cur_color", _wrap_CubeDrawer_get_cur_color, METH_O, NULL},
 	 { "CubeDrawer_push_matrix", _wrap_CubeDrawer_push_matrix, METH_O, NULL},
 	 { "CubeDrawer_pop_matrix", _wrap_CubeDrawer_pop_matrix, METH_O, NULL},
-	 { "CubeDrawer_update_matrix", _wrap_CubeDrawer_update_matrix, METH_O, NULL},
+	 { "CubeDrawer_pop_all_matrix", _wrap_CubeDrawer_pop_all_matrix, METH_O, NULL},
 	 { "CubeDrawer_translate", _wrap_CubeDrawer_translate, METH_VARARGS, NULL},
 	 { "CubeDrawer_rotate", _wrap_CubeDrawer_rotate, METH_VARARGS, NULL},
 	 { "CubeDrawer_scale", _wrap_CubeDrawer_scale, METH_VARARGS, NULL},

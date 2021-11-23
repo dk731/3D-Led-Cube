@@ -11,47 +11,47 @@
 
 ## About The Project
 
-If you every asked yourself, what if monitors could display true 3D visual output without projecting them on 2D plane, this project attempts show how such tool could look like.
+If you ever asked yourself, what if monitors could display actual 3D visual output without projecting them on a 2D plane? This project attempts to show how such a device could look like.
 
 <br/>
 
 ### Hardware
 
-Following display realization is made up from small (_3 x 3 x 1_ mm) 3 colored led's [SK6812](https://cdn-shop.adafruit.com/product-files/1138/SK6812+LED+datasheet+.pdf) which allows controll each pixel independenly and prevent animations from any sort of flickering (no multiplexers are used). Total cube dimensions are _460 x 460 x 460_ with resolution _16 x 16 x 16_ voxels. Dueing assembly about 20k soldering points had to be connected and ~_0.5_ km of thin copper wire was used. Max. refreshrate is ~110 frames per second with 300 W avarage power consumption. Control unit of led's is Raspberry PI being more precies its SMI device that gives ability to produce very prices PWM (_800kHZ_) signal on 16 pins at the same time ([very nive blog about SMI](https://iosoft.blog/2020/07/16/raspberry-pi-smi/)).
+Following display realization is made up of small (_3 x 3 x 1_ mm) 3 colored led's [SK6812](https://cdn-shop.adafruit.com/product-files/1138/SK6812+LED+datasheet+.pdf), which allows control of each pixel independently and prevent animations from any flickering (no multiplexers are used). Total cube dimensions are _460 x 460 x 460_ with resolution _16 x 16 x 16_ voxels. About 20k soldering points had to be connected during assembly, and ~_0.5_ km of thin copper wire was used. MAX refresh rate is ~110 frames per second with 300 W average power consumption. The Control unit of LEDs is Raspberry PI being more precise its SMI device that gives the ability to produce a very precise PWM (_800kHZ_) signal on 16 pins at the same time ([very nice blog about SMI](https://iosoft.blog/2020/07/16/raspberry-pi-smi/)).
 
 ### Software
 
-To produce complex output while being able to excecute drawing calls in no time, core of the library was written in _C/C++_ with OpenGL graphical acceleration for even better performance. All speed and feature richness is wrapped to _Python_ modules which gives end coder not only fast but also very easy to use tool which is precompiled and ready to use almost on all major computer systems. As in theory this method seemed to be easy to realise and work, in practise connecting everything together would produce very unstable result with pereodical arduino freezes.
+To produce complex output while executing drawing calls in no time, the library's core is written in _C/C++_ with OpenGL graphical acceleration for even better performance. All speed and feature richness are wrapped to _Python_ modules, which gives an end coder a fast and easy-to-use tool that is precompiled and ready to use almost on all major computer systems. As in theory, this method seemed to be easy to implement and work. In practice connecting everything would produce a volatile result with periodical Arduino freezes.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Want To Try It Yourself?
 
-As mentioned before, display can be driven by a very simple python scripts so everyone who is interested can try to write his own animation and even run it on real device (to run your code on real cube follow for upcomming events here). More information about writing your own animation in this [doc](https://doc.trycubic.com/)
+As mentioned before, the display can be driven by a straightforward Python script so everyone interested can try to write his animation and even run it on an actual device (to run your code on real cube follow for upcoming events here). More information about writing your animation in this [doc](https://doc.trycubic.com/)
 
 <br/>
 
 ## Upcoming Events
 
-Small competition event is currently scheduled for the _**end of November (2021)**_, more details can be found [here](https:://google.com)
+A small competition event is currently scheduled for the _**3rd-5th December**_. More details can be found on our [Facebook page](https://www.facebook.com/events/1019178698930725/?ref=newsfeed) or [here](https://trycubic.devpost.com/)
 
 <br/>
 
 ## Development Process
 
-Due to general lack of knowlage in the beggining of project many itteration were made to get to the point where it is right now.
+Due to a general lack of knowledge at the beginning of the project, many iterations were made to get to where it is right now.
 
 <br/>
 
 ### Raspberry GPIO's
 
-At first design of whole system could not be easier, it was planned that just Raspberry PI board with its 40 GPIO pins will be more than enough, but almost immediatly after first tests it was obvious that it wont be able to work with required precision. So new approach should be used.
+The first design of the whole system could not be more straightforward, it was planned that just Raspberry PI board with its 40 GPIO pins would be more than enough, but almost immediately after the first tests, it was apparent that it wouldn't be able to work with the required precision. So a new approach should be used.
 
 <br/>
 
 ### Arduino Towers
 
-After some thinking idea of using Arduino board appeard, as it had allready written driver and was very easy to use. This was planned to work in following way, image would render on Raspberry PI board, then Raspberry board would send all needed data to many arduino boards using I2C which later would independetly send this data to leds. After implmenting all hardware and software it appeared to work very unstable, for some reason arduino's from time to time would just randomly crash and no longer respond.
+After some thinking, using the Arduino board appeared to solve the problem, as it had a ready driver and was very easy to use. This was planned to work in the following way. The image would render on the Raspberry PI board. Raspberry board would send all needed data to many Arduino boards using I2C, which later would independently send this data to LEDs. After implementing all hardware and Software, it appeared to work very unstably. For some reason, Arduino's, from time to time, would randomly crash and no longer respond.
 
 <img src="https://i.ibb.co/x6Vr3jY/photo-2021-11-15-17-24-06.jpg" width="25%">
 
@@ -59,13 +59,13 @@ After some thinking idea of using Arduino board appeard, as it had allready writ
 
 #### Single ATMega board
 
-After some additional research was found that microchips used in arduino but with faster oscillator would be just enough to make this leds work, custom leds driver was written in pure ASM due timming restrictions (to hit needed speed not even 1 cpu was allowd to be wasted). After redoing almost whoole project 3rd time and running whole system again test result showed huge improvements in stability but one key number was disapointing and that is max refresh rate, as now we could use only one I2C chanell it was throtelling whole system to only ~40FPS.
+After some additional research, microchips used in Arduino but with faster oscillators would be just enough to make these LEDs work. Custom LEDs driver was written in pure ASM due to timing restrictions (to hit needed speed, not even one CPU was allowed to be wasted). After redoing almost the whole project 3rd time and running the entire system again, the test result showed considerable stability improvements. Still, one key number was disappointing, and that is the max refresh rate, as now we could use only one I2C channel. It was throttling the whole system to only ~40FPS.
 
 <img src="https://i.ibb.co/bQP177J/photo-2021-11-15-17-24-06-2.jpg" width="25%">
 
 ### Raspberry SMI
 
-As potential max refrash rate could be >100 per second, another solution had to be developed, after long time span of researching different approaches, this [article about Raspberry PI SMI perephiral](https://iosoft.blog/2020/07/16/raspberry-pi-smi/) was discovered. Mentioned SMI device allows to write big amount of data with high precision on 16 GPIO's at the same time directly from Raspberry borad, so everythink had to be re-done 4th time, simple PCB with level shifter and some indecational lights was designed and tested. This appered to work as excpected.
+As the potential max refresh rate could be >100 per second, another solution had to be developed. After a long period of researching different approaches, this [article about Raspberry PI SMI perephiral](https://iosoft.blog/2020/07/16/raspberry-pi-smi/) was discovered. Mentioned SMI device allows writing a significant amount of data with high precision on 16 GPIO's at the same time directly from Raspberry board. So everything had to be re-done 4th time. A simple PCB with a level shifter and some indicator lights was designed and tested. This appeared to work as expected.
 
 <img src="https://i.ibb.co/bJzXKJt/photo-2021-11-19-16-39-26.jpg" width="25%">
 
@@ -73,14 +73,14 @@ As potential max refrash rate could be >100 per second, another solution had to 
 
 ## Contributions
 
-- Dmitry Kaidalov - help with soldering, general design tips and Hackaton Prize Sponsor
+- Dmitry Kaidalov - help with soldering, general design tips, and Hackathon Prize Sponsor
 - Anna Kacane - logo design
 - Anastasija Sirotkina - help with soldering
 - Tom Kaidalov - help with resin works and Hackaton PC station provide
 
 ## Additional Tools
 
-For project were also create additional web pages with docs, emulator and submition platform:
+For the project were also created additional web pages with docs, emulator, and submission platform:
 
 - [Cube Doc](https://github.com/dk731/cube-doc) - documention page (_[doc.trycubic.com](https://doc.trycubic.com/)_)
 - [Cube Emulator](https://github.com/dk731/cube-emulator) - emulator page (_[cube.trycubic.com](https://cube.trycubic.com/)_)

@@ -60,12 +60,12 @@ class _SwigNonDynamicMeta(type):
     """Meta class to enforce nondynamic attributes (no new attributes) for a class"""
     __setattr__ = _swig_setattr_nondynamic_class_variable(type.__setattr__)
 
-import signal
-import sys
+import signal, sys
 
 class CubeDrawer(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-
+    delta_time = property(_ledcd.CubeDrawer_delta_time_get)
+    
     def __init__(self, *args, **kwargs):
         raise AttributeError("No constructor defined")
     __repr__ = _swig_repr
@@ -82,9 +82,9 @@ class CubeDrawer(object):
 
     def get_virt_amount(self):
         return _ledcd.CubeDrawer_get_virt_amount(self)
-    wait_cube = property(_ledcd.CubeDrawer_wait_cube_get, _ledcd.CubeDrawer_wait_cube_set)
-    virt_hdls = property(_ledcd.CubeDrawer_virt_hdls_get, _ledcd.CubeDrawer_virt_hdls_set)
-    delta_time = property(_ledcd.CubeDrawer_delta_time_get, _ledcd.CubeDrawer_delta_time_set)
+
+    def set_wait_cube(self, v):
+        return _ledcd.CubeDrawer_set_wait_cube(self, v)
 
     def get_cur_color(self):
         return _ledcd.CubeDrawer_get_cur_color(self)
@@ -95,8 +95,8 @@ class CubeDrawer(object):
     def pop_matrix(self):
         return _ledcd.CubeDrawer_pop_matrix(self)
 
-    def update_matrix(self):
-        return _ledcd.CubeDrawer_update_matrix(self)
+    def pop_all_matrix(self):
+        return _ledcd.CubeDrawer_pop_all_matrix(self)
 
     def translate(self, *args):
         return _ledcd.CubeDrawer_translate(self, *args)
@@ -163,4 +163,5 @@ class CubeDrawer(object):
 
 # Register CubeDrawer in _ledcd:
 _ledcd.CubeDrawer_swigregister(CubeDrawer)
+
 

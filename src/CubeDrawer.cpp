@@ -166,11 +166,7 @@ PyObject *CubeDrawer::get_cur_color()
 
 void CubeDrawer::update_matrix()
 {
-    Transform *lt = transform_list.back();
-    if (lt->local_recalc)
-        lt->update_local();
-    if (lt->recalc)
-        lt->update_global(transform_list[transform_list.size() - 2]);
+    transform_list.back()->update_global(transform_list[transform_list.size() - 2]);
 }
 
 void CubeDrawer::apply_transforms(glm::vec4 &cur_vec)
@@ -209,6 +205,17 @@ void CubeDrawer::pop_matrix()
         delete transform_list.back();
         transform_list.pop_back();
     }
+}
+
+void CubeDrawer::pop_all_matrix()
+{
+    for (int i = 0; i < transform_list.size() - 1; i++)
+    {
+        delete transform_list.back();
+        transform_list.pop_back();
+    }
+
+    pop_matrix();
 }
 
 void CubeDrawer::translate(float x, float y, float z)
@@ -453,6 +460,11 @@ void CubeDrawer::set_color(PyObject *input)
 void CubeDrawer::set_immediate(bool v)
 {
     draw_immediate = v;
+}
+
+void CubeDrawer::set_wait_cube(bool v)
+{
+    wait_cube = v;
 }
 
 ////////// OpenGL
