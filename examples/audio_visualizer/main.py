@@ -1,4 +1,4 @@
-# scipy, simpleaudio, numpy, colorsys
+# scipy, simpleaudio, numpy
 from ledcd import CubeDrawer as cd
 
 from scipy.fft import rfft, rfftfreq

@@ -1,4 +1,4 @@
-# colorsys, numpy
+# numpy
 from ledcd import CubeDrawer as cd
 from scaling_sphere import ScalingSphere
 import threading

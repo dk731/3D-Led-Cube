@@ -1,4 +1,3 @@
-# colorsys
 from ledcd import CubeDrawer
 import colorsys
 

@@ -1,4 +1,4 @@
-# colorsys, colorsys
+# colorsys, opensimplex
 from ledcd import CubeDrawer as cd
 from noise_terrain import NoiseTerrain, TreeObj
 from math import sin, cos

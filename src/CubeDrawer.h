@@ -30,31 +30,40 @@
 #include <GLFW/glfw3.h>
 
 #ifdef DYNAMIC_SHADER_INCLUDE
-#include "shaders.h"
+    #include "shaders.h"
 #endif
 
 #if defined(VIRTUAL_RENDER)
 
-#define ASIO_STANDALONE
-#define _WEBSOCKETPP_CPP11_TYPE_TRAITS_
-#include <websocketpp/config/asio_no_tls.hpp>
-#include <websocketpp/server.hpp>
+    #define ASIO_STANDALONE
+    #define _WEBSOCKETPP_CPP11_TYPE_TRAITS_
+    #include <websocketpp/config/asio_no_tls.hpp>
+    #include <websocketpp/server.hpp>
 
 #elif defined(RASPI_RENDER)
 
-#include <fcntl.h>
-#include <unistd.h>
+    #include <fcntl.h>
+    #include <unistd.h>
 
-#include <sys/shm.h>
-#include <sys/mman.h>
-#include <sys/ioctl.h>
+    #include <sys/shm.h>
+    #include <sys/mman.h>
+    #include <sys/ioctl.h>
 
 #elif defined(REMOTE_RENDER)
+#define REMOTE_IP "192.168.1.8"
+#define REMOTE_PORT 50256
 
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
-#include <winsock2.h>
+#ifdef _WIN32
+    #define _WINSOCK_DEPRECATED_NO_WARNINGS
+    #include <winsock2.h>
 
-#pragma comment(lib, "ws2_32.lib") //Winsock Library
+    #pragma comment(lib, "ws2_32.lib") //Winsock Library
+#else
+    #include <netdb.h>
+    #include <netinet/in.h>
+
+#endif
+
 
 // #else
 
@@ -211,7 +220,11 @@ private:
 #if defined(VIRTUAL_RENDER)
     websocketpp::server<websocketpp::config::asio> ws_server;
 #elif defined(REMOTE_RENDER)
+    #ifdef _WIN32
     SOCKET raspi_soc;
+    #else
+    int sockfd;
+    #endif
     struct sockaddr_in server;
 #endif
 

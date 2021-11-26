@@ -36,9 +36,13 @@ int CubeDrawer::get_virt_amount()
 {
     return virt_hdls.size();
 }
+void CubeDrawer::set_wait_cube(bool v)
+{
+    wait_cube = v;
+}
 #endif
 
-CubeDrawer::CubeDrawer(float brightness, int fps) : prev_show_time(GET_MICROS()), delta_time(0), cleaned(false)
+CubeDrawer::CubeDrawer(float brightness, int fps) : prev_show_time(GET_MICROS()), delta_time(0.0f), cleaned(false)
 {
     init_suc = false;
 
@@ -83,8 +87,9 @@ CubeDrawer::CubeDrawer(float brightness, int fps) : prev_show_time(GET_MICROS())
     shm_buf->flags.lock = 0;
     shm_buf->flags.frame_shown = 1;
 #elif defined(REMOTE_RENDER)
+    #ifdef _WIN32
+
     WSADATA wsa;
-    server;
 
     if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
     {
@@ -98,15 +103,35 @@ CubeDrawer::CubeDrawer(float brightness, int fps) : prev_show_time(GET_MICROS())
         THROW_EXP("ERROR Socket initialization...", )
     }
 
-    server.sin_addr.s_addr = inet_addr("192.168.1.8");
+    server.sin_addr.s_addr = inet_addr(REMOTE_IP);
     server.sin_family = AF_INET;
-    server.sin_port = htons(50256);
+    server.sin_port = htons(REMOTE_PORT);
 
     if (connect(raspi_soc, (struct sockaddr *)&server, sizeof(server)) < 0)
     {
         std::cout << "ERROR Was Not able to connet to raspi server..." << std::endl;
         THROW_EXP("ERROR Was Not able to connet to raspi server...", )
     }
+    #else
+    
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) 
+      std::cout << "Was not able to create socket" << std::endl;
+
+    struct hostent *server_host = gethostbyname(REMOTE_IP);
+
+    if (server_host == nullptr) 
+      std::cout << "Was not able to get host by name" << std::endl;
+
+    memset(&server, 0, sizeof(server));
+    server.sin_family = AF_INET;
+    memcpy(&server.sin_addr.s_addr, server_host->h_addr, server_host->h_length);
+    server.sin_port = htons(REMOTE_PORT);
+
+    if (connect(sockfd, (struct sockaddr*)&server, sizeof(server)) < 0) 
+        std::cout << "Was not able to connect to host" << std::endl;
+
+    #endif
 #endif
 
     set_fps_cap(fps);
@@ -363,9 +388,11 @@ void CubeDrawer::show()
     shm_buf->flags.frame_shown = 0;
     shm_buf->flags.lock = 0;
 #elif defined(REMOTE_RENDER)
-
+    #ifdef _WIN32
     send(raspi_soc, (const char *)back_buf, 12288, 0);
-
+    #else
+    write(sockfd, (void *) back_buf, 12288);
+    #endif
 #endif
 #endif
 }
@@ -460,11 +487,6 @@ void CubeDrawer::set_color(PyObject *input)
 void CubeDrawer::set_immediate(bool v)
 {
     draw_immediate = v;
-}
-
-void CubeDrawer::set_wait_cube(bool v)
-{
-    wait_cube = v;
 }
 
 ////////// OpenGL
@@ -1084,11 +1106,15 @@ void CubeDrawer::_clean_obj()
     if (!cleaned)
     {
 #if defined(VIRTUAL_RENDER)
-        ws_server.stop_perpetual();
-        ws_server.stop();
+    ws_server.stop_perpetual();
+    ws_server.stop();
 #elif defined(REMOTE_RENDER)
-        closesocket(raspi_soc);
-        WSACleanup();
+    #ifdef _WIN32
+    closesocket(raspi_soc);
+    WSACleanup();
+    #else
+
+    #endif
 #endif
         cleaned = true;
     }
@@ -1099,11 +1125,15 @@ CubeDrawer::~CubeDrawer()
     if (!cleaned)
     {
 #if defined(VIRTUAL_RENDER)
-        ws_server.stop_perpetual();
-        ws_server.stop();
+    ws_server.stop_perpetual();
+    ws_server.stop();
 #elif defined(REMOTE_RENDER)
-        closesocket(raspi_soc);
-        WSACleanup();
+    #ifdef _WIN32
+    closesocket(raspi_soc);
+    WSACleanup();
+    #else
+        
+    #endif
 #endif
         cleaned = true;
     }

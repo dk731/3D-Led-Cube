@@ -34,4 +34,4 @@ while True:
                 drawer.filled_sphere((x, y, z), VOXEL_SIZE)
 
     drawer.show()
-    anim_time += drawer.delta_time / 6
+    anim_time += drawer.delta_time / 2
