@@ -39,7 +39,7 @@ class FallingWall:
             self.start_time = time.time()
         t = time.time() - self.start_time
         if t > self.anim_time:
-            self.scatter = ScatterSquare(25, 25, self.PLANE_WIDTH, self.color, self.drawer)
+            self.scatter = ScatterSquare(15, 15, self.PLANE_WIDTH, self.color, self.drawer)
             t = self.anim_time
 
         
@@ -107,9 +107,9 @@ class ScatterPiece:
 
 class ScatterSquare:
     ROT_SPEED = 1
-    OFF_SPEED = 4
+    OFF_SPEED = 6
     MIN_ROT_SPEED = 0.2
-    MIN_OFF_SPEED = 8
+    MIN_OFF_SPEED = 10
 
     def __init__(self, x_res, z_res, square_width, color, drawer):
         self.triangles = []

@@ -16,9 +16,9 @@ def plane_updater():
     global plane
     counter = 0
     while True:
-        time.sleep(4.5)
+        time.sleep(2.8)
         counter += 1
-        plane = FallingWall(counter, 1.5, colorsys.hsv_to_rgb(random(), 1, 1), drawer)
+        plane = FallingWall(counter % 4, 1, colorsys.hsv_to_rgb(random(), 1, 1), drawer)
 
 
 threading.Thread(target=plane_updater, daemon=True).start()
