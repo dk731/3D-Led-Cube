@@ -1,4 +1,5 @@
 # scipy, simpleaudio, numpy
+# Working only on Windows!
 from ledcd import CubeDrawer as cd
 
 from scipy.fft import rfft, rfftfreq

@@ -87,7 +87,7 @@ CubeDrawer::CubeDrawer(float brightness, int fps) : prev_show_time(GET_MICROS())
     shm_buf->flags.lock = 0;
     shm_buf->flags.frame_shown = 1;
 #elif defined(REMOTE_RENDER)
-    #ifdef _WIN32
+#ifdef _WIN32
 
     WSADATA wsa;
 
@@ -112,29 +112,29 @@ CubeDrawer::CubeDrawer(float brightness, int fps) : prev_show_time(GET_MICROS())
         std::cout << "ERROR Was Not able to connet to raspi server..." << std::endl;
         THROW_EXP("ERROR Was Not able to connet to raspi server...", )
     }
-    #else
-    
+#else
+
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0) 
-      std::cout << "Was not able to create socket" << std::endl;
+    if (sockfd < 0)
+        std::cout << "Was not able to create socket" << std::endl;
 
     struct hostent *server_host = gethostbyname(REMOTE_IP);
 
-    if (server_host == nullptr) 
-      std::cout << "Was not able to get host by name" << std::endl;
+    if (server_host == nullptr)
+        std::cout << "Was not able to get host by name" << std::endl;
 
     memset(&server, 0, sizeof(server));
     server.sin_family = AF_INET;
     memcpy(&server.sin_addr.s_addr, server_host->h_addr, server_host->h_length);
     server.sin_port = htons(REMOTE_PORT);
 
-    if (connect(sockfd, (struct sockaddr*)&server, sizeof(server)) < 0) 
+    if (connect(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0)
         std::cout << "Was not able to connect to host" << std::endl;
 
-    #endif
+#endif
 #endif
 
-    set_fps_cap(fps);
+    set_fps(fps);
 
     memset(back_buf, 0, 12288);
     cur_brush.brigthness = 1.0f;
@@ -388,16 +388,16 @@ void CubeDrawer::show()
     shm_buf->flags.frame_shown = 0;
     shm_buf->flags.lock = 0;
 #elif defined(REMOTE_RENDER)
-    #ifdef _WIN32
+#ifdef _WIN32
     send(raspi_soc, (const char *)back_buf, 12288, 0);
-    #else
-    write(sockfd, (void *) back_buf, 12288);
-    #endif
+#else
+    write(sockfd, (void *)back_buf, 12288);
+#endif
 #endif
 #endif
 }
 
-void CubeDrawer::set_fps_cap(float fps)
+void CubeDrawer::set_fps(float fps)
 {
     if (fps < EPSILON)
         min_frame_delay = 0;
@@ -1106,15 +1106,15 @@ void CubeDrawer::_clean_obj()
     if (!cleaned)
     {
 #if defined(VIRTUAL_RENDER)
-    ws_server.stop_perpetual();
-    ws_server.stop();
+        ws_server.stop_perpetual();
+        ws_server.stop();
 #elif defined(REMOTE_RENDER)
-    #ifdef _WIN32
-    closesocket(raspi_soc);
-    WSACleanup();
-    #else
+#ifdef _WIN32
+        closesocket(raspi_soc);
+        WSACleanup();
+#else
 
-    #endif
+#endif
 #endif
         cleaned = true;
     }
@@ -1125,15 +1125,15 @@ CubeDrawer::~CubeDrawer()
     if (!cleaned)
     {
 #if defined(VIRTUAL_RENDER)
-    ws_server.stop_perpetual();
-    ws_server.stop();
+        ws_server.stop_perpetual();
+        ws_server.stop();
 #elif defined(REMOTE_RENDER)
-    #ifdef _WIN32
-    closesocket(raspi_soc);
-    WSACleanup();
-    #else
-        
-    #endif
+#ifdef _WIN32
+        closesocket(raspi_soc);
+        WSACleanup();
+#else
+
+#endif
 #endif
         cleaned = true;
     }
