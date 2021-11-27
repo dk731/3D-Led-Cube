@@ -42,15 +42,9 @@ class FallingWall:
             self.scatter = ScatterSquare(25, 25, self.PLANE_WIDTH, self.color, self.drawer)
             t = self.anim_time
 
-        match self.side:
-            case 0:
-                self.fall_rot = ((self.fall_a * t ** 2) / 2, 0, 0)
-            case 1:
-                self.fall_rot = (0, (self.fall_a * t ** 2) / 2, 0)
-            case 2:
-                self.fall_rot = (-(self.fall_a * t ** 2) / 2, 0, 0)
-            case _:
-                self.fall_rot = (0, (self.fall_a * t ** 2) / 2, 0)
+        
+        self.fall_rot = ((self.fall_a * t ** 2) / 2, 0, 0)
+
 
     def draw(self):
         if self.scatter:
@@ -65,6 +59,7 @@ class FallingWall:
         self.drawer.translate(self.pos)
         self.drawer.rotate(self.start_rot)
 
+        self.drawer.push_matrix()
         self.drawer.rotate(self.fall_rot)
         
         self.drawer.set_color(self.color)
@@ -72,6 +67,7 @@ class FallingWall:
         self.drawer.poly((0, 0, 0), (0, -15, 0), (0, 0, 15), self.PLANE_WIDTH)
         self.drawer.poly((0, 0, 15), (0, -15, 0), (0, -15, 15), self.PLANE_WIDTH)
 
+        self.drawer.pop_matrix()
         self.drawer.pop_matrix()
 
 
