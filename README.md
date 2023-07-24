@@ -1,10 +1,10 @@
 <div id="top"></div>
 
 <div align="center">
-    <img src="https://trycubic.com/img/black_circle_logo.svg" alt="Logo" width="15%" height="15%">
+    <img src="https://cube.qwe.me/img/black_circle_logo.svg" alt="Logo" width="15%" height="15%">
     <h1 align="center">3D Led Display</h1>
     <p align="center">
-        <a href="https://doc.trycubic.com/"><strong>Explore the docs »</strong></a>
+        <a href="https://docs.cube.qwe.me/"><strong>Explore the docs »</strong></a>
         <br/>
     </p>
 </div>
@@ -27,7 +27,7 @@ To produce complex output while executing drawing calls in no time, the library'
 
 ## Want To Try It Yourself?
 
-As mentioned before, the display can be driven by a straightforward Python script so everyone interested can try to write his animation and even run it on an actual device (to run your code on real cube follow for upcoming events here). More information about writing your animation in this [doc](https://doc.trycubic.com/)
+As mentioned before, the display can be driven by a straightforward Python script so everyone interested can try to write his animation and even run it on an actual device (to run your code on real cube follow for upcoming events here). More information about writing your animation in this [doc](https://docs.cube.qwe.me/)
 
 <br/>
 
@@ -82,9 +82,9 @@ As the potential max refresh rate could be >100 per second, another solution had
 
 For the project were also created additional web pages with docs, emulator, and submission platform:
 
-- [Cube Doc](https://github.com/dk731/cube-doc) - documention page (_[doc.trycubic.com](https://doc.trycubic.com/)_)
-- [Cube Emulator](https://github.com/dk731/cube-emulator) - emulator page (_[cube.trycubic.com](https://cube.trycubic.com/)_)
-- [Code Submition](https://github.com/dk731/cube-submit) - submition platform (_[trycubic.com](https://trycubic.com/)_)
+- [Cube Doc](https://github.com/dk731/cube-doc) - documention page (_[docs.cube.qwe.me](https://docs.cube.qwe.me/)_)
+- [Cube Emulator](https://github.com/dk731/cube-emulator) - emulator page (_[sim.cube.qwe.me](https://sim.cube.qwe.me/)_)
+- [Code Submition](https://github.com/dk731/cube-submit) - submition platform (_[cube.qwe.me](https://cube.qwe.me/)_)
 
 ## Contact
 
